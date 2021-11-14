@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TorDeanon</title>
+    <style>
+        .trigger_plate {
+            width: 100vw;
+            height: 100vh;
+            border: 2px solid red;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="trigger_plate"
+     onmousemove="showAndStorePosition(event)"
+     onmouseleave="sendData()"
+     onkeydown="noteKey(event)">
+
+    <p id="coordinates"></p>
+    <p id="key_pressed"></p>
+
+    <button type="button"> Random button (does nothing)</button>
+</div>
+
+
+<script>
+    // Keys pressed
+    document.onkeydown = noteKey;
+
+    function noteKey(e) {
+        document.getElementById("key_pressed").innerText = ` ${e.code}`;
+    }
+
+    // Mouse movement
+    function getStoredPositions() {
+        return sessionStorage.getItem("mouse_trajectory")
+    }
+
+    function storePosition(time, x_pos, y_pos) {
+        let data = getStoredPositions() + `${time},${x_pos},${y_pos}:`;
+        sessionStorage.setItem("mouse_trajectory", data);
+    }
+
+    function showPosition(t, x, y) {
+        document.getElementById("coordinates")
+            .innerText = `x,y = ${x},${y}\nt = ${t}`;
+    }
+
+    function showAndStorePosition(e) {
+        let x = e.clientX;
+        let y = e.clientY;
+        let t = Date.now();
+        showPosition(t, x, y);
+        storePosition(t, x, y);
+    }
+
+    async function sendData() {
+        const t_xy_data = JSON.stringify({"mouse_trajectory": getStoredPositions()});
+        const options = {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: t_xy_data
+        };
+        await fetch("/store-txy", options);
+    }
+</script>
+</body>
+</html>
