@@ -3,21 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>TorDeanon</title>
-    <style>
-        .trigger_plate {
-            width: 100vw;
-            height: 100vh;
-            border: 2px solid red;
-        }
+    <link href="../static/styles.css" rel="stylesheet">
 
-    </style>
 </head>
 <body>
 
 <div class="trigger_plate"
      onmousemove="showAndStorePosition(event)"
-     onmouseleave="sendData()"
-     onkeydown="noteKey(event)">
+     onmouseleave="sendData()">
 
     <p id="coordinates"></p>
     <p id="key_pressed"></p>
