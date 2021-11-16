@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, Response
+
 
 app = Flask(__name__)
 
@@ -12,10 +13,8 @@ def index():
 def store_mouse_position():
     ip = request.remote_addr
     txy_data = request.json["mouse_trajectory"]
-    return ''
 
-
-
+    return Response(status=204)
 
 
 if __name__ == "__main__":
