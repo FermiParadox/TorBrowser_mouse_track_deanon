@@ -1,28 +1,33 @@
 from ipaddress import IPv4Address, IPv6Address, ip_address
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Union, List
 
+from data_converter import TXYConverter
 
 # WARNING
 # Dataclasses are problematic (refactoring names fails),
 # TODO: consider using pydantic, or use normal init
 
+
+IPv6_or_IPv4_obj = Union[IPv4Address, IPv6Address]
+
+
 @dataclass
 class TimeXY(list):
-    time: List[int]
-    x: List[int]
-    y: List[int]
+    time: List[int] = field(default_factory=list)
+    x: List[int] = field(default_factory=list)
+    y: List[int] = field(default_factory=list)
 
 
 @dataclass
 class TimeKeys(list):
-    time: List[int]
-    keys_pressed: List[int]
+    time: List[int] = field(default_factory=list)
+    keys_pressed: List[int] = field(default_factory=list)
 
 
 @dataclass
 class User:
-    ip: Union[IPv4Address, IPv6Address]
+    ip: IPv6_or_IPv4_obj
     mouse_txy: TimeXY
     time_keys: TimeKeys
 
@@ -50,9 +55,33 @@ class AllUsers(set):
 all_users = AllUsers()
 
 
-def update_user(user: User):
-    # Simply replace a user with its updated self
-    all_users.add(user)
+@dataclass
+class UserCreator:
+    ip_str: str
+    mouse_txy_str: str
+
+    user: User = field(default_factory=list, init=False)
+    ip: IPv6_or_IPv4_obj = field(init=False)
+
+    def __post_init__(self):
+        self.create_ip()
+        self.create_user()
+        self.add_user()
+
+    def create_ip(self):
+        self.ip = ip_address(self.ip_str)
+
+    def create_user(self):
+        t, x, y = TXYConverter(data_string=self.mouse_txy_str).txy_lists()
+        mouse_txy = TimeXY(time=t, x=x, y=y)
+
+        self.user = User(ip=self.ip,
+                         mouse_txy=mouse_txy,
+                         time_keys=TimeKeys())
+
+    def add_user(self):
+        # Simply replace a user with its updated self
+        all_users.add(self.user)
 
 
 if __name__ == "__main__":
@@ -76,7 +105,7 @@ if __name__ == "__main__":
     for _ in range(10 ** 0):
         all_users.add(User(ip=ip_address("0.0.0.1"),
                            mouse_txy=mouse_txy,
-                           t_keys=TimeKeys([4], [4])))
+                           time_keys=TimeKeys([4], [4])))
 
     print(all_users)
     for i in all_users:
