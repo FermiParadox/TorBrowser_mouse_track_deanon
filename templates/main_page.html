@@ -33,7 +33,11 @@
     }
 
     function storePosition(time, x_pos, y_pos) {
-        let data = getStoredPositions() + `${time},${x_pos},${y_pos}:`;
+        let prev_data = getStoredPositions();
+        if (prev_data == null) {
+            prev_data = '';
+        }
+        let data = prev_data + `${time},${x_pos},${y_pos}:`;
         sessionStorage.setItem("mouse_trajectory", data);
     }
 

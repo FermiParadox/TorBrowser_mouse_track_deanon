@@ -1,7 +1,11 @@
-from ipaddress import ip_address, IPv4Address, IPv6Address
+from ipaddress import IPv4Address, IPv6Address, ip_address
 from dataclasses import dataclass
 from typing import Union, List
 
+
+# WARNING
+# Dataclasses are problematic (refactoring names fails),
+# TODO: consider using pydantic, or use normal init
 
 @dataclass
 class TimeXY(list):
@@ -19,7 +23,60 @@ class TimeKeys(list):
 @dataclass
 class User:
     ip: Union[IPv4Address, IPv6Address]
-    txy: TimeXY
+    mouse_txy: TimeXY
     t_keys: TimeKeys
 
+    def __eq__(self, other):
+        return self.ip == other.ip
 
+    def __hash__(self):
+        return hash(self.ip)
+
+
+class AllUsers(set):
+    @property
+    def ips(self):
+        return [str(u.ip) for u in self]
+
+    def __repr__(self):
+        ips_as_str = ', '.join(self.ips)
+        return f"{self.__class__.__name__}({ips_as_str})"
+
+    def add(self, other):
+        self.discard(other)
+        super().add(other)
+
+
+all_users = AllUsers()
+
+
+def add_user(user: User):
+    all_users.add(user)
+
+
+if __name__ == "__main__":
+    ip1 = ip_address("0.0.0.0")
+    mouse_txy = TimeXY([], [], [])
+    t_keys = TimeKeys([], [])
+    u1 = User(ip=ip1,
+              mouse_txy=mouse_txy,
+              t_keys=t_keys)
+
+    u2 = User(ip=ip_address("0.0.0.1"),
+              mouse_txy=mouse_txy,
+              t_keys=t_keys)
+
+    print(u1 == u1)
+    print(u1 == u2)
+
+    all_users.add(u1)
+    all_users.add(u1)
+    all_users.add(u2)
+    for _ in range(10 ** 0):
+        all_users.add(User(ip=ip_address("0.0.0.1"),
+                           mouse_txy=mouse_txy,
+                           t_keys=TimeKeys([4], [4])))
+
+    print(all_users)
+    for i in all_users:
+        print(i)

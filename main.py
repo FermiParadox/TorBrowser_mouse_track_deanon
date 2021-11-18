@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, Response
-
+from data_converter import TXYConverter
+from matplotlib.pyplot import plot, show
 
 app = Flask(__name__)
 
@@ -12,7 +13,10 @@ def index():
 @app.route("/store-txy", methods=["POST"])
 def store_mouse_position():
     ip = request.remote_addr
-    txy_data = request.json["mouse_trajectory"]
+    mouse_txy_str = request.json["mouse_trajectory"]
+    t, x, y = TXYConverter(data_string=mouse_txy_str).txy_lists()
+    plot(x, y)
+    show()
 
     return Response(status=204)
 
