@@ -24,7 +24,7 @@ class TimeKeys(list):
 class User:
     ip: Union[IPv4Address, IPv6Address]
     mouse_txy: TimeXY
-    t_keys: TimeKeys
+    time_keys: TimeKeys
 
     def __eq__(self, other):
         return self.ip == other.ip
@@ -50,21 +50,22 @@ class AllUsers(set):
 all_users = AllUsers()
 
 
-def add_user(user: User):
+def update_user(user: User):
+    # Simply replace a user with its updated self
     all_users.add(user)
 
 
 if __name__ == "__main__":
     ip1 = ip_address("0.0.0.0")
     mouse_txy = TimeXY([], [], [])
-    t_keys = TimeKeys([], [])
+    time_keys = TimeKeys([], [])
     u1 = User(ip=ip1,
               mouse_txy=mouse_txy,
-              t_keys=t_keys)
+              time_keys=time_keys)
 
     u2 = User(ip=ip_address("0.0.0.1"),
               mouse_txy=mouse_txy,
-              t_keys=t_keys)
+              time_keys=time_keys)
 
     print(u1 == u1)
     print(u1 == u2)
