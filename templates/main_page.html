@@ -36,7 +36,7 @@
         if (prev_data == null) {
             prev_data = '';
         }
-        let data = prev_data + `${time},${x_pos},${y_pos}${pointSeparator}`;
+        let data = prev_data + `${time},${x_pos},${y_pos}:`;
         sessionStorage.setItem("mouse_trajectory", data);
     }
 
