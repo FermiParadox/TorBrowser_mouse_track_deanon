@@ -1,6 +1,3 @@
-# WARNING
-Remove foreign code after test.
-
 # Goals
 Check de-anonymization risk of Tor Browser users, through:
 - switching browsers with hotkeys
