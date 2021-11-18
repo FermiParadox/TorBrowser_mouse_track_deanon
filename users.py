@@ -48,6 +48,11 @@ class AllUsers(set):
         return f"{self.__class__.__name__}({ips_as_str})"
 
     def add(self, other):
+        """When added element is already present, it replaces the existing one.
+        Not very efficient, but should be ok.
+
+        By default `add` has no effect if the element is already present,
+        meaning new data points wouldn't be stored."""
         self.discard(other)
         super().add(other)
 
