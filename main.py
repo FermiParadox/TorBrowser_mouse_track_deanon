@@ -1,9 +1,8 @@
 from ipaddress import ip_address
 
 from flask import Flask, render_template, request, Response
-from data_converter import TXYConverter
 
-from users import UserCreator, User, TimeXY, TimeKeys
+from users import UserCreator
 from utils import plot_and_show
 
 app = Flask(__name__)
