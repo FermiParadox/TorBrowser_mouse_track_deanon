@@ -1,3 +1,4 @@
+import secrets
 from ipaddress import IPv4Address, IPv6Address, ip_address
 from dataclasses import dataclass, field
 from typing import Union, List
@@ -25,27 +26,39 @@ class TimeKeys(list):
     keys_pressed: List[int] = field(default_factory=list)
 
 
+class IDGenerator:
+    MAX_ID_NUM = 10 ** 50
+    IDs_Used = {}
+
+    @staticmethod
+    def unique_id():
+        while 1:
+            generated_id = secrets.randbelow(IDGenerator.MAX_ID_NUM)
+            if generated_id not in IDGenerator.IDs_Used:
+                return generated_id
+
+
 @dataclass
 class User:
+    id: str = field(init=False)
     ip: IPv6_or_IPv4_obj
     mouse_txy: TimeXY
     time_keys: TimeKeys
 
+    def __post_init__(self):
+        self.id = IDGenerator.unique_id()
+
     def __eq__(self, other):
-        return self.ip == other.ip
+        return self.id == other.id
 
     def __hash__(self):
-        return hash(self.ip)
+        return hash(self.id)
 
 
 class AllUsers(set):
     @property
     def ips(self):
         return [str(u.ip) for u in self]
-
-    def __repr__(self):
-        ips_as_str = ', '.join(self.ips)
-        return f"{self.__class__.__name__}({ips_as_str})"
 
     def add(self, other):
         """When added element is already present, it replaces the existing one.
@@ -60,8 +73,9 @@ class AllUsers(set):
 all_users = AllUsers()
 
 
+# TODO un-dataclass it
 @dataclass
-class UserCreator:
+class UserHandler:
     ip_str: str
     mouse_txy_str: str
 
