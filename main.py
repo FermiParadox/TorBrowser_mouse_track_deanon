@@ -9,8 +9,8 @@ app = Flask(__name__)
 
 @app.route("/", methods=["GET"])
 def index():
-    user_id = IDGenerator.unique_id()
-    resp = make_response(render_template("main_page.html", userID=user_id))
+    new_user_id = IDGenerator.unique_id()
+    resp = make_response(render_template("main_page.html", userID=new_user_id))
     return resp
 
 
@@ -22,8 +22,7 @@ def store_mouse_position():
     mouse_txy_str = req_json["mouse_trajectory"]
     user_id = req_json["userID"]
 
-    # TODO change existing-user replacement to user update
-    user = UserHandler(ip_str=ip, mouse_txy_str=mouse_txy_str).user
+    user = UserHandler(user_id=user_id, ip_str=ip, mouse_txy_str=mouse_txy_str).user
     plot_and_show(x=user.mouse_txy.x, y=user.mouse_txy.y)
     return Response(status=204)
 

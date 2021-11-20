@@ -40,13 +40,10 @@ class IDGenerator:
 
 @dataclass
 class User:
-    id: str = field(init=False)
-    ip: IPv6_or_IPv4_obj
+    id: int
+    ip: IPv6_or_IPv4_obj    # TODO turn into dict with ip:time
     mouse_txy: TimeXY
     time_keys: TimeKeys
-
-    def __post_init__(self):
-        self.id = IDGenerator.unique_id()
 
     def __eq__(self, other):
         return self.id == other.id
@@ -60,72 +57,46 @@ class AllUsers(set):
     def ips(self):
         return [str(u.ip) for u in self]
 
-    def add(self, other):
-        """When added element is already present, it replaces the existing one.
-        Not very efficient, but should be ok.
-
-        By default `add` has no effect if the element is already present,
-        meaning new data points wouldn't be stored."""
-        self.discard(other)
-        super().add(other)
+    @property
+    def ids(self):
+        return [str(u.id) for u in self]
 
 
 all_users = AllUsers()
 
 
-# TODO un-dataclass it
-@dataclass
 class UserHandler:
-    ip_str: str
-    mouse_txy_str: str
+    def __init__(self, user_id: int, ip_str: str, mouse_txy_str: str):
+        self.user_id = user_id
+        self.mouse_txy_str = mouse_txy_str
+        self.ip_str = ip_str
+        self.user = None
+        self.ip = None
+        self.create_or_update_user()
 
-    user: User = field(default_factory=list, init=False)
-    ip: IPv6_or_IPv4_obj = field(init=False)
-
-    def __post_init__(self):
-        self.create_ip()
-        self.create_user()
-        self.add_user()
-
-    def create_ip(self):
+    def _create_ip_obj(self):
         self.ip = ip_address(self.ip_str)
 
-    def create_user(self):
+    def _create_user(self):
         t, x, y = TXYConverter(data_string=self.mouse_txy_str).txy_lists()
         mouse_txy = TimeXY(time=t, x=x, y=y)
 
-        self.user = User(ip=self.ip,
+        self.user = User(id=self.user_id,
+                         ip=self.ip,
                          mouse_txy=mouse_txy,
                          time_keys=TimeKeys())
 
-    def add_user(self):
+    def _readd_user(self):
+        """When added element is already present, it replaces the existing one.
+        Not very efficient, but should be ok.
+
+        By default `add` has no effect if the element is already present,
+        meaning new data points wouldn't be stored."""
         # Simply replace a user with its updated self
+        all_users.discard(self.user)
         all_users.add(self.user)
 
-
-if __name__ == "__main__":
-    ip1 = ip_address("0.0.0.0")
-    mouse_txy = TimeXY([], [], [])
-    time_keys = TimeKeys([], [])
-    u1 = User(ip=ip1,
-              mouse_txy=mouse_txy,
-              time_keys=time_keys)
-
-    u2 = User(ip=ip_address("0.0.0.1"),
-              mouse_txy=mouse_txy,
-              time_keys=time_keys)
-
-    print(u1 == u1)
-    print(u1 == u2)
-
-    all_users.add(u1)
-    all_users.add(u1)
-    all_users.add(u2)
-    for _ in range(10 ** 0):
-        all_users.add(User(ip=ip_address("0.0.0.1"),
-                           mouse_txy=mouse_txy,
-                           time_keys=TimeKeys([4], [4])))
-
-    print(all_users)
-    for i in all_users:
-        print(i)
+    def create_or_update_user(self):
+        self._create_ip_obj()
+        self._create_user()
+        self._readd_user()
