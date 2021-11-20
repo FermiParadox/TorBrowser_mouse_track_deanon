@@ -28,7 +28,7 @@ class TimeKeys(list):
 
 class IDGenerator:
     MAX_ID_NUM = 10 ** 50
-    IDs_Used = {}
+    IDs_Used = set()
 
     @staticmethod
     def unique_id():
@@ -55,11 +55,20 @@ class User:
 class AllUsers(set):
     @property
     def ips(self):
-        return [str(u.ip) for u in self]
+        return {str(u.ip) for u in self}
 
     @property
     def ids(self):
-        return [str(u.id) for u in self]
+        return {str(u.id) for u in self}
+
+    def add(self, other):
+        """When added element is already present, it replaces the existing one.
+        Not very efficient, but should be ok for testing.
+
+        By default `add` has no effect if the element is already present,
+        meaning new data points wouldn't be stored."""
+        self.discard(other)
+        super().add(other)
 
 
 all_users = AllUsers()
@@ -86,17 +95,6 @@ class UserHandler:
                          mouse_txy=mouse_txy,
                          time_keys=TimeKeys())
 
-    def _readd_user(self):
-        """When added element is already present, it replaces the existing one.
-        Not very efficient, but should be ok.
-
-        By default `add` has no effect if the element is already present,
-        meaning new data points wouldn't be stored."""
-        # Simply replace a user with its updated self
-        all_users.discard(self.user)
-        all_users.add(self.user)
-
     def create_or_update_user(self):
         self._create_ip_obj()
         self._create_user()
-        self._readd_user()
