@@ -1,4 +1,5 @@
 import string
+from ipaddress import ip_address
 
 POINT_SPLITTER = ":"
 COORDINATE_SPLITTER = ","
@@ -6,7 +7,7 @@ COORDINATE_SPLITTER = ","
 ALLOWED_CHARS = POINT_SPLITTER + COORDINATE_SPLITTER + string.digits
 
 
-class TXYConverter:
+class TXYStrToArray:
     def __init__(self, data_string):
         self.data_string = data_string
         self.sanitize_data()
@@ -41,3 +42,21 @@ class TXYConverter:
             y_list.append(-int(y))
 
         return t_list, x_list, y_list
+
+
+class ActionDataExtractor:
+    def __init__(self, req):
+        self.req = req
+        self.json = req.json
+
+    @property
+    def mouse_txy_str(self):
+        return self.json["mouse_trajectory"]
+
+    @property
+    def user_id_str(self):
+        return self.json["userID"]
+
+    @property
+    def user_ip_str(self):
+        return ip_address(self.req.remote_addr)

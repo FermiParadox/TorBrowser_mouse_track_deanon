@@ -3,12 +3,13 @@ from ipaddress import IPv4Address, IPv6Address, ip_address
 from dataclasses import dataclass, field
 from typing import Union, List
 
-from data_converter import TXYConverter
+
+from data_converter import TXYStrToArray, ActionDataExtractor
+from utils import plot_x_y
 
 # WARNING
 # Dataclasses are problematic (refactoring names fails),
 # TODO: consider using pydantic, or use normal init
-
 
 IPv6_or_IPv4_obj = Union[IPv4Address, IPv6Address]
 
@@ -41,7 +42,7 @@ class IDGenerator:
 @dataclass
 class User:
     id: int
-    ip: IPv6_or_IPv4_obj    # TODO turn into dict with ip:time
+    ip: IPv6_or_IPv4_obj  # TODO turn into dict with ip:time
     mouse_txy: TimeXY
     time_keys: TimeKeys
 
@@ -75,19 +76,26 @@ all_users = AllUsers()
 
 
 class UserHandler:
-    def __init__(self, user_id: int, ip_str: str, mouse_txy_str: str):
-        self.user_id = user_id
-        self.mouse_txy_str = mouse_txy_str
-        self.ip_str = ip_str
+    def __init__(self, req):
+        self.req = req
+        self.user_id = None
+        self.mouse_txy_str = None
         self.user = None
         self.ip = None
-        self.create_or_update_user()
 
-    def _create_ip_obj(self):
-        self.ip = ip_address(self.ip_str)
+    def _create_action_arrays(self):
+        extractor = ActionDataExtractor(req=self.req)
+        self.ip = ip_address(extractor.user_ip_str)
+        self.mouse_txy_str = extractor.mouse_txy_str
+        self.user_id = int(extractor.user_id_str)
+
+    @property
+    def _txy_lists(self):
+        t, x, y = TXYStrToArray(data_string=self.mouse_txy_str).txy_lists()
+        return t, x, y
 
     def _create_user(self):
-        t, x, y = TXYConverter(data_string=self.mouse_txy_str).txy_lists()
+        t, x, y = self._txy_lists
         mouse_txy = TimeXY(time=t, x=x, y=y)
 
         self.user = User(id=self.user_id,
@@ -95,6 +103,12 @@ class UserHandler:
                          mouse_txy=mouse_txy,
                          time_keys=TimeKeys())
 
-    def create_or_update_user(self):
-        self._create_ip_obj()
+    def create_user(self):
+        self._create_action_arrays()
         self._create_user()
+
+    def create_and_insert_user(self):
+        all_users.add(self.user)
+
+    def plot_mouse_movement(self):
+        plot_x_y(x=self.user.mouse_txy.x, y=self.user.mouse_txy.y)

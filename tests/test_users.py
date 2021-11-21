@@ -1,7 +1,7 @@
 from ipaddress import ip_address
 from unittest import TestCase
 
-from users import User, TimeXY, TimeKeys, AllUsers, IDGenerator
+from users import User, TimeXY, TimeKeys, AllUsers, IDGenerator, UserHandler
 
 
 class TestUser(TestCase):
@@ -99,3 +99,6 @@ class TestAllUsers(TestCase):
 
         self.assertEqual(users_list.ips.pop(), str(stored_user.ip))
 
+
+class TestUserHandler(TestCase):
+    ...

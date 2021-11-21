@@ -1,8 +1,6 @@
-from ipaddress import ip_address
 from flask import Flask, render_template, request, Response, make_response
 
 from users import UserHandler, IDGenerator
-from utils import plot_and_show
 
 app = Flask(__name__)
 
@@ -15,15 +13,10 @@ def index():
 
 
 @app.route("/store-txy", methods=["POST"])
-def store_mouse_position():
-    ip = ip_address(request.remote_addr)
-
-    req_json = request.json
-    mouse_txy_str = req_json["mouse_trajectory"]
-    user_id = req_json["userID"]
-
-    user = UserHandler(user_id=user_id, ip_str=ip, mouse_txy_str=mouse_txy_str).user
-    plot_and_show(x=user.mouse_txy.x, y=user.mouse_txy.y)
+async def store_mouse_position():
+    user_handler = UserHandler(req=request)
+    user_handler.create_user()
+    user_handler.plot_mouse_movement()
     return Response(status=204)
 
 
