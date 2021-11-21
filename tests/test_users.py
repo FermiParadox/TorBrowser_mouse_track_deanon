@@ -57,6 +57,14 @@ class TestAllUsers(TestCase):
                                mouse_txy=self.txy_updated,
                                time_keys=TimeKeys([4, 5], [44, 55]))
 
+    def test_displayed_id_exists_when_adding_user(self):
+        stored_user = self.u1
+
+        users_list = AllUsers()
+        users_list.add(stored_user)
+
+        self.assertEqual(users_list.ids.pop(), str(stored_user.id))
+
     def test_all_ids_added_when_unique(self):
         users_list = AllUsers()
 
@@ -82,3 +90,12 @@ class TestAllUsers(TestCase):
 
         user = users_list.pop()
         self.assertEqual(user.mouse_txy, self.txy_updated)
+
+    def test_displayed_ip_exists_when_adding_user(self):
+        stored_user = self.u1
+
+        users_list = AllUsers()
+        users_list.add(stored_user)
+
+        self.assertEqual(users_list.ips.pop(), str(stored_user.ip))
+
