@@ -28,7 +28,7 @@ class TimeKeys(list):
 
 
 class IDGenerator:
-    MAX_ID_NUM = 10 ** 50
+    MAX_ID_NUM = 10 ** 9
     IDs_Used = set()
 
     @staticmethod
@@ -83,7 +83,7 @@ class UserHandler:
         self.user = None
         self.ip = None
 
-    def _create_action_arrays(self):
+    def _extract_data(self):
         extractor = ActionDataExtractor(req=self.req)
         self.ip = ip_address(extractor.user_ip_str)
         self.mouse_txy_str = extractor.mouse_txy_str
@@ -104,7 +104,7 @@ class UserHandler:
                          time_keys=TimeKeys())
 
     def create_user(self):
-        self._create_action_arrays()
+        self._extract_data()
         self._create_user()
 
     def create_and_insert_user(self):

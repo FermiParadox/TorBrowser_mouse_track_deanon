@@ -65,6 +65,14 @@ class TestAllUsers(TestCase):
 
         self.assertEqual(users_list.ids.pop(), str(stored_user.id))
 
+    def test_displayed_ip_exists_when_adding_user(self):
+        stored_user = self.u1
+
+        users_list = AllUsers()
+        users_list.add(stored_user)
+
+        self.assertEqual(users_list.ips.pop(), str(stored_user.ip))
+
     def test_all_ids_added_when_unique(self):
         users_list = AllUsers()
 
@@ -82,7 +90,7 @@ class TestAllUsers(TestCase):
 
         self.assertEqual(len(users_list), 1)
 
-    def test_most_previous_user_replaced(self):
+    def test_previous_user_data_replaced(self):
         users_list = AllUsers()
 
         users_list.add(self.u3_initial)
@@ -90,14 +98,6 @@ class TestAllUsers(TestCase):
 
         user = users_list.pop()
         self.assertEqual(user.mouse_txy, self.txy_updated)
-
-    def test_displayed_ip_exists_when_adding_user(self):
-        stored_user = self.u1
-
-        users_list = AllUsers()
-        users_list.add(stored_user)
-
-        self.assertEqual(users_list.ips.pop(), str(stored_user.ip))
 
 
 class TestUserHandler(TestCase):

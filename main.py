@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, Response, make_response
+from flask import Flask, render_template, request, Response, make_response, jsonify
 
 from users import UserHandler, IDGenerator
 
