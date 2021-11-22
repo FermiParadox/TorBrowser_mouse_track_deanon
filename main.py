@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 
 @app.route("/", methods=["GET"])
-def index():
+async def index():
     new_user_id = IDGenerator.unique_id()
     resp = make_response(render_template("main_page.html", userID=new_user_id))
     return resp
@@ -18,6 +18,11 @@ async def store_mouse_position():
     user_handler.create_user()
     user_handler.plot_mouse_movement()
     return Response(status=204)
+
+
+@app.route("/users-correlated-to-me", methods=["GET"])
+async def store_mouse_position():
+    ...
 
 
 if __name__ == "__main__":

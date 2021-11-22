@@ -7,9 +7,6 @@ from typing import Union, List
 from data_converter import TXYStrToArray, ActionDataExtractor
 from utils import plot_x_y
 
-# WARNING
-# Dataclasses are problematic (refactoring names fails),
-# TODO: consider using pydantic, or use normal init
 
 IPv6_or_IPv4_obj = Union[IPv4Address, IPv6Address]
 
