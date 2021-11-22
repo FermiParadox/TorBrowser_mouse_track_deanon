@@ -90,3 +90,14 @@ class TestSpeed2Points(TestCase):
         p2 = (1, 21)
         speed = self.Speed2Points(p1=p1, p2=p2, t1=6, t2=7).speed
         self.assertEqual(20, speed)
+
+
+class TestAcceleration3Points(TestCase):
+    def test_dt(self):
+        self.fail()
+
+    def test_du(self):
+        self.fail()
+
+    def test_acceleration(self):
+        self.fail()
