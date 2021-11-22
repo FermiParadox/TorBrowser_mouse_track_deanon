@@ -93,11 +93,55 @@ class TestSpeed2Points(TestCase):
 
 
 class TestAcceleration3Points(TestCase):
-    def test_dt(self):
-        self.fail()
+    def setUp(self) -> None:
+        from physics import Acceleration3Points
+        self.Acceleration3Points = Acceleration3Points
 
-    def test_du(self):
-        self.fail()
+    def test_dt(self):
+        dt_expected = random()
+        p1 = (1, 1)
+        p2 = (2, 6)
+        p3 = (7, 3)
+        t1 = 1
+        t2 = 4
+        t3 = t1 + dt_expected
+        dt = self.Acceleration3Points(p1=p1, p2=p2, p3=p3, t1=t1, t2=t2, t3=t3).dt
+        self.assertAlmostEqual(dt_expected, dt)
+
+    def test_dv(self):
+        from scipy.spatial import distance
+        p1 = (1, 1)
+        p2 = (2, 6)
+        p3 = (7, 3)
+        t1 = 1
+        t2 = 4
+        t3 = 25
+        v1 = distance.euclidean(p2, p1) / (t2 - t1)
+        v2 = distance.euclidean(p3, p2) / (t3 - t2)
+        dv_expected = v2 - v1
+        dv = self.Acceleration3Points(p1=p1, p2=p2, p3=p3, t1=t1, t2=t2, t3=t3).dv
+        self.assertAlmostEqual(dv_expected, dv)
+
+    def test_acceleration_0(self):
+        p1 = (1, 2)
+        p2 = (2, 3)
+        p3 = (3, 4)
+        t1 = 1
+        t2 = 2
+        t3 = 3
+        acceleration = self.Acceleration3Points(p1=p1, p2=p2, p3=p3, t1=t1, t2=t2, t3=t3).acceleration
+        self.assertAlmostEqual(0, acceleration)
 
     def test_acceleration(self):
-        self.fail()
+        from scipy.spatial import distance
+        p1 = (6, 2)
+        p2 = (47, 6)
+        p3 = (85, 25)
+        t1 = 1
+        t2 = 4
+        t3 = 8
+        v1 = distance.euclidean(p2, p1) / (t2 - t1)
+        v2 = distance.euclidean(p3, p2) / (t3 - t2)
+        acceleration_expected = (v2 - v1) / (t3 - t1)
+        acceleration = self.Acceleration3Points(p1=p1, p2=p2, p3=p3, t1=t1, t2=t2, t3=t3).acceleration
+        self.assertAlmostEqual(acceleration_expected, acceleration)

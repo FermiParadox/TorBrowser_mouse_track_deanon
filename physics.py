@@ -54,11 +54,11 @@ class Acceleration3Points:
         return self.t3 - self.t1
 
     @property
-    def du(self):
+    def dv(self):
         speed_1 = Speed2Points(p1=self.p1, p2=self.p2, t1=self.t1, t2=self.t2).speed
         speed_2 = Speed2Points(p1=self.p2, p2=self.p3, t1=self.t2, t2=self.t3).speed
         return speed_2 - speed_1
 
     @property
     def acceleration(self):
-        return self.du / self.dt
+        return self.dv / self.dt
