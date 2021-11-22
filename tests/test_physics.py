@@ -38,7 +38,7 @@ class TestSlope2Points(TestCase):
         p1 = (5, y1)
         p2 = (12, y2)
         dy = self.Slope2Points(p1=p1, p2=p2).dy
-        self.assertEqual(random_dy, dy)
+        self.assertAlmostEqual(random_dy, dy)
 
     def test_angle_0_when_points_same_y(self):
         y = random()

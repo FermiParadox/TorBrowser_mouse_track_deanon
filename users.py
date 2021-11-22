@@ -1,10 +1,10 @@
 import secrets
-from ipaddress import IPv4Address, IPv6Address, ip_address
+from ipaddress import IPv4Address, IPv6Address
 from dataclasses import dataclass, field
 from typing import Union, List
 
 
-from data_converter import TXYStrToArray, ActionDataExtractor
+from data_converter import ActionDataExtractor
 from utils import plot_x_y
 
 
@@ -76,26 +76,19 @@ class UserHandler:
     def __init__(self, req):
         self.req = req
         self.user_id = None
-        self.mouse_txy_str = None
-        self.mouse_crit_t_str = None
+        self.mouse_crit_t = None
         self.user = None
         self.ip = None
 
     def _extract_data(self):
         extractor = ActionDataExtractor(req=self.req)
-        self.ip = ip_address(extractor.user_ip_str)
-        self.mouse_txy_str = extractor.mouse_txy_str
-        self.mouse_crit_t_str = extractor.mouse_crit_t_str
-        self.user_id = int(extractor.user_id_str)
-
-    @property
-    def _txy_lists(self):
-        inst = TXYStrToArray(data_string=self.mouse_txy_str)
-        t, x, y = inst.txy_lists
-        return t, x, y
+        self.ip = extractor.user_ip
+        self.mouse_crit_t = extractor.mouse_crit_t
+        self.user_id = extractor.user_id
+        self.txy_lists = extractor.txy_lists
 
     def _create_user(self):
-        t, x, y = self._txy_lists
+        t, x, y = self.txy_lists
         mouse_txy = TimeXY(time=t, x=x, y=y)
 
         self.user = User(id=self.user_id,

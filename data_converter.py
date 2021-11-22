@@ -40,17 +40,27 @@ class ActionDataExtractor:
         self.json = req.json
 
     @property
-    def mouse_txy_str(self):
-        return self.json["mouse_txy"]
+    def user_id(self):
+        return int(self.json["userID"])
 
     @property
-    def user_id_str(self):
-        return self.json["userID"]
-
-    @property
-    def user_ip_str(self):
+    def user_ip(self):
         return ip_address(self.req.remote_addr)
 
     @property
-    def mouse_crit_t_str(self):
+    def _mouse_crit_t_str(self):
         return self.json["mouse_crit_t"]
+
+    @property
+    def mouse_crit_t(self):
+        return [int(s) for s in self._mouse_crit_t_str.split(POINT_SPLITTER) if s]
+
+    @property
+    def _mouse_txy_str(self):
+        return self.json["mouse_txy"]
+
+    @property
+    def txy_lists(self):
+        inst = TXYStrToArray(data_string=self._mouse_txy_str)
+        t, x, y = inst.txy_lists
+        return t, x, y
