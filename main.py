@@ -21,8 +21,8 @@ async def store_mouse_position():
 
 
 @app.route("/users-correlated-to-me", methods=["GET"])
-async def store_mouse_position():
-    ...
+async def correlated_users():
+    return Response(status=404)
 
 
 if __name__ == "__main__":

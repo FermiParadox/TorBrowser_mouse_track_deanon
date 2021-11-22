@@ -1,21 +1,21 @@
-import string
 from ipaddress import ip_address
 
 POINT_SPLITTER = ":"
 COORDINATE_SPLITTER = ","
 
 
-ALLOWED_CHARS = POINT_SPLITTER + COORDINATE_SPLITTER + string.digits
-
-
 class TXYStrToArray:
     def __init__(self, data_string):
         self.data_string = data_string
+        self.t = []
+        self.x = []
+        self.y = []
+        self.create_txy_lists()
 
     def points_as_str(self):
         return [s for s in self.data_string.split(POINT_SPLITTER) if s]
 
-    def txy_lists(self):
+    def create_txy_lists(self):
         t_list = []
         x_list = []
         y_list = []
@@ -25,7 +25,13 @@ class TXYStrToArray:
             x_list.append(int(x))
             y_list.append(-int(y))
 
-        return t_list, x_list, y_list
+        self.t = t_list
+        self.x = x_list
+        self.y = y_list
+
+    @property
+    def txy_lists(self):
+        return self.t, self.x, self.y
 
 
 class ActionDataExtractor:

@@ -1,26 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"
+     onmousemove="showAndStorePosition(event)"
+     onmouseleave="sendData()">
 <head>
     <meta charset="UTF-8">
     <title>TorDeanon</title>
     <link href="../static/styles.css" rel="stylesheet">
 </head>
 <body>
-<div class="trigger_plate"
-     onmousemove="showAndStorePosition(event)"
-     onmouseleave="sendData()">
-
+<div class="displayed_data">
+    <p id="user_ID"></p>
     <p id="coordinates"></p>
     <p id="key_pressed"></p>
 
-    <button type="button"> Random button (does nothing)</button>
+    <button class="display_correlated_users" type="button">
+        Show usersID correlated to me.</button>
 </div>
 
 
 <script>
     // User ID
     function getStoredUserID() {
-        console.log(sessionStorage.getItem("userID"));
         return sessionStorage.getItem("userID")
     }
 
@@ -30,10 +30,16 @@
             ID = JSON.parse("{{ userID }}");
         }
         sessionStorage.setItem("userID", ID);
-        console.log(ID);
+    }
+
+    function showUserID(e) {
+        const userID = getStoredUserID();
+        document.getElementById("key_pressed")
+            .innerText = `Your ID is: ${userID}`;
     }
 
     storeUserID();
+    showUserID();
 
     // Keys pressed
     document.onkeydown = noteKey;
@@ -58,7 +64,7 @@
 
     function showPosition(t, x, y) {
         document.getElementById("coordinates")
-            .innerText = `x,y = ${x},${y}\nt = ${t}`;
+            .innerText = `x,y = ${x}, ${y}\nt = ${t}`;
     }
 
     function showAndStorePosition(e) {

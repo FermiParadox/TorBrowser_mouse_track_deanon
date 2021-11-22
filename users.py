@@ -88,7 +88,8 @@ class UserHandler:
 
     @property
     def _txy_lists(self):
-        t, x, y = TXYStrToArray(data_string=self.mouse_txy_str).txy_lists()
+        inst = TXYStrToArray(data_string=self.mouse_txy_str)
+        t, x, y = inst.txy_lists
         return t, x, y
 
     def _create_user(self):

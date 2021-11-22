@@ -1,5 +1,12 @@
-.trigger_plate {
+.displayed_data {
     width: 100vw;
     height: 100vh;
     border: 2px solid red;
+}
+
+p {
+    text-align: center;
+}
+
+.display_correlated_users {
 }
