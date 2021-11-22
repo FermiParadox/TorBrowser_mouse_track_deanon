@@ -22,16 +22,16 @@ class TestSlope2Points(TestCase):
         dy = self.Slope2Points(p1=p1, p2=p2).dy
         self.assertEqual(0, dy)
 
-    def test_dx_(self):
+    def test_dx_any(self):
         random_dx = random() * 100
         x1 = 4
         x2 = random_dx + x1
         p1 = (x1, 5)
         p2 = (x2, 12)
         dx = self.Slope2Points(p1=p1, p2=p2).dx
-        self.assertEqual(random_dx, dx)
+        self.assertAlmostEqual(random_dx, dx)
 
-    def test_dy_76(self):
+    def test_dy_any(self):
         random_dy = random() * 100
         y1 = 4
         y2 = random_dy + y1
@@ -72,7 +72,7 @@ class TestSpeed2Points(TestCase):
         dt = self.Speed2Points(p1=p1, p2=p2, t1=t, t2=t).dt
         self.assertEqual(0, dt)
 
-    def test_distance(self):
+    def test_distance_is_sqrt2(self):
         from math import sqrt
         p1 = (1, 1)
         p2 = (2, 2)
