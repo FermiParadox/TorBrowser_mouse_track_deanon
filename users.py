@@ -77,6 +77,7 @@ class UserHandler:
         self.req = req
         self.user_id = None
         self.mouse_txy_str = None
+        self.mouse_crit_t_str = None
         self.user = None
         self.ip = None
 
@@ -84,6 +85,7 @@ class UserHandler:
         extractor = ActionDataExtractor(req=self.req)
         self.ip = ip_address(extractor.user_ip_str)
         self.mouse_txy_str = extractor.mouse_txy_str
+        self.mouse_crit_t_str = extractor.mouse_crit_t_str
         self.user_id = int(extractor.user_id_str)
 
     @property

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"
-     onmousemove="showAndStorePosition(event)"
-     onmouseleave="sendData()">
+      onmousemove="showAndStorePosition(event)"
+      onmouseleave="sendData()">
 <head>
     <meta charset="UTF-8">
     <title>TorDeanon</title>
@@ -14,7 +14,8 @@
     <p id="key_pressed"></p>
 
     <button class="display_correlated_users" type="button">
-        Show usersID correlated to me.</button>
+        Show usersID correlated to me.
+    </button>
 </div>
 
 
@@ -25,7 +26,7 @@
     }
 
     function storeUserID() {
-        let ID =  getStoredUserID()
+        let ID = getStoredUserID();
         if (ID === null) {
             ID = JSON.parse("{{ userID }}");
         }
@@ -50,21 +51,34 @@
 
     // Mouse movement
     function getStoredPositions() {
-        return sessionStorage.getItem("mouse_trajectory")
+        return sessionStorage.getItem("mouse_txy")
     }
 
     function storePosition(time, x_pos, y_pos) {
-        let prev_data = getStoredPositions();
-        if (prev_data == null) {
-            prev_data = '';
+        let data = getStoredPositions();
+        if (data == null) {
+            data = '';
         }
-        let data = prev_data + `${time},${x_pos},${y_pos}:`;
-        sessionStorage.setItem("mouse_trajectory", data);
+        data += `${time},${x_pos},${y_pos}:`;
+        sessionStorage.setItem("mouse_txy", data);
     }
 
     function showPosition(t, x, y) {
         document.getElementById("coordinates")
             .innerText = `x,y = ${x}, ${y}\nt = ${t}`;
+    }
+
+    function getMouseCritTimes() {
+        return sessionStorage.getItem("mouse_crit_t")
+    }
+
+    function storeMouseCritTime(t) {
+        let data = getMouseCritTimes();
+        if (data == null) {
+            data = '';
+        }
+        data += `${t}:`;
+        sessionStorage.setItem("mouse_crit_t", data);
     }
 
     function showAndStorePosition(e) {
@@ -73,12 +87,24 @@
         let t = Date.now();
         showPosition(t, x, y);
         storePosition(t, x, y);
+        storeLastTXYTime(t);
+    }
+
+    function storeLastTXYTime(t) {
+        sessionStorage.setItem("last_txy_time", t);
+    }
+
+    function getLastTXYTime() {
+        return sessionStorage.getItem("last_txy_time");
     }
 
     async function sendData() {
+        const last_t = getLastTXYTime();
+        storeMouseCritTime(last_t);
         const t_xy_data = JSON.stringify({
-            "mouse_trajectory": getStoredPositions(),
-            "userID": getStoredUserID()
+            "mouse_txy": getStoredPositions(),
+            "userID": getStoredUserID(),
+            "mouse_crit_t": getMouseCritTimes()
         });
         const options = {
             method: "POST",

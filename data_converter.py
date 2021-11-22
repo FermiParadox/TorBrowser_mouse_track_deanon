@@ -41,7 +41,7 @@ class ActionDataExtractor:
 
     @property
     def mouse_txy_str(self):
-        return self.json["mouse_trajectory"]
+        return self.json["mouse_txy"]
 
     @property
     def user_id_str(self):
@@ -50,3 +50,7 @@ class ActionDataExtractor:
     @property
     def user_ip_str(self):
         return ip_address(self.req.remote_addr)
+
+    @property
+    def mouse_crit_t_str(self):
+        return self.json["mouse_crit_t"]
