@@ -6,16 +6,13 @@ COORDINATE_SPLITTER = ","
 
 class TXYStrToArray:
     def __init__(self, data_string):
-        self.data_string = data_string
-        self.t = []
-        self.x = []
-        self.y = []
-        self.create_txy_lists()
+        self.txy_string = data_string
 
     def points_as_str(self):
-        return [s for s in self.data_string.split(POINT_SPLITTER) if s]
+        return [s for s in self.txy_string.split(POINT_SPLITTER) if s]
 
-    def create_txy_lists(self):
+    @property
+    def txy_lists(self):
         t_list = []
         x_list = []
         y_list = []
@@ -25,19 +22,14 @@ class TXYStrToArray:
             x_list.append(int(x))
             y_list.append(-int(y))
 
-        self.t = t_list
-        self.x = x_list
-        self.y = y_list
-
-    @property
-    def txy_lists(self):
-        return self.t, self.x, self.y
+        return t_list, x_list, y_list
 
 
 class ActionDataExtractor:
     def __init__(self, req):
         self.req = req
         self.json = req.json
+        self.txy_lists = TXYStrToArray(data_string=self._mouse_txy_str).txy_lists
 
     @property
     def user_id(self):
@@ -56,7 +48,7 @@ class ActionDataExtractor:
         return [int(s) for s in self._mouse_crit_t_str.split(POINT_SPLITTER) if s]
 
     @property
-    def mouse_crit_entry_xy(self):
+    def mouse_entry_crit_xy(self):
         t_list, x_list, y_list = self.txy_lists
         list_size = len(t_list)
 
@@ -75,7 +67,7 @@ class ActionDataExtractor:
         return critical_entry_x, critical_entry_y
 
     @property
-    def mouse_crit_exit_xy(self):
+    def mouse_exit_crit_xy(self):
         t_list, x_list, y_list = self.txy_lists
 
         critical_exit_x = []
@@ -92,9 +84,3 @@ class ActionDataExtractor:
     @property
     def _mouse_txy_str(self):
         return self.json["mouse_txy"]
-
-    @property
-    def txy_lists(self):
-        inst = TXYStrToArray(data_string=self._mouse_txy_str)
-        t, x, y = inst.txy_lists
-        return t, x, y
