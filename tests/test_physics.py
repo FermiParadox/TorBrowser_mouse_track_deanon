@@ -1,5 +1,4 @@
 from unittest import TestCase
-from math import pi
 from random import random
 
 
@@ -51,13 +50,13 @@ class TestSlope2Points(TestCase):
         p1 = (1, 1)
         p2 = (22, 22)
         angle = self.Slope2Points(p1=p1, p2=p2).angle
-        self.assertAlmostEqual(pi / 4, angle)
+        self.assertAlmostEqual(45, angle)
 
     def test_angle_90deg(self):
         p1 = (1, 1)
         p2 = (1, 2)
         angle = self.Slope2Points(p1=p1, p2=p2).angle
-        self.assertAlmostEqual(pi / 2, angle)
+        self.assertAlmostEqual(90, angle)
 
 
 class TestSpeed2Points(TestCase):

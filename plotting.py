@@ -1,4 +1,4 @@
-from matplotlib.pyplot import scatter, plot, show
+from matplotlib.pyplot import scatter, plot
 
 
 def plot_all_x_y(x, y):

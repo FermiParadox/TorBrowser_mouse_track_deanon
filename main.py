@@ -17,6 +17,7 @@ async def store_mouse_position():
     user_handler = UserHandler(req=request)
     user_handler.create_user()
     user_handler.user.plot_and_show_mouse_movement()
+    print(user_handler.user.exit_critical_angles())
     return Response(status=204)
 
 

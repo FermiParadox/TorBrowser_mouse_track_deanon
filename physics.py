@@ -1,4 +1,4 @@
-from math import atan2
+from math import atan2, degrees
 from scipy.spatial import distance
 
 
@@ -17,7 +17,7 @@ class Slope2Points:
 
     @property
     def angle(self):
-        return atan2(self.dy, self.dx)
+        return degrees(atan2(self.dy, self.dx))
 
 
 class Speed2Points:

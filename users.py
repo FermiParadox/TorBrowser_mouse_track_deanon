@@ -4,21 +4,16 @@ from dataclasses import dataclass, field
 from typing import Union, List
 from matplotlib.pyplot import show
 
+import physics
 from data_converter import ActionDataExtractor
 from plotting import plot_all_x_y, plot_crit_exit_x_y, plot_crit_entry_x_y
+
 
 IPv6_or_IPv4_obj = Union[IPv4Address, IPv6Address]
 
 
 @dataclass
 class TimeXY(list):
-    time: List[int] = field(default_factory=list)
-    x: List[int] = field(default_factory=list)
-    y: List[int] = field(default_factory=list)
-
-
-@dataclass
-class CriticalTXY(list):
     time: List[int] = field(default_factory=list)
     x: List[int] = field(default_factory=list)
     y: List[int] = field(default_factory=list)
@@ -45,10 +40,10 @@ class IDGenerator:
 @dataclass
 class User:
     id: int
-    ip: IPv6_or_IPv4_obj  # TODO turn into dict with ip:time
+    ip: IPv6_or_IPv4_obj
     mouse_txy: TimeXY
-    mouse_exit_crit_txy: CriticalTXY
-    mouse_entry_crit_txy: CriticalTXY
+    mouse_exit_crit_txy: TimeXY    # last point of mouse position stored, before browser switching
+    mouse_entry_crit_txy: TimeXY   # first point after refocusing browser
     time_keys: TimeKeys
 
     def __eq__(self, other):
@@ -56,6 +51,50 @@ class User:
 
     def __hash__(self):
         return hash(self.id)
+
+    def mouse_critical_time_index(self, t_critical):
+        return self.mouse_txy.time.index(t_critical)
+
+    def last_3_points_and_t_before_exit(self, t_critical):
+        x_list = self.mouse_txy.x
+        y_list = self.mouse_txy.y
+        t_list = self.mouse_txy.time
+
+        t_index = self.mouse_critical_time_index(t_critical=t_critical)
+
+        p3 = (x_list[t_index], y_list[t_index])
+
+        t_index_minus1 = t_index - 1
+        if t_index_minus1 >= 0:
+            p2 = (x_list[t_index_minus1], y_list[t_index_minus1])
+            t2 = t_list[t_index_minus1]
+        else:
+            p2 = None
+            t2 = None
+
+        t_index_minus2 = t_index - 2
+        if t_index_minus2 >= 0:
+            p1 = (x_list[t_index_minus2], y_list[t_index_minus2])
+            t1 = t_list[t_index_minus2]
+        else:
+            p1 = None
+            t1 = None
+
+        return {"p1": p1, "p2": p2, "p3": p3, "t1": t1, "t2": t2, "t3": t_critical}
+
+    def first_3_points_and_t_after_entry(self, t_critical):
+        ...
+
+    def exit_critical_angle(self, t_critical):
+        """Return approximate angle when exiting browser."""
+        d = self.last_3_points_and_t_before_exit(t_critical=t_critical)
+        p2 = d["p2"]
+        p3 = d["p3"]
+        if p2 and p3:
+            return physics.Slope2Points(p1=p2, p2=p3).angle
+
+    def exit_critical_angles(self):
+        return [self.exit_critical_angle(t_critical=t) for t in self.mouse_exit_crit_txy.time]
 
     def plot_and_show_mouse_movement(self):
         x_all = self.mouse_txy.x
@@ -120,10 +159,10 @@ class UserHandler:
 
         crit_t = self.mouse_crit_t
         exit_xy = self.mouse_exit_crit_xy
-        mouse_exit_crit_txy = CriticalTXY(time=crit_t, x=exit_xy[0], y=exit_xy[1])
+        mouse_exit_crit_txy = TimeXY(time=crit_t, x=exit_xy[0], y=exit_xy[1])
 
         entry_xy = self.mouse_entry_crit_xy
-        mouse_entry_crit_txy = CriticalTXY(time=crit_t, x=entry_xy[0], y=entry_xy[1])
+        mouse_entry_crit_txy = TimeXY(time=crit_t, x=entry_xy[0], y=entry_xy[1])
 
         self.user = User(id=self.user_id,
                          ip=self.ip,
