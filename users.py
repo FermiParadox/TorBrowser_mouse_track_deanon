@@ -2,11 +2,10 @@ import secrets
 from ipaddress import IPv4Address, IPv6Address
 from dataclasses import dataclass, field
 from typing import Union, List
-
+from matplotlib.pyplot import show
 
 from data_converter import ActionDataExtractor
-from utils import plot_x_y
-
+from plotting import plot_all_x_y, plot_crit_exit_x_y, plot_crit_entry_x_y
 
 IPv6_or_IPv4_obj = Union[IPv4Address, IPv6Address]
 
@@ -84,6 +83,8 @@ class UserHandler:
         extractor = ActionDataExtractor(req=self.req)
         self.ip = extractor.user_ip
         self.mouse_crit_t = extractor.mouse_crit_t
+        self.mouse_crit_exit_xy = extractor.mouse_crit_exit_xy
+        self.mouse_crit_entry_xy = extractor.mouse_crit_entry_xy
         self.user_id = extractor.user_id
         self.txy_lists = extractor.txy_lists
 
@@ -94,7 +95,7 @@ class UserHandler:
         self.user = User(id=self.user_id,
                          ip=self.ip,
                          mouse_txy=mouse_txy,
-                         time_keys=TimeKeys())
+                         time_keys=TimeKeys(), )
 
     def create_user(self):
         self._extract_data()
@@ -103,5 +104,17 @@ class UserHandler:
     def create_and_insert_user(self):
         all_users.add(self.user)
 
-    def plot_mouse_movement(self):
-        plot_x_y(x=self.user.mouse_txy.x, y=self.user.mouse_txy.y)
+    def plot_and_show_mouse_movement(self):
+        x_all = self.user.mouse_txy.x
+        y_all = self.user.mouse_txy.y
+        plot_all_x_y(x=x_all, y=y_all)
+
+        x_crit_entry = self.mouse_crit_entry_xy[0]
+        y_crit_entry = self.mouse_crit_entry_xy[1]
+        plot_crit_entry_x_y(x=x_crit_entry, y=y_crit_entry)
+
+        x_crit_exit = self.mouse_crit_exit_xy[0]
+        y_crit_exit = self.mouse_crit_exit_xy[1]
+        plot_crit_exit_x_y(x=x_crit_exit, y=y_crit_exit)
+
+        show()

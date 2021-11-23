@@ -56,6 +56,40 @@ class ActionDataExtractor:
         return [int(s) for s in self._mouse_crit_t_str.split(POINT_SPLITTER) if s]
 
     @property
+    def mouse_crit_entry_xy(self):
+        t_list, x_list, y_list = self.txy_lists
+        list_size = len(t_list)
+
+        critical_entry_x = []
+        critical_entry_y = []
+
+        for t in self.mouse_crit_t:
+            point_index = t_list.index(t) + 1
+            if point_index >= list_size - 1:
+                break
+            x = x_list[point_index]
+            y = y_list[point_index]
+            critical_entry_x.append(x)
+            critical_entry_y.append(y)
+
+        return critical_entry_x, critical_entry_y
+
+    @property
+    def mouse_crit_exit_xy(self):
+        t_list, x_list, y_list = self.txy_lists
+
+        critical_exit_x = []
+        critical_exit_y = []
+
+        for t in self.mouse_crit_t:
+            point_index = t_list.index(t)
+            x = x_list[point_index]
+            y = y_list[point_index]
+            critical_exit_x.append(x)
+            critical_exit_y.append(y)
+        return critical_exit_x, critical_exit_y
+
+    @property
     def _mouse_txy_str(self):
         return self.json["mouse_txy"]
 
