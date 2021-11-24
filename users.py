@@ -1,14 +1,12 @@
 import secrets
-from enum import Enum
 from ipaddress import IPv4Address, IPv6Address
 from dataclasses import dataclass, field
 from typing import Union, List
 from matplotlib.pyplot import show
 
-import physics
 from data_converter import ActionDataExtractor
 from plotting import plot_all_x_y, plot_crit_exit_x_y, plot_crit_entry_x_y
-from points import ExitPointHandler
+from points import ExitPointHandler, EntryPointHandler
 
 IPv6_or_IPv4_obj = Union[IPv4Address, IPv6Address]
 
@@ -53,25 +51,30 @@ class User:
     def __hash__(self):
         return hash(self.id)
 
-    def crit_index_in_txy(self, t_critical):
+    def index_in_txy(self, t_critical):
         return self.mouse_txy.time.index(t_critical)
 
-    def _exit_critical_angle(self, t_critical):
-        """Return approximate angle when exiting browser."""
-        crit_index = self.crit_index_in_txy(t_critical)
-        txy = self.mouse_txy
-        handler = ExitPointHandler(index=crit_index,
-                                   x_list=txy.x,
-                                   y_list=txy.y,
-                                   t_list=txy.time)
-
-        p2 = handler.p2
-        p3 = handler.p3
-        if p2 and p3:
-            return physics.Slope2Points(p1=p2, p2=p3).angle
-
     def exit_critical_angles(self):
-        return [self._exit_critical_angle(t_critical=t) for t in self.mouse_exit_crit_txy.time]
+        angles = []
+        for time in self.mouse_exit_crit_txy.time:
+            i = self.index_in_txy(t_critical=time)
+            point_handler = ExitPointHandler(index=i, mouse_txy=self.mouse_txy)
+            angle = point_handler.exit_critical_angle
+            if not angle:
+                return None
+            angles.append(angle)
+        return angles
+
+    def entry_critical_angles(self):
+        angles = []
+        for time in self.mouse_entry_crit_txy.time:
+            i = self.index_in_txy(t_critical=time)
+            point_handler = EntryPointHandler(index=i, mouse_txy=self.mouse_txy)
+            angle = point_handler.entry_critical_angle
+            if not angle:
+                continue
+            angles.append(angle)
+        return angles
 
     def plot_and_show_mouse_movement(self):
         x_all = self.mouse_txy.x
