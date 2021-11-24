@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, Response, make_response, jsonify
+from flask import Flask, render_template, request, Response, make_response
 
 from users import UserHandler, IDGenerator
 
@@ -14,10 +14,14 @@ async def index():
 
 @app.route("/store-txy", methods=["POST"])
 async def store_mouse_position():
-    user_handler = UserHandler(req=request)
-    user_handler.create_user()
-    user_handler.user.plot_and_show_mouse_movement()
-    print(user_handler.user.exit_critical_angles())
+    try:
+        user_handler = UserHandler(req=request)
+        user_handler.create_user()
+        user_handler.user.plot_and_show_mouse_movement()
+        print(user_handler.user.exit_critical_angles())
+    except Exception as e:
+        print(e)
+        return Response(status=400)
     return Response(status=204)
 
 
