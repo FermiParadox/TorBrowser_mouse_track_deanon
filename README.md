@@ -5,8 +5,22 @@ Check de-anonymization risk of Tor Browser users, through:
 - switching browsers with hotkeys (implementation pending)
 
 
-There are probably many ways the user can be de-anonymized. 
-Not all are examined here.
+There are probably many similar ways the user 
+can be de-anonymized. Not all are examined here.
+
+### Tor is unaware of the attack
+ 
+[Official page:](https://support.torproject.org/tbb/tbb-17/)
+
+> **Is it safe to run Tor Browser and another browser 
+> at the same time?**
+
+> If you run Tor Browser and another browser at the same time, 
+> it won't affect Tor's performance or privacy properties. 
+> However, be aware that your other browser is not keeping 
+> your activity private, and you may forget 
+> and accidentally use that non-private browser to do something 
+> that you intended to do in Tor Browser.
 
 # Metrics analysed
 The following are compared between users 
@@ -19,6 +33,9 @@ At entry and exit locations:
 - mouse speed
 - mouse acceleration
 
+## Exit and entry point distances on both browsers
+
+
 
 
 ### Pixels are like chessboard boxes
@@ -26,7 +43,7 @@ At entry and exit locations:
 I am assuming, slow mouse movement 
 results erroneously in exit/entry angles 
 of 45.00000, 90.00000 or 0.00000 degrees. 
-Or other "standard" values.
+Or other "standard" values for slightly higher speeds.
 
 That's because x,y are "quantized" and during 
 slow speeds adjacent points are noted. 
@@ -41,8 +58,10 @@ expensive) methods are possible.
 - entry points' distances compared to exit points'
 
 # Thresholds
-Metrics are compared for time differences approaching 
+Metrics will be compared for time differences approaching 
 the expected latency differences of clearnet/Tor. 
+(note: latency might not be an issue; 
+must check whether collected time-data is based on PC clock)
 
 To reduce false positives smaller thresholds 
 can be used for all metrics.

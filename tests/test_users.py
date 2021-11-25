@@ -1,7 +1,8 @@
 from ipaddress import ip_address
 from unittest import TestCase
 
-from users import User, TimeXY, TimeKeys, AllUsers, IDGenerator, UserHandler
+from users import User, AllUsers, IDGenerator, UserHandler
+from metrics_dataclasses import TimeXY, TimeKeys
 
 
 class TestUser(TestCase):

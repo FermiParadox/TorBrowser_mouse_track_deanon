@@ -1,27 +1,15 @@
 import secrets
 from ipaddress import IPv4Address, IPv6Address
-from dataclasses import dataclass, field
-from typing import Union, List
+from dataclasses import dataclass
+from typing import Union, Type
 from matplotlib.pyplot import show
 
 from data_converter import ActionDataExtractor
+from metrics_dataclasses import TimeXY, TimeKeys
 from plotting import plot_all_x_y, plot_crit_exit_x_y, plot_crit_entry_x_y
-from points import ExitPointHandler, EntryPointHandler
+from points import PointsHandler, CriticalPointType
 
 IPv6_or_IPv4_obj = Union[IPv4Address, IPv6Address]
-
-
-@dataclass
-class TimeXY(list):
-    time: List[int] = field(default_factory=list)
-    x: List[int] = field(default_factory=list)
-    y: List[int] = field(default_factory=list)
-
-
-@dataclass
-class TimeKeys(list):
-    time: List[int] = field(default_factory=list)
-    keys_pressed: List[int] = field(default_factory=list)
 
 
 class IDGenerator:
@@ -45,36 +33,51 @@ class User:
     mouse_entry_crit_txy: TimeXY  # first point after refocusing browser
     time_keys: TimeKeys
 
+    def __post_init__(self):
+        self.mouse_exit_crit_t = self.mouse_exit_crit_txy.time
+        self.mouse_entry_crit_t = self.mouse_entry_crit_txy.time
+
     def __eq__(self, other):
         return self.id == other.id
 
     def __hash__(self):
         return hash(self.id)
 
-    def index_in_txy(self, t_critical):
-        return self.mouse_txy.time.index(t_critical)
+    def exit_angles(self):
+        handler = PointsHandler(mouse_txy=self.mouse_txy,
+                                crit_type=CriticalPointType.EXIT,
+                                mouse_crit_t=self.mouse_exit_crit_t)
+        return handler.critical_angles()
 
-    def exit_critical_angles(self):
-        angles = []
-        for time in self.mouse_exit_crit_txy.time:
-            i = self.index_in_txy(t_critical=time)
-            point_handler = ExitPointHandler(index=i, mouse_txy=self.mouse_txy)
-            angle = point_handler.exit_critical_angle
-            if not angle:
-                return None
-            angles.append(angle)
-        return angles
+    def entry_angles(self):
+        handler = PointsHandler(mouse_txy=self.mouse_txy,
+                                crit_type=CriticalPointType.ENTRY,
+                                mouse_crit_t=self.mouse_entry_crit_t)
+        return handler.critical_angles()
 
-    def entry_critical_angles(self):
-        angles = []
-        for time in self.mouse_entry_crit_txy.time:
-            i = self.index_in_txy(t_critical=time)
-            point_handler = EntryPointHandler(index=i, mouse_txy=self.mouse_txy)
-            angle = point_handler.entry_critical_angle
-            if not angle:
-                continue
-            angles.append(angle)
-        return angles
+    def exit_speeds(self):
+        handler = PointsHandler(mouse_txy=self.mouse_txy,
+                                crit_type=CriticalPointType.EXIT,
+                                mouse_crit_t=self.mouse_exit_crit_t)
+        return handler.critical_speeds()
+
+    def entry_speeds(self):
+        handler = PointsHandler(mouse_txy=self.mouse_txy,
+                                crit_type=CriticalPointType.ENTRY,
+                                mouse_crit_t=self.mouse_entry_crit_t)
+        return handler.critical_speeds()
+
+    def exit_accelerations(self):
+        handler = PointsHandler(mouse_txy=self.mouse_txy,
+                                crit_type=CriticalPointType.EXIT,
+                                mouse_crit_t=self.mouse_exit_crit_t)
+        return handler.critical_accelerations()
+
+    def entry_accelerations(self):
+        handler = PointsHandler(mouse_txy=self.mouse_txy,
+                                crit_type=CriticalPointType.ENTRY,
+                                mouse_crit_t=self.mouse_entry_crit_t)
+        return handler.critical_accelerations()
 
     def plot_and_show_mouse_movement(self):
         x_all = self.mouse_txy.x
@@ -121,7 +124,7 @@ class UserHandler:
         self.mouse_crit_t = None
         self.mouse_exit_crit_xy = None
         self.mouse_entry_crit_xy = None
-        self.user = None
+        self.user: User = None
         self.ip = None
 
     def _extract_data(self):
