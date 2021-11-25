@@ -121,7 +121,7 @@ class UserHandler:
     def __init__(self, req):
         self.req = req
         self.user_id = None
-        self.mouse_crit_t = None
+        self.mouse_exit_t = None
         self.mouse_exit_crit_xy = None
         self.mouse_entry_crit_xy = None
         self.user: User = None
@@ -130,7 +130,7 @@ class UserHandler:
     def _extract_data(self):
         extractor = ActionDataExtractor(req=self.req)
         self.ip = extractor.user_ip
-        self.mouse_crit_t = extractor.mouse_crit_t
+        self.mouse_exit_t = extractor.mouse_exit_t
         self.mouse_exit_crit_xy = extractor.mouse_exit_crit_xy
         self.mouse_entry_crit_xy = extractor.mouse_entry_crit_xy
         self.user_id = extractor.user_id
@@ -140,12 +140,13 @@ class UserHandler:
         t, x, y = self.txy_lists
         mouse_txy = TimeXY(time=t, x=x, y=y)
 
-        crit_t = self.mouse_crit_t
+        exit_t = self.mouse_exit_t
         exit_xy = self.mouse_exit_crit_xy
-        mouse_exit_crit_txy = TimeXY(time=crit_t, x=exit_xy[0], y=exit_xy[1])
+        mouse_exit_crit_txy = TimeXY(time=exit_t, x=exit_xy[0], y=exit_xy[1])
 
         entry_xy = self.mouse_entry_crit_xy
-        mouse_entry_crit_txy = TimeXY(time=crit_t, x=entry_xy[0], y=entry_xy[1])
+        # TODO bug: replace `exit_t`
+        mouse_entry_crit_txy = TimeXY(time=exit_t, x=entry_xy[0], y=entry_xy[1])
 
         self.user = User(id=self.user_id,
                          ip=self.ip,
