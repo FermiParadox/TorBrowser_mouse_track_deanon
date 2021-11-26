@@ -1,15 +1,23 @@
-from matplotlib.pyplot import scatter, plot
+import matplotlib.pyplot as plt
 
 
-def plot_all_x_y(x, y):
-    plot(x, y, c='gray', linewidth=0.4)
-    scatter(x, y, s=5, c='blue')
+class Plotter:
+    def __init__(self, user_id):
+        self.user_id = user_id
 
+    def plot_all_x_y(self, x, y):
+        plt.plot(x, y, c='gray', linewidth=0.4)
+        plt.scatter(x, y, s=5, c='blue')
 
-def plot_crit_entry_x_y(x, y):
-    scatter(x, y, s=50, c='green', marker='x')
+    def plot_crit_entry_x_y(self, x, y):
+        plt.scatter(x, y, s=50, c='green', marker='x', label='Exit point')
 
+    def plot_crit_exit_x_y(self, x, y):
+        plt.scatter(x, y, s=50, c='red', marker='x', label='Entry point')
 
-def plot_crit_exit_x_y(x, y):
-    scatter(x, y, s=50, c='red', marker='x')
-
+    def decorate_graphs_and_show(self):
+        title = f"Mouse track (UserID: {self.user_id})"
+        plt.title(title)
+        plt.legend()
+        plt.axis([0, None, None, 0])
+        plt.show()

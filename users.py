@@ -1,12 +1,11 @@
 import secrets
 from ipaddress import IPv4Address, IPv6Address
 from dataclasses import dataclass
-from typing import Union, Type
-from matplotlib.pyplot import show
+from typing import Union
 
 from data_converter import ActionDataExtractor
 from metrics_dataclasses import TimeXY, TimeKeys
-from plotting import plot_all_x_y, plot_crit_exit_x_y, plot_crit_entry_x_y
+from plotting import Plotter
 from points import PointsHandler, CriticalPointType
 
 IPv6_or_IPv4_obj = Union[IPv4Address, IPv6Address]
@@ -82,17 +81,19 @@ class User:
     def plot_and_show_mouse_movement(self):
         x_all = self.mouse_txy.x
         y_all = self.mouse_txy.y
-        plot_all_x_y(x=x_all, y=y_all)
+
+        plotter = Plotter(user_id=self.id)
+        plotter.plot_all_x_y(x=x_all, y=y_all)
 
         x_crit_entry = self.mouse_entry_crit_txy.x
         y_crit_entry = self.mouse_entry_crit_txy.y
-        plot_crit_entry_x_y(x=x_crit_entry, y=y_crit_entry)
+        plotter.plot_crit_entry_x_y(x=x_crit_entry, y=y_crit_entry)
 
         x_crit_exit = self.mouse_exit_crit_txy.x
         y_crit_exit = self.mouse_exit_crit_txy.y
-        plot_crit_exit_x_y(x=x_crit_exit, y=y_crit_exit)
+        plotter.plot_crit_exit_x_y(x=x_crit_exit, y=y_crit_exit)
 
-        show()
+        plotter.decorate_graphs_and_show()
 
 
 class AllUsers(set):
@@ -131,6 +132,7 @@ class UserHandler:
         extractor = ActionDataExtractor(req=self.req)
         self.ip = extractor.user_ip
         self.mouse_exit_t = extractor.mouse_exit_t
+        self.mouse_entry_t = extractor.mouse_entry_t
         self.mouse_exit_crit_xy = extractor.mouse_exit_crit_xy
         self.mouse_entry_crit_xy = extractor.mouse_entry_crit_xy
         self.user_id = extractor.user_id
@@ -140,13 +142,11 @@ class UserHandler:
         t, x, y = self.txy_lists
         mouse_txy = TimeXY(time=t, x=x, y=y)
 
-        exit_t = self.mouse_exit_t
         exit_xy = self.mouse_exit_crit_xy
-        mouse_exit_crit_txy = TimeXY(time=exit_t, x=exit_xy[0], y=exit_xy[1])
+        mouse_exit_crit_txy = TimeXY(time=self.mouse_exit_t, x=exit_xy[0], y=exit_xy[1])
 
         entry_xy = self.mouse_entry_crit_xy
-        # TODO bug: replace `exit_t`
-        mouse_entry_crit_txy = TimeXY(time=exit_t, x=entry_xy[0], y=entry_xy[1])
+        mouse_entry_crit_txy = TimeXY(time=self.mouse_entry_t, x=entry_xy[0], y=entry_xy[1])
 
         self.user = User(id=self.user_id,
                          ip=self.ip,

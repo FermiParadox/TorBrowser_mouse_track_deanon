@@ -73,3 +73,8 @@ I haven't taken into account all scenarios, e.g.:
 - interrupted data transfer
 - changing IP during session
 - assignment of existing IP to new user
+
+
+# Investigate later
+- Can browser exit points be used to extract user patterns 
+related to user's UI layout (file shortcuts on desktop, etc.)?
