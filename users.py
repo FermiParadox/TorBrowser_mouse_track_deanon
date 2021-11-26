@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Union
 
 from data_converter import ActionDataExtractor
-from metrics_dataclasses import TimeXY, TimeKeys
+from metrics_dataclasses import TimeXY, TimeKeys, XY
 from plotting import Plotter
 from points import PointsHandler, CriticalPointType
 
@@ -123,9 +123,9 @@ class UserHandler:
         self.req = req
         self.user_id = None
         self.mouse_exit_t = None
-        self.mouse_exit_crit_xy = None
-        self.mouse_entry_crit_xy = None
-        self.user: User = None
+        self.mouse_exit_crit_xy: XY
+        self.mouse_entry_crit_xy: XY
+        self.user: User
         self.ip = None
 
     def _extract_data(self):

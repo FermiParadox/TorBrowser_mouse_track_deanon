@@ -43,7 +43,7 @@ class ActionDataExtractor:
         return ip_address(self.req.remote_addr)
 
     @property
-    def _mouse_crit_t_str(self):
+    def _mouse_crit_t_str(self) -> str:
         return self.json["mouse_exit_t"]
 
     @property
@@ -54,7 +54,7 @@ class ActionDataExtractor:
     def mouse_exit_t(self):
         return [int(s) for s in self._mouse_crit_t if s]
 
-    def entry_point_index_out_of_range(self, index):
+    def entry_point_index_out_of_range(self, index) -> bool:
         return index > self.maximum_txy_index
 
     @property
@@ -73,10 +73,8 @@ class ActionDataExtractor:
         critical_entry_x = []
         critical_entry_y = []
 
-        for t in self.mouse_exit_t:
-            point_index = self.t_list.index(t) + 1
-            if point_index >= self.lists_len - 1:
-                break
+        for t in self.mouse_entry_t:
+            point_index = self.t_list.index(t)
             x = self.x_list[point_index]
             y = self.y_list[point_index]
             critical_entry_x.append(x)

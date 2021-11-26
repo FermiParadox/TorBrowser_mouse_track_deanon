@@ -3,6 +3,12 @@ from typing import List
 
 
 @dataclass
+class XY(list):
+    x: List[int] = field(default_factory=list)
+    y: List[int] = field(default_factory=list)
+
+
+@dataclass
 class TimeXY(list):
     time: List[int] = field(default_factory=list)
     x: List[int] = field(default_factory=list)
