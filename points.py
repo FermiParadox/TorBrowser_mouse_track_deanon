@@ -171,8 +171,9 @@ class EntryHandler(_SinglePointHandler):
     def critical_acceleration(self):
         if self.index_too_large:
             return None
-        return physics.Acceleration3Points(p1=self.p1, p2=self.p2, p3=self.p3,
-                                           t1=self.t1, t2=self.t2, t3=self.t3).acceleration
+        return physics.Acceleration3Points(
+            p1=self.p1, p2=self.p2, p3=self.p3,
+            t1=self.t1, t2=self.t2, t3=self.t3).acceleration
 
 
 class CriticalPointType:
