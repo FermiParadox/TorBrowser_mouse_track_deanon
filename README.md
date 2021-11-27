@@ -6,7 +6,7 @@ Check de-anonymization risk of Tor Browser users, through:
 
 
 There are probably many similar ways the user 
-can be de-anonymized. Not all are examined here.
+can be deanonymized. Not all are examined here.
 
 ### Tor is unaware of the attack
  
@@ -68,6 +68,7 @@ can be used for all metrics.
 
 # Software limitations 
 
+This is simply a proof of concept.   
 I haven't taken into account all scenarios, e.g.: 
 - user trying to deceive the server by manipulating data
 - interrupted data transfer
@@ -76,5 +77,5 @@ I haven't taken into account all scenarios, e.g.:
 
 
 # Investigate later
-- Can browser exit points be used to extract user patterns 
+- Can single browser metrics be used to extract user patterns 
 related to user's UI layout (file shortcuts on desktop, etc.)?

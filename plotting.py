@@ -10,14 +10,14 @@ class Plotter:
         plt.scatter(x, y, s=4, c='blue')
 
     def plot_crit_entry_x_y(self, x, y):
-        plt.scatter(x, y, s=50, c='green', marker='x', label='Browser exit point')
+        plt.scatter(x, y, s=50, c='green', marker='x', label='Browser entry point')
 
     def plot_crit_exit_x_y(self, x, y):
-        plt.scatter(x, y, s=50, c='red', marker='x', label='Browser entry point')
+        plt.scatter(x, y, s=50, c='red', marker='x', label='Browser exit point')
 
     def decorate_graphs_and_show(self):
         title = f"Mouse track (UserID: {self.user_id})"
         plt.title(title)
         plt.legend()
-        plt.axis([0, None, None, 0])
+        plt.axis([0, 1500, -1000, 0])
         plt.show()

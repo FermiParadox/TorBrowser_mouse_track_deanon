@@ -3,6 +3,7 @@
       onmousemove="showAndStorePosition(event)"
       onmouseleave="sendData()">
 <head>
+    <meta name="robots" content="noindex">
     <meta charset="UTF-8">
     <title>TorDeanon</title>
     <link href="../static/styles.css" rel="stylesheet">
@@ -36,7 +37,7 @@
     function showUserID(e) {
         const userID = getStoredUserID();
         document.getElementById("key_pressed")
-            .innerText = `Your ID is: ${userID}`;
+            .innerText = `User ID assigned: ${userID}`;
     }
 
     storeUserID();

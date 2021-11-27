@@ -60,11 +60,13 @@ class ActionDataExtractor:
     @property
     def mouse_entry_t(self):
         entry_t_list = []
-        for exit_index, t_exit in enumerate(self.mouse_exit_t):
-            entry_index = exit_index + 1
-            if self.entry_point_index_out_of_range(index=entry_index):
+        for exit_t in self.mouse_exit_t:
+            # the next point is always an entry point
+            current_index = self.t_list.index(exit_t)
+            entry_point_index = current_index + 1
+            if self.entry_point_index_out_of_range(index=entry_point_index):
                 break
-            entry_t = self.t_list[entry_index]     # the next point is always an entry point
+            entry_t = self.t_list[entry_point_index]
             entry_t_list.append(entry_t)
         return entry_t_list
 
