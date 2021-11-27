@@ -40,7 +40,7 @@ class Speed2Points:
         return self.distance / self.dt
 
 
-class Acceleration3Points:
+class Acceleration:
     def __init__(self, p1, p2, p3, t1, t2, t3):
         self.t3 = t3
         self.p3 = p3

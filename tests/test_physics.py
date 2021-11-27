@@ -93,8 +93,8 @@ class TestSpeed2Points(TestCase):
 
 class TestAcceleration3Points(TestCase):
     def setUp(self) -> None:
-        from physics import Acceleration3Points
-        self.Acceleration3Points = Acceleration3Points
+        from physics import Acceleration
+        self.Acceleration3Points = Acceleration
 
     def test_dt(self):
         dt_expected = random()

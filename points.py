@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Type, Union
 
-import physics
 from metrics_dataclasses import TimeXY
+from physics import Speed2Points, Slope2Points, Acceleration
 
 """
 When calculating angle, speed, etc. using only the last 2 points 
@@ -109,22 +109,21 @@ class ExitHandler(_SinglePointHandler):
     def critical_angle(self):
         if self.index_too_small:
             return None
-        return physics.Slope2Points(p1=self.p2, p2=self.p3).angle
+        return Slope2Points(p1=self.p2, p2=self.p3).angle
 
     @property
     def critical_speed(self):
         if self.index_too_small:
             return None
-        return physics.Speed2Points(p1=self.p2, p2=self.p3,
-                                    t1=self.t2, t2=self.t3).speed
+        return Speed2Points(p1=self.p2, p2=self.p3,
+                            t1=self.t2, t2=self.t3).speed
 
     @property
     def critical_acceleration(self):
         if self.index_too_small:
             return None
-        return physics.Acceleration3Points(
-            p1=self.p1, p2=self.p2, p3=self.p3,
-            t1=self.t1, t2=self.t2, t3=self.t3).acceleration
+        return Acceleration(p1=self.p1, p2=self.p2, p3=self.p3,
+                            t1=self.t1, t2=self.t2, t3=self.t3).acceleration
 
 
 class EntryHandler(_SinglePointHandler):
@@ -158,20 +157,20 @@ class EntryHandler(_SinglePointHandler):
         """Return approximate angle when exiting browser."""
         if self.index_too_large:
             return None
-        return physics.Slope2Points(p1=self.p1, p2=self.p2).angle
+        return Slope2Points(p1=self.p1, p2=self.p2).angle
 
     @property
     def critical_speed(self):
         if self.index_too_large:
             return None
-        return physics.Speed2Points(p1=self.p1, p2=self.p2,
-                                    t1=self.t1, t2=self.t2).speed
+        return Speed2Points(p1=self.p1, p2=self.p2,
+                            t1=self.t1, t2=self.t2).speed
 
     @property
     def critical_acceleration(self):
         if self.index_too_large:
             return None
-        return physics.Acceleration3Points(
+        return Acceleration(
             p1=self.p1, p2=self.p2, p3=self.p3,
             t1=self.t1, t2=self.t2, t3=self.t3).acceleration
 
