@@ -39,4 +39,4 @@ async def correlated_users():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host='77.49.24.68', port=5000, debug=True)
