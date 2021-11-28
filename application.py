@@ -27,6 +27,7 @@ async def store_mouse_position():
         print(f"speed {user.entry_speeds()}")
         print(f"a {user.exit_accelerations()}")
         print(f"a {user.entry_accelerations()}")
+        print("=" * 50)
     except Exception as e:
         print(e)
         return Response(status=400)
@@ -37,6 +38,8 @@ async def store_mouse_position():
 async def correlated_users():
     return Response(status=404)
 
+# if __name__ == "__main__":
+#     app.run(debug=True)
 
-if __name__ == "__main__":
-    app.run(host='77.49.24.68', port=5000, debug=True)
+# Run in terminal:
+#   gunicorn -w 4 -b 0.0.0.0:65000 application:app

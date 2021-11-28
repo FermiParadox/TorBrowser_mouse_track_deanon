@@ -105,7 +105,7 @@ class AllUsers(set):
     def ids(self):
         return {str(u.id) for u in self}
 
-    def add(self, other):
+    def add(self, other: User):
         """When added element is already present, it replaces the existing one.
         Not very efficient, but should be ok for testing.
 
