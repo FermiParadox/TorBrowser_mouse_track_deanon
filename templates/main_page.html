@@ -69,12 +69,12 @@
             .innerText = `x,y = ${x}, ${y}\nt = ${t}`;
     }
 
-    function getMouseCritTimes() {
+    function getMouseExitTimes() {
         return sessionStorage.getItem("mouse_exit_t")
     }
 
-    function storeMouseCritTime(t) {
-        let data = getMouseCritTimes();
+    function storeMouseExitTime(t) {
+        let data = getMouseExitTimes();
         if (data == null) {
             data = '';
         }
@@ -99,13 +99,14 @@
         return sessionStorage.getItem("last_txy_time");
     }
 
+
     async function sendData() {
         const last_t = getLastTXYTime();
-        storeMouseCritTime(last_t);
+        storeMouseExitTime(last_t);
         const t_xy_data = JSON.stringify({
             "mouse_txy": getStoredPositions(),
             "userID": getStoredUserID(),
-            "mouse_exit_t": getMouseCritTimes()
+            "mouse_exit_t": getMouseExitTimes(),
         });
         const options = {
             method: "POST",
