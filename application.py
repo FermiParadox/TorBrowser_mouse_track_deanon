@@ -19,8 +19,8 @@ async def store_mouse_position():
         user_handler.create_user()
         user = user_handler.user
         user.plot_and_show_mouse_movement()
-        print(f"t_exit {user.mouse_exit_crit_t}")
-        print(f"t_entry {user.mouse_entry_crit_t}")
+        print(f"t_exit {user.mouse_exit_times}")
+        print(f"t_entry {user.mouse_entry_times}")
         print(f"angles {user.exit_angles()}")
         print(f"angles {user.entry_angles()}")
         # print(f"speed {user.exit_speeds()}")

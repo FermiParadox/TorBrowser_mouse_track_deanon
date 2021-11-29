@@ -25,7 +25,7 @@ class TXYStrToArray:
         return t_list, x_list, y_list
 
 
-class ActionDataExtractor:
+class MouseDataExtractor:
     def __init__(self, req):
         self.req = req
         self.json = req.json
@@ -43,58 +43,60 @@ class ActionDataExtractor:
         return ip_address(self.req.remote_addr)
 
     @property
-    def _mouse_exit_t_str(self) -> str:
+    def _exit_times_str(self) -> str:
         return self.json["mouse_exit_t"]
 
     @property
-    def mouse_exit_t(self):
-        return [int(s) for s in self._mouse_exit_t_str.split(POINT_SPLITTER) if s]
+    def exit_times(self):
+        print("exit list")
+
+        print([int(s) for s in self._exit_times_str.split(POINT_SPLITTER) if s])
+        return [int(s) for s in self._exit_times_str.split(POINT_SPLITTER) if s]
 
     def entry_point_index_out_of_range(self, index) -> bool:
         return index > self.maximum_txy_index
 
     @property
-    def mouse_entry_t(self):
-        entry_t_list = []
-        for exit_t in self.mouse_exit_t:
+    def entry_times(self):
+        entry_times = []
+        for exit_t in self.exit_times:
             # the next point is always an entry point
             current_index = self.t_list.index(exit_t)
             entry_point_index = current_index + 1
             if self.entry_point_index_out_of_range(index=entry_point_index):
                 break
             entry_t = self.t_list[entry_point_index]
-            entry_t_list.append(entry_t)
-        return entry_t_list
+            entry_times.append(entry_t)
+        return entry_times
 
     @property
-    def mouse_entry_crit_xy(self):
-        critical_entry_x = []
-        critical_entry_y = []
+    def entry_xy_lists(self):
+        entry_x_list = []
+        entry_y_list = []
 
-        for t in self.mouse_entry_t:
-            point_index = self.t_list[::-1].index(t)
-            point_index = len(self.t_list) - point_index - 1
+        for t in self.entry_times:
+            point_index = self.t_list.index(t)
             x = self.x_list[point_index]
             y = self.y_list[point_index]
-            critical_entry_x.append(x)
-            critical_entry_y.append(y)
-        return critical_entry_x, critical_entry_y
+            entry_x_list.append(x)
+            entry_y_list.append(y)
+        return entry_x_list, entry_y_list
 
     @property
-    def mouse_exit_crit_xy(self):
+    def exit_xy_lists(self):
         t_list, x_list, y_list = self.txy_lists
 
-        critical_exit_x = []
-        critical_exit_y = []
+        exit_x_list = []
+        exit_y_list = []
 
-        for t in self.mouse_exit_t:
+        for t in self.exit_times:
             point_index = t_list[::-1].index(t)
             point_index = len(t_list) - point_index - 1
             x = x_list[point_index]
             y = y_list[point_index]
-            critical_exit_x.append(x)
-            critical_exit_y.append(y)
-        return critical_exit_x, critical_exit_y
+            exit_x_list.append(x)
+            exit_y_list.append(y)
+        return exit_x_list, exit_y_list
 
     @property
     def _mouse_txy_str(self):

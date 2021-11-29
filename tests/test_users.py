@@ -12,15 +12,15 @@ class TestUser(TestCase):
                             ip=ip_address("0.0.0.0"),
                             mouse_txy=TimeXY([1, 2], [11, 22], [111, 222]),
                             time_keys=TimeKeys([4, 5], [44, 55]),
-                            mouse_exit_crit_txy=TimeXY(),
-                            mouse_entry_crit_txy=TimeXY())
+                            mouse_exit_txy_lists=TimeXY(),
+                            mouse_entry_txy_lists=TimeXY())
 
         self.u2_5000 = User(id=user_id,
                             ip=ip_address("5.0.0.0"),
                             mouse_txy=TimeXY([1, 2, 3], [11, 22, 33], [111, 222, 333]),
                             time_keys=TimeKeys([4, 5], [44, 55]),
-                            mouse_exit_crit_txy=TimeXY(),
-                            mouse_entry_crit_txy=TimeXY())
+                            mouse_exit_txy_lists=TimeXY(),
+                            mouse_entry_txy_lists=TimeXY())
 
     def test_same_id_considered_same_user(self):
         self.assertEqual(self.u1_0000, self.u2_5000)
@@ -45,30 +45,30 @@ class TestAllUsers(TestCase):
                        ip=ip_address("0.42.0.0"),
                        mouse_txy=TimeXY(),
                        time_keys=TimeKeys([4, 5], [44, 55]),
-                       mouse_exit_crit_txy=TimeXY(),
-                       mouse_entry_crit_txy=TimeXY())
+                       mouse_exit_txy_lists=TimeXY(),
+                       mouse_entry_txy_lists=TimeXY())
 
         self.u2 = User(id=3333,
                        ip=ip_address("0.0.7.0"),
                        mouse_txy=TimeXY(),
                        time_keys=TimeKeys([4, 5], [44, 55]),
-                       mouse_exit_crit_txy=TimeXY(),
-                       mouse_entry_crit_txy=TimeXY())
+                       mouse_exit_txy_lists=TimeXY(),
+                       mouse_entry_txy_lists=TimeXY())
 
         self.u3_initial = User(id=5252525,
                                ip=ip_address("52.0.0.0"),
                                mouse_txy=TimeXY(),
                                time_keys=TimeKeys(),
-                               mouse_exit_crit_txy=TimeXY(),
-                               mouse_entry_crit_txy=TimeXY())
+                               mouse_exit_txy_lists=TimeXY(),
+                               mouse_entry_txy_lists=TimeXY())
 
         self.txy_updated = TimeXY([1, 2], [11, 22], [111, 222])
         self.u3_updated = User(id=5252525,
                                ip=ip_address("52.0.0.0"),
                                mouse_txy=self.txy_updated,
                                time_keys=TimeKeys([4, 5], [44, 55]),
-                               mouse_exit_crit_txy=TimeXY(),
-                               mouse_entry_crit_txy=TimeXY())
+                               mouse_exit_txy_lists=TimeXY(),
+                               mouse_entry_txy_lists=TimeXY())
 
     def test_displayed_id_exists_when_adding_user(self):
         stored_user = self.u1

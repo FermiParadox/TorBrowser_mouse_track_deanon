@@ -34,7 +34,7 @@
         sessionStorage.setItem("userID", ID);
     }
 
-    function showUserID(e) {
+    function showUserID() {
         const userID = getStoredUserID();
         document.getElementById("key_pressed")
             .innerText = `User ID assigned: ${userID}`;
