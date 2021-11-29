@@ -42,27 +42,25 @@ class MouseDataExtractor:
     def user_ip(self):
         return ip_address(self.req.remote_addr)
 
-    @property
-    def _exit_times_str(self) -> str:
-        return self.json["mouse_exit_t"]
+    def _exit_indices_str(self):
+        return self.json["mouse_exit_txy_indices"]
+
+    def exit_indices(self):
+        return [int(s) for s in self._exit_indices_str().split(POINT_SPLITTER) if s]
 
     @property
     def exit_times(self):
-        print("exit list")
-
-        print([int(s) for s in self._exit_times_str.split(POINT_SPLITTER) if s])
-        return [int(s) for s in self._exit_times_str.split(POINT_SPLITTER) if s]
+        return [self.t_list[i] for i in self.exit_indices()]
 
     def entry_point_index_out_of_range(self, index) -> bool:
         return index > self.maximum_txy_index
 
     @property
     def entry_times(self):
-        entry_times = []
-        for exit_t in self.exit_times:
+        entry_times = [self.t_list[0]]  # first point is always an entry point
+        for exit_index in self.exit_indices():
             # the next point is always an entry point
-            current_index = self.t_list.index(exit_t)
-            entry_point_index = current_index + 1
+            entry_point_index = exit_index + 1
             if self.entry_point_index_out_of_range(index=entry_point_index):
                 break
             entry_t = self.t_list[entry_point_index]

@@ -69,44 +69,38 @@
             .innerText = `x,y = ${x}, ${y}\nt = ${t}`;
     }
 
-    function getMouseExitTimes() {
-        return sessionStorage.getItem("mouse_exit_t")
+    function getMouseExitTXYIndices() {
+        return sessionStorage.getItem("mouse_exit_txy_indices")
     }
 
-    function storeMouseExitTime(t) {
-        let data = getMouseExitTimes();
+    function storeMouseExitTXYIndices(i) {
+        let data = getMouseExitTXYIndices();
         if (data == null) {
             data = '';
         }
-        data += `${t}:`;
-        sessionStorage.setItem("mouse_exit_t", data);
+        data += `${i}:`;
+        sessionStorage.setItem("mouse_exit_txy_indices", data);
+    }
+
+    function totalPointsTXY() {
+        return getStoredPositions().match(/:/g).length - 1
     }
 
     function showAndStorePosition(e) {
-        let x = e.clientX;
-        let y = e.clientY;
-        let t = Date.now();
+        const x = e.clientX;
+        const y = e.clientY;
+        const t = Date.now();
         showPosition(t, x, y);
         storePosition(t, x, y);
-        storeLastTXYTime(t);
     }
-
-    function storeLastTXYTime(t) {
-        sessionStorage.setItem("last_txy_time", t);
-    }
-
-    function getLastTXYTime() {
-        return sessionStorage.getItem("last_txy_time");
-    }
-
 
     async function sendData() {
-        const last_t = getLastTXYTime();
-        storeMouseExitTime(last_t);
+        const index = totalPointsTXY();
+        storeMouseExitTXYIndices(index);
         const t_xy_data = JSON.stringify({
             "mouse_txy": getStoredPositions(),
             "userID": getStoredUserID(),
-            "mouse_exit_t": getMouseExitTimes(),
+            "mouse_exit_txy_indices": getMouseExitTXYIndices(),
         });
         const options = {
             method: "POST",
