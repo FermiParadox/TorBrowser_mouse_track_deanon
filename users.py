@@ -124,34 +124,25 @@ class UserHandler:
     def __init__(self, req):
         self.req = req
         self.user_id = None
-        self.mouse_exit_t = None
-        self.mouse_exit_xy_lists: XY
-        self.mouse_entry_xy_lists: XY
+        self.exit_txy: XY
+        self.entry_txy: XY
         self.user: User
         self.ip = None
 
     def _extract_data(self):
         extractor = MouseDataExtractor(req=self.req)
         self.ip = extractor.user_ip
-        self.mouse_exit_t = extractor.exit_times
-        self.mouse_entry_t = extractor.entry_times
-        self.mouse_exit_xy_lists = extractor.exit_txy
-        self.mouse_entry_xy_lists = extractor.entry_txy
+        self.exit_txy = extractor.exit_txy
+        self.entry_txy = extractor.entry_txy
         self.user_id = extractor.user_id
         self.mouse_txy = extractor.txy_lists
 
     def _create_user(self):
-        exit_xy = self.mouse_exit_xy_lists
-        mouse_exit_txy_lists = TimeXY(time=self.mouse_exit_t, x=exit_xy.x, y=exit_xy.y)
-
-        entry_xy = self.mouse_entry_xy_lists
-        mouse_entry_txy_lists = TimeXY(time=self.mouse_entry_t, x=entry_xy.x, y=entry_xy.y)
-
         self.user = User(id=self.user_id,
                          ip=self.ip,
                          mouse_txy=self.mouse_txy,
-                         entry_txy_lists=mouse_entry_txy_lists,
-                         exit_txy_lists=mouse_exit_txy_lists,
+                         entry_txy_lists=self.entry_txy,
+                         exit_txy_lists=self.exit_txy,
                          time_keys=TimeKeys())
 
     def create_user(self):

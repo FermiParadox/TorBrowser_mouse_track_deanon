@@ -57,10 +57,6 @@ class MouseDataExtractor:
     def exit_indices(self):
         return [int(s) for s in self._exit_indices_str().split(POINT_SPLITTER) if s]
 
-    @property
-    def exit_times(self):
-        return [self.t_list[i] for i in self.exit_indices()]
-
     def entry_point_index_out_of_range(self, index) -> bool:
         return index > self.maximum_txy_index
 
@@ -73,14 +69,6 @@ class MouseDataExtractor:
                 break
             entry_i_list.append(entry_i)
         return entry_i_list
-
-    @property
-    def entry_times(self):
-        entry_times = []
-        for entry_index in self.entry_indices():
-            t = self.t_list[entry_index]
-            entry_times.append(t)
-        return entry_times
 
     @property
     def entry_txy(self) -> TimeXY:
