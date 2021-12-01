@@ -1,6 +1,6 @@
 from ipaddress import ip_address
 
-from metrics_dataclasses import XY, TimeXY
+from metrics_dataclasses import TimesXY
 
 POINT_SPLITTER = ":"
 COORDINATE_SPLITTER = ","
@@ -17,8 +17,8 @@ class TXYStrToArray:
         return [s for s in self.txy_string.split(POINT_SPLITTER) if s]
 
     @property
-    def txy_lists(self) -> TimeXY:
-        txy_lists = TimeXY()
+    def txy_lists(self) -> TimesXY:
+        txy_lists = TimesXY()
         for p in self.points_as_list_of_strings():
             t, x, y = p.split(',')
             txy_lists.time.append(int(t))
@@ -62,6 +62,7 @@ class MouseDataExtractor:
 
     def entry_indices(self):
         entry_i_list = [0, ]  # first point in TXY, is always an entry point
+
         for exit_i in self.exit_indices():
             # the next point after an exit point, is always an entry point
             entry_i = exit_i + 1
@@ -71,27 +72,19 @@ class MouseDataExtractor:
         return entry_i_list
 
     @property
-    def entry_txy(self) -> TimeXY:
-        entry_txy = TimeXY()
+    def entry_txy(self) -> TimesXY:
+        entry_txy = TimesXY()
 
         for entry_i in self.entry_indices():
-            x = self.x_list[entry_i]
-            y = self.y_list[entry_i]
-            t = self.t_list[entry_i]
-            entry_txy.x.append(x)
-            entry_txy.y.append(y)
-            entry_txy.time.append(t)
+            txy_point = self.txy_lists.get_point_by_index(index=entry_i)
+            entry_txy.append_point(txy_point)
         return entry_txy
 
     @property
-    def exit_txy(self) -> TimeXY:
-        exit_txy = TimeXY()
+    def exit_txy(self) -> TimesXY:
+        exit_txy = TimesXY()
 
         for exit_i in self.exit_indices():
-            x = self.x_list[exit_i]
-            y = self.y_list[exit_i]
-            t = self.t_list[exit_i]
-            exit_txy.x.append(x)
-            exit_txy.y.append(y)
-            exit_txy.time.append(t)
+            txy_point = self.txy_lists.get_point_by_index(index=exit_i)
+            exit_txy.append_point(txy_point)
         return exit_txy

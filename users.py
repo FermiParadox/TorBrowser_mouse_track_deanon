@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Union
 
 from data_converter import MouseDataExtractor
-from metrics_dataclasses import TimeXY, TimeKeys, XY
+from metrics_dataclasses import TimesXY, TimeKeys, XY
 from plotting import Plotter
 from points import PointsHandler, CriticalPointType
 
@@ -28,9 +28,9 @@ class User:
     id: int
     ip: IPv6_or_IPv4_obj
     # Mouse
-    mouse_txy: TimeXY
-    exit_txy_lists: TimeXY  # last point of mouse position stored, before browser switching
-    entry_txy_lists: TimeXY  # first point after refocusing browser
+    mouse_txy: TimesXY
+    exit_txy_lists: TimesXY  # last point of mouse position stored, before browser switching
+    entry_txy_lists: TimesXY  # first point after refocusing browser
     # Keyboard
     time_keys: TimeKeys
 
