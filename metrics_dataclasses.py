@@ -3,7 +3,7 @@ from typing import List
 
 
 @dataclass
-class XY(list):
+class XY:
     x: List[int] = field(default_factory=list)
     y: List[int] = field(default_factory=list)
 
@@ -16,7 +16,7 @@ class TimeXYPoint:
 
 
 @dataclass
-class TimesXY(list):
+class TimesXY:
     time: List[int] = field(default_factory=list)
     x: List[int] = field(default_factory=list)
     y: List[int] = field(default_factory=list)
@@ -33,6 +33,6 @@ class TimesXY(list):
 
 
 @dataclass
-class TimeKeys(list):
+class TimeKeys:
     time: List[int] = field(default_factory=list)
     keys_pressed: List[int] = field(default_factory=list)
