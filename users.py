@@ -27,14 +27,16 @@ class IDGenerator:
 class User:
     id: int
     ip: IPv6_or_IPv4_obj
+    # Mouse
     mouse_txy: TimeXY
-    mouse_exit_txy_lists: TimeXY  # last point of mouse position stored, before browser switching
-    mouse_entry_txy_lists: TimeXY  # first point after refocusing browser
+    exit_txy_lists: TimeXY  # last point of mouse position stored, before browser switching
+    entry_txy_lists: TimeXY  # first point after refocusing browser
+    # Keyboard
     time_keys: TimeKeys
 
     def __post_init__(self):
-        self.mouse_exit_times = self.mouse_exit_txy_lists.time
-        self.mouse_entry_times = self.mouse_entry_txy_lists.time
+        self.mouse_exit_times = self.exit_txy_lists.time
+        self.mouse_entry_times = self.entry_txy_lists.time
 
     def __eq__(self, other):
         return self.id == other.id
@@ -85,13 +87,13 @@ class User:
         plotter = Plotter(user_id=self.id)
         plotter.plot_all_x_y(x=x_all, y=y_all)
 
-        entry_x_list = self.mouse_entry_txy_lists.x
-        entry_y_list = self.mouse_entry_txy_lists.y
-        plotter.plot_entry_x_y(x=entry_x_list, y=entry_y_list)
+        entry_x_list = self.entry_txy_lists.x
+        entry_y_list = self.entry_txy_lists.y
+        plotter.plot_entry_xy(x=entry_x_list, y=entry_y_list)
 
-        exit_x_list = self.mouse_exit_txy_lists.x
-        exit_y_list = self.mouse_exit_txy_lists.y
-        plotter.plot_exit_x_y(x=exit_x_list, y=exit_y_list)
+        exit_x_list = self.exit_txy_lists.x
+        exit_y_list = self.exit_txy_lists.y
+        plotter.plot_exit_xy(x=exit_x_list, y=exit_y_list)
 
         plotter.decorate_graphs_and_show()
 
@@ -146,13 +148,13 @@ class UserHandler:
         mouse_exit_txy_lists = TimeXY(time=self.mouse_exit_t, x=exit_xy[0], y=exit_xy[1])
 
         entry_xy = self.mouse_entry_xy_lists
-        mouse_entry_txy_lists = TimeXY(time=self.mouse_entry_t, x=entry_xy[0], y=entry_xy[1])
+        mouse_entry_txy_lists = TimeXY(time=self.mouse_entry_t, x=entry_xy.x, y=entry_xy.y)
 
         self.user = User(id=self.user_id,
                          ip=self.ip,
                          mouse_txy=mouse_txy,
-                         mouse_entry_txy_lists=mouse_entry_txy_lists,
-                         mouse_exit_txy_lists=mouse_exit_txy_lists,
+                         entry_txy_lists=mouse_entry_txy_lists,
+                         exit_txy_lists=mouse_exit_txy_lists,
                          time_keys=TimeKeys())
 
     def create_user(self):
