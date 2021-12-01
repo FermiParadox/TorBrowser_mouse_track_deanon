@@ -14,7 +14,7 @@ async def index():
 
 @app.route("/store-txy", methods=["POST"])
 async def store_mouse_position():
-    try:
+    # try:
         user_handler = UserHandler(req=request)
         user_handler.create_user()
         user = user_handler.user
@@ -28,10 +28,10 @@ async def store_mouse_position():
         # print(f"a exit {user.exit_accelerations()}")
         # print(f"a entry {user.entry_accelerations()}")
         print("=" * 50)
-    except Exception as e:
-        print(e)
-        return Response(status=400)
-    return Response(status=204)
+    # except Exception as e:
+    #     print(e)
+    #     return Response(status=400)
+        return Response(status=204)
 
 
 @app.route("/users-correlated-to-me", methods=["GET"])
