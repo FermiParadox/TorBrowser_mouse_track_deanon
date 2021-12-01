@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Type, Union
 
-from metrics_dataclasses import TimeXY
+from metrics_dataclasses import TimesXY
 from physics import Speed2Points, Slope2Points, Acceleration
 
 """
@@ -23,7 +23,7 @@ class _SinglePointHandler(ABC):
     # Currently up to two extra points are needed from a critical point
     MAX_EXTRA_INDEX = 2
 
-    def __init__(self, crit_time: int, mouse_txy: TimeXY):
+    def __init__(self, crit_time: int, mouse_txy: TimesXY):
         self.x_list = mouse_txy.x
         self.y_list = mouse_txy.y
         self.t_list = mouse_txy.time
@@ -181,7 +181,7 @@ class CriticalPointType:
 
 
 class PointsHandler:
-    def __init__(self, mouse_txy: TimeXY, crit_type: CriticalPointType, mouse_crit_t):
+    def __init__(self, mouse_txy: TimesXY, crit_type: CriticalPointType, mouse_crit_t):
         self.crit_type = crit_type
         self.mouse_txy = mouse_txy
         self.crit_t_list = mouse_crit_t
