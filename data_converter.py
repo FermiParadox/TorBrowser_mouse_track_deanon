@@ -28,7 +28,7 @@ class TXYStrToArray:
         return txy_lists
 
 
-class MouseDataExtractor:
+class DataExtractor:
     def __init__(self, req):
         self.req = req
         self.json = req.json

@@ -3,7 +3,7 @@ from ipaddress import IPv4Address, IPv6Address
 from dataclasses import dataclass
 from typing import Union, List
 
-from data_converter import MouseDataExtractor
+from data_converter import DataExtractor
 from metrics_dataclasses import TimesXY
 from plotting import Plotter
 from points import Metrics
@@ -28,16 +28,15 @@ class IDGenerator:
 class User:
     id: int
     ip: IPv6_or_IPv4_obj
-    # Mouse
     all_txy: TimesXY
-    exit_txy_lists: TimesXY  # last point of mouse position stored, before browser switching
+    exit_txy_lists: TimesXY  # last point of position stored, before browser switching
     entry_txy_lists: TimesXY  # first point after refocusing browser
     exit_indices: List[int]
     entry_indices: List[int]
 
     def __post_init__(self):
-        self.mouse_exit_times = self.exit_txy_lists.time
-        self.mouse_entry_times = self.entry_txy_lists.time
+        self.exit_times = self.exit_txy_lists.time
+        self.entry_times = self.entry_txy_lists.time
 
     def __eq__(self, other):
         return self.id == other.id
@@ -128,7 +127,7 @@ class UserHandler:
         self.user: User
 
     def _created_user(self):
-        extractor = MouseDataExtractor(req=self.req)
+        extractor = DataExtractor(req=self.req)
 
         return User(id=extractor.user_id,
                     ip=extractor.user_ip,
