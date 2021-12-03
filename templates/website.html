@@ -1,7 +1,9 @@
 <!DOCTYPE html>
-<html lang="en"
-      onmousemove="showAndStorePosition(event)"
-      onmouseleave="sendData()">
+<html
+        lang="en"
+        onmousemove="showAndStorePosition(event)"
+        onmouseleave="sendData()"
+>
 <head>
     <meta name="robots" content="noindex">
     <meta charset="UTF-8">
@@ -94,7 +96,7 @@
         storePosition(t, x, y);
     }
 
-    async function sendData() {
+    async function sendData(e) {
         const index = totalPointsTXY();
         storeMouseExitTXYIndices(index);
         const t_xy_data = JSON.stringify({

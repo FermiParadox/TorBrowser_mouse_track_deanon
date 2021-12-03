@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, Response, make_response
 
-from users import UserHandler, IDGenerator
+from users import UserHandler, IDGenerator, all_users
 
 app = Flask(__name__)
 
@@ -8,13 +8,13 @@ app = Flask(__name__)
 @app.route("/", methods=["GET"])
 async def index():
     new_user_id = IDGenerator.unique_id()
-    resp = make_response(render_template("main_page.html", userID=new_user_id))
+    resp = make_response(render_template("website.html", userID=new_user_id))
     return resp
 
 
 def print_metrics():
     user_handler = UserHandler(req=request)
-    user_handler.create_user()
+    user_handler.create_and_insert_user()
     user = user_handler.user
     user.plot_and_show_mouse_movement()
     print(f"t exit {user.mouse_exit_times}")

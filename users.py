@@ -1,12 +1,13 @@
 import secrets
 from ipaddress import IPv4Address, IPv6Address
 from dataclasses import dataclass
-from typing import Union
+from typing import Union, List
 
 from data_converter import MouseDataExtractor
 from metrics_dataclasses import TimesXY, TimeKeys, XY
 from plotting import Plotter
-from points import PointsHandler, CriticalPointType
+from points import Metrics
+from point_types import ExitType, EntryType
 
 IPv6_or_IPv4_obj = Union[IPv4Address, IPv6Address]
 
@@ -31,6 +32,8 @@ class User:
     mouse_txy: TimesXY
     exit_txy_lists: TimesXY  # last point of mouse position stored, before browser switching
     entry_txy_lists: TimesXY  # first point after refocusing browser
+    exit_indices: List[int]
+    entry_indices: List[int]
     # Keyboard
     time_keys: TimeKeys
 
@@ -45,40 +48,40 @@ class User:
         return hash(self.id)
 
     def exit_angles(self):
-        handler = PointsHandler(mouse_txy=self.mouse_txy,
-                                crit_type=CriticalPointType.EXIT,
-                                mouse_crit_t=self.mouse_exit_times)
-        return handler.critical_angles()
+        metrics = Metrics(mouse_txy=self.mouse_txy,
+                          crit_type=ExitType,
+                          crit_indices=self.exit_indices)
+        return metrics.critical_angles()
 
     def entry_angles(self):
-        handler = PointsHandler(mouse_txy=self.mouse_txy,
-                                crit_type=CriticalPointType.ENTRY,
-                                mouse_crit_t=self.mouse_entry_times)
-        return handler.critical_angles()
+        metrics = Metrics(mouse_txy=self.mouse_txy,
+                          crit_type=EntryType,
+                          crit_indices=self.entry_indices)
+        return metrics.critical_angles()
 
     def exit_speeds(self):
-        handler = PointsHandler(mouse_txy=self.mouse_txy,
-                                crit_type=CriticalPointType.EXIT,
-                                mouse_crit_t=self.mouse_exit_times)
-        return handler.critical_speeds()
+        metrics = Metrics(mouse_txy=self.mouse_txy,
+                          crit_type=ExitType,
+                          crit_indices=self.exit_indices)
+        return metrics.critical_speeds()
 
     def entry_speeds(self):
-        handler = PointsHandler(mouse_txy=self.mouse_txy,
-                                crit_type=CriticalPointType.ENTRY,
-                                mouse_crit_t=self.mouse_entry_times)
-        return handler.critical_speeds()
+        metrics = Metrics(mouse_txy=self.mouse_txy,
+                          crit_type=EntryType,
+                          crit_indices=self.entry_indices)
+        return metrics.critical_speeds()
 
     def exit_accelerations(self):
-        handler = PointsHandler(mouse_txy=self.mouse_txy,
-                                crit_type=CriticalPointType.EXIT,
-                                mouse_crit_t=self.mouse_exit_times)
-        return handler.critical_accelerations()
+        metrics = Metrics(mouse_txy=self.mouse_txy,
+                          crit_type=ExitType,
+                          crit_indices=self.exit_indices)
+        return metrics.critical_accelerations()
 
     def entry_accelerations(self):
-        handler = PointsHandler(mouse_txy=self.mouse_txy,
-                                crit_type=CriticalPointType.ENTRY,
-                                mouse_crit_t=self.mouse_entry_times)
-        return handler.critical_accelerations()
+        metrics = Metrics(mouse_txy=self.mouse_txy,
+                          crit_type=EntryType,
+                          crit_indices=self.entry_indices)
+        return metrics.critical_accelerations()
 
     def plot_and_show_mouse_movement(self):
         x_all = self.mouse_txy.x
@@ -108,7 +111,8 @@ class AllUsers(set):
         return {str(u.id) for u in self}
 
     def add(self, other: User):
-        """When added element is already present, it replaces the existing one.
+        """When added element is already present, it replaces the existing one,
+        instead of "editing" it.
         Not very efficient, but should be ok for testing.
 
         By default `add` has no effect if the element is already present,
@@ -123,31 +127,20 @@ all_users = AllUsers()
 class UserHandler:
     def __init__(self, req):
         self.req = req
-        self.user_id = None
-        self.exit_txy: XY
-        self.entry_txy: XY
         self.user: User
-        self.ip = None
 
-    def _extract_data(self):
+    def _created_user(self):
         extractor = MouseDataExtractor(req=self.req)
-        self.ip = extractor.user_ip
-        self.exit_txy = extractor.exit_txy
-        self.entry_txy = extractor.entry_txy
-        self.user_id = extractor.user_id
-        self.mouse_txy = extractor.txy_lists
 
-    def _create_user(self):
-        self.user = User(id=self.user_id,
-                         ip=self.ip,
-                         mouse_txy=self.mouse_txy,
-                         entry_txy_lists=self.entry_txy,
-                         exit_txy_lists=self.exit_txy,
-                         time_keys=TimeKeys())
-
-    def create_user(self):
-        self._extract_data()
-        self._create_user()
+        return User(id=extractor.user_id,
+                    ip=extractor.user_ip,
+                    mouse_txy=extractor.txy_lists,
+                    entry_txy_lists=extractor.entry_txy,
+                    exit_txy_lists=extractor.exit_txy,
+                    exit_indices=extractor.exit_indices(),
+                    entry_indices=extractor.entry_indices(),
+                    time_keys=TimeKeys())
 
     def create_and_insert_user(self):
+        self.user = self._created_user()
         all_users.add(self.user)
