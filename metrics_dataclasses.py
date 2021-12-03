@@ -30,9 +30,3 @@ class TimesXY:
         self.time.append(txy_point.time)
         self.x.append(txy_point.x)
         self.y.append(txy_point.y)
-
-
-@dataclass
-class TimeKeys:
-    time: List[int] = field(default_factory=list)
-    keys_pressed: List[int] = field(default_factory=list)

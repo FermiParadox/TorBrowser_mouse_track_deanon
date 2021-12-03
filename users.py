@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Union, List
 
 from data_converter import MouseDataExtractor
-from metrics_dataclasses import TimesXY, TimeKeys, XY
+from metrics_dataclasses import TimesXY
 from plotting import Plotter
 from points import Metrics
 from point_types import ExitType, EntryType
@@ -29,13 +29,11 @@ class User:
     id: int
     ip: IPv6_or_IPv4_obj
     # Mouse
-    mouse_txy: TimesXY
+    all_txy: TimesXY
     exit_txy_lists: TimesXY  # last point of mouse position stored, before browser switching
     entry_txy_lists: TimesXY  # first point after refocusing browser
     exit_indices: List[int]
     entry_indices: List[int]
-    # Keyboard
-    time_keys: TimeKeys
 
     def __post_init__(self):
         self.mouse_exit_times = self.exit_txy_lists.time
@@ -48,44 +46,44 @@ class User:
         return hash(self.id)
 
     def exit_angles(self):
-        metrics = Metrics(mouse_txy=self.mouse_txy,
+        metrics = Metrics(all_txy=self.all_txy,
                           crit_type=ExitType,
                           crit_indices=self.exit_indices)
         return metrics.critical_angles()
 
     def entry_angles(self):
-        metrics = Metrics(mouse_txy=self.mouse_txy,
+        metrics = Metrics(all_txy=self.all_txy,
                           crit_type=EntryType,
                           crit_indices=self.entry_indices)
         return metrics.critical_angles()
 
     def exit_speeds(self):
-        metrics = Metrics(mouse_txy=self.mouse_txy,
+        metrics = Metrics(all_txy=self.all_txy,
                           crit_type=ExitType,
                           crit_indices=self.exit_indices)
         return metrics.critical_speeds()
 
     def entry_speeds(self):
-        metrics = Metrics(mouse_txy=self.mouse_txy,
+        metrics = Metrics(all_txy=self.all_txy,
                           crit_type=EntryType,
                           crit_indices=self.entry_indices)
         return metrics.critical_speeds()
 
     def exit_accelerations(self):
-        metrics = Metrics(mouse_txy=self.mouse_txy,
+        metrics = Metrics(all_txy=self.all_txy,
                           crit_type=ExitType,
                           crit_indices=self.exit_indices)
         return metrics.critical_accelerations()
 
     def entry_accelerations(self):
-        metrics = Metrics(mouse_txy=self.mouse_txy,
+        metrics = Metrics(all_txy=self.all_txy,
                           crit_type=EntryType,
                           crit_indices=self.entry_indices)
         return metrics.critical_accelerations()
 
     def plot_and_show_mouse_movement(self):
-        x_all = self.mouse_txy.x
-        y_all = self.mouse_txy.y
+        x_all = self.all_txy.x
+        y_all = self.all_txy.y
 
         plotter = Plotter(user_id=self.id)
         plotter.plot_all_x_y(x=x_all, y=y_all)
@@ -134,12 +132,11 @@ class UserHandler:
 
         return User(id=extractor.user_id,
                     ip=extractor.user_ip,
-                    mouse_txy=extractor.txy_lists,
+                    all_txy=extractor.txy_lists,
                     entry_txy_lists=extractor.entry_txy,
                     exit_txy_lists=extractor.exit_txy,
                     exit_indices=extractor.exit_indices(),
-                    entry_indices=extractor.entry_indices(),
-                    time_keys=TimeKeys())
+                    entry_indices=extractor.entry_indices())
 
     def create_and_insert_user(self):
         self.user = self._created_user()

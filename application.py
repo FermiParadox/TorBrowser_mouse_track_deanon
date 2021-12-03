@@ -51,6 +51,7 @@ async def store_mouse_position():
 
 @app.route("/users-correlated-to-me", methods=["GET"])
 async def correlated_users():
+    print(all_users)
     return Response(status=404)
 
 

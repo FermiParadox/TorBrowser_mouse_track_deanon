@@ -24,10 +24,10 @@ class _SinglePointHandler(ABC):
     # Currently up to two extra points are needed from a critical point
     MAX_EXTRA_INDEX = 2
 
-    def __init__(self, crit_index: int, mouse_txy: TimesXY):
-        self.x_list = mouse_txy.x
-        self.y_list = mouse_txy.y
-        self.t_list = mouse_txy.time
+    def __init__(self, crit_index: int, all_txy: TimesXY):
+        self.x_list = all_txy.x
+        self.y_list = all_txy.y
+        self.t_list = all_txy.time
         self.crit_index = crit_index
         self.max_index = len(self.x_list) - 1
         self.index_too_small = self._index_too_small()
@@ -38,9 +38,6 @@ class _SinglePointHandler(ABC):
 
     def _index_too_large(self):
         return self.crit_index + self.MAX_EXTRA_INDEX > self.max_index
-
-    def index_in_txy(self, t_critical):
-        return self.t_list.index(t_critical)
 
     def p_i(self, extra_index):
         index = self.crit_index + extra_index
@@ -177,10 +174,10 @@ class EntryHandler(_SinglePointHandler):
 
 
 class Metrics:
-    def __init__(self, mouse_txy: TimesXY, crit_type: Type[ExitOrEntryType], crit_indices):
+    def __init__(self, all_txy: TimesXY, crit_type: Type[ExitOrEntryType], crit_indices):
         self.crit_indices = crit_indices
         self.crit_type = crit_type
-        self.mouse_txy = mouse_txy
+        self.all_txy = all_txy
         self.point_handler: Type[Union[ExitHandler, EntryHandler]] = self._point_handler()
 
     def _point_handler(self):
@@ -192,7 +189,7 @@ class Metrics:
     def critical_angles(self):
         angles = []
         for i in self.crit_indices:
-            handler = self.point_handler(crit_index=i, mouse_txy=self.mouse_txy)
+            handler = self.point_handler(crit_index=i, all_txy=self.all_txy)
             angle = handler.critical_angle
             if angle:
                 angles.append(angle)
@@ -201,7 +198,7 @@ class Metrics:
     def critical_speeds(self):
         speeds = []
         for i in self.crit_indices:
-            handler = self.point_handler(crit_index=i, mouse_txy=self.mouse_txy)
+            handler = self.point_handler(crit_index=i, all_txy=self.all_txy)
             speed = handler.critical_speed
             speeds.append(speed)
         return speeds
@@ -209,7 +206,7 @@ class Metrics:
     def critical_accelerations(self):
         accelerations = []
         for i in self.crit_indices:
-            handler = self.point_handler(crit_index=i, mouse_txy=self.mouse_txy)
+            handler = self.point_handler(crit_index=i, all_txy=self.all_txy)
             acceleration = handler.critical_acceleration
             accelerations.append(acceleration)
         return accelerations
