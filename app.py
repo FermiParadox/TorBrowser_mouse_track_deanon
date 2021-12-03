@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, Response, make_response
 
-from users import UserHandler, IDGenerator, all_users
+from users.user_base import IDGenerator
+from users.user_handling import UserCreator
 
 app = Flask(__name__)
 
@@ -13,7 +14,7 @@ async def index():
 
 
 def print_metrics():
-    user_handler = UserHandler(req=request)
+    user_handler = UserCreator(req=request)
     user_handler.create_and_insert_user()
     user = user_handler.user
     user.plot_and_show_mouse_movement()
@@ -51,7 +52,6 @@ async def store_mouse_position():
 
 @app.route("/users-correlated-to-me", methods=["GET"])
 async def correlated_users():
-    print(all_users)
     return Response(status=404)
 
 

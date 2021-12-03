@@ -1,6 +1,6 @@
 from ipaddress import ip_address
 
-from metrics_dataclasses import TimesXY
+from analysis.metrics_dataclasses import TimesXY
 
 POINT_SPLITTER = ":"
 COORDINATE_SPLITTER = ","

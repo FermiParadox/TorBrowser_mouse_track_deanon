@@ -4,7 +4,7 @@ from random import random
 
 class TestSlope2Points(TestCase):
     def setUp(self) -> None:
-        from physics import Slope2Points
+        from analysis.physics import Slope2Points
         self.Slope2Points = Slope2Points
 
     def test_dx_0(self):
@@ -61,7 +61,7 @@ class TestSlope2Points(TestCase):
 
 class TestSpeed2Points(TestCase):
     def setUp(self) -> None:
-        from physics import Speed2Points
+        from analysis.physics import Speed2Points
         self.Speed2Points = Speed2Points
 
     def test_dt_0(self):
@@ -93,7 +93,7 @@ class TestSpeed2Points(TestCase):
 
 class TestAcceleration3Points(TestCase):
     def setUp(self) -> None:
-        from physics import Acceleration
+        from analysis.physics import Acceleration
         self.Acceleration3Points = Acceleration
 
     def test_dt(self):

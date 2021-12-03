@@ -1,9 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Type, Union
 
-from metrics_dataclasses import TimesXY
-from physics import Speed2Points, Slope2Points, Acceleration
-from point_types import ExitOrEntryType, ExitType
+from analysis.metrics_dataclasses import TimesXY
+from analysis.physics import Speed2Points, Slope2Points, Acceleration
 
 """
 When calculating angle, speed, etc. using only the last 2 points 
@@ -173,40 +171,3 @@ class EntryHandler(_SinglePointHandler):
             t1=self.t1, t2=self.t2, t3=self.t3).acceleration
 
 
-class Metrics:
-    def __init__(self, all_txy: TimesXY, crit_type: Type[ExitOrEntryType], crit_indices):
-        self.crit_indices = crit_indices
-        self.crit_type = crit_type
-        self.all_txy = all_txy
-        self.point_handler: Type[Union[ExitHandler, EntryHandler]] = self._point_handler()
-
-    def _point_handler(self):
-        if self.crit_type == ExitType:
-            return ExitHandler
-        else:
-            return EntryHandler
-
-    def critical_angles(self):
-        angles = []
-        for i in self.crit_indices:
-            handler = self.point_handler(crit_index=i, all_txy=self.all_txy)
-            angle = handler.critical_angle
-            if angle:
-                angles.append(angle)
-        return angles
-
-    def critical_speeds(self):
-        speeds = []
-        for i in self.crit_indices:
-            handler = self.point_handler(crit_index=i, all_txy=self.all_txy)
-            speed = handler.critical_speed
-            speeds.append(speed)
-        return speeds
-
-    def critical_accelerations(self):
-        accelerations = []
-        for i in self.crit_indices:
-            handler = self.point_handler(crit_index=i, all_txy=self.all_txy)
-            acceleration = handler.critical_acceleration
-            accelerations.append(acceleration)
-        return accelerations
