@@ -17,11 +17,12 @@ def print_metrics():
     user_handler = UserCreator(req=request)
     user_handler.create_and_insert_user()
     user = user_handler.user
+    user.calc_and_store_metrics()
     user.plot_and_show_mouse_movement()
     print(f"t exit {user.exit_times}")
     print(f"t entry {user.entry_times}")
-    print(f"angles exit {user.exit_angles()}")
-    print(f"angles entry {user.entry_angles()}")
+    print(f"angles exit {user.exit_angles}")
+    print(f"angles entry {user.entry_angles}")
     # print(f"speed exit {user.exit_speeds()}")
     # print(f"speed entry {user.entry_speeds()}")
     # print(f"a exit {user.exit_accelerations()}")
@@ -38,7 +39,7 @@ def try_print_metrics():
     return Response(status=204)
 
 
-PREVENT_SERVER_CRASH = 1
+PREVENT_SERVER_CRASH = 0
 
 
 @app.route("/store-txy", methods=["POST"])

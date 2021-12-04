@@ -1,11 +1,12 @@
+from dataclasses import dataclass
 from typing import Type, Union
 
 from analysis.metrics_dataclasses import TimesXY
 from analysis.point_types import ExitOrEntryType, ExitType, EntryType
 from analysis.points import ExitHandler, EntryHandler
 
-TOR_RESOLUTION_MILLISECONDS = 100
-MAX_DELTA_MILLISECONDS = TOR_RESOLUTION_MILLISECONDS + 20
+TOR_RESOLUTION = 100
+MAX_DELTA_TIME = TOR_RESOLUTION + 20
 
 
 class _Metrics:
@@ -56,8 +57,3 @@ class EntryMetrics(_Metrics):
     def __init__(self, all_txy: TimesXY, crit_indices):
         super().__init__(all_txy=all_txy, crit_type=EntryType, crit_indices=crit_indices)
 
-
-class TimeDifferences:
-    def __init__(self, exit_user, entry_user):
-        self.exit_user = exit_user
-        self.entry_user = entry_user

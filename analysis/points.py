@@ -12,13 +12,6 @@ A better solution would be (linear) fitting of more than 2 points.
 
 
 class _SinglePointHandler(ABC):
-    """
-    Points right before browser exit:
-        P1 -> P2 -> P3 (exit point; or "critical").
-
-    Points right after browser entry:
-        P1 (entry point; or "critical") -> P2 -> P3.
-    """
     # Currently up to two extra points are needed from a critical point
     MAX_EXTRA_INDEX = 2
 
@@ -28,20 +21,18 @@ class _SinglePointHandler(ABC):
         self.t_list = all_txy.time
         self.crit_index = crit_index
         self.max_index = len(self.x_list) - 1
-        self.index_too_small = self._index_too_small()
-        self.index_too_large = self._index_too_large()
 
-    def _index_too_small(self):
+    def index_too_small(self):
         return self.crit_index - self.MAX_EXTRA_INDEX < 0
 
-    def _index_too_large(self):
+    def index_too_large(self):
         return self.crit_index + self.MAX_EXTRA_INDEX > self.max_index
 
-    def p_i(self, extra_index):
+    def point_n(self, extra_index):
         index = self.crit_index + extra_index
         return self.x_list[index], self.y_list[index]
 
-    def t_i(self, extra_index):
+    def time_n(self, extra_index):
         index = self.crit_index + extra_index
         return self.t_list[index]
 
@@ -50,56 +41,40 @@ class _SinglePointHandler(ABC):
     def p3(self):
         pass
 
-    @property
-    @abstractmethod
-    def p2(self):
+    def space_n(self, extra_index):
         pass
 
-    @property
-    @abstractmethod
-    def p1(self):
+    def velocity_n(self, extra_index):
         pass
 
-    @property
-    @abstractmethod
-    def t1(self):
-        pass
-
-    @property
-    @abstractmethod
-    def t2(self):
-        pass
-
-    @property
-    @abstractmethod
-    def t3(self):
+    def acceleration_n(self, extra_index):
         pass
 
 
 class ExitHandler(_SinglePointHandler):
     @property
     def p3(self):
-        return self.p_i(extra_index=0)
+        return self.point_n(extra_index=0)
 
     @property
     def p2(self):
-        return self.p_i(extra_index=-1)
+        return self.point_n(extra_index=-1)
 
     @property
     def p1(self):
-        return self.p_i(extra_index=-2)
+        return self.point_n(extra_index=-2)
 
     @property
     def t3(self):
-        return self.t_i(extra_index=0)
+        return self.time_n(extra_index=0)
 
     @property
     def t2(self):
-        return self.t_i(extra_index=-1)
+        return self.time_n(extra_index=-1)
 
     @property
     def t1(self):
-        return self.t_i(extra_index=-2)
+        return self.time_n(extra_index=-2)
 
     @property
     def critical_angle(self):
@@ -125,28 +100,28 @@ class ExitHandler(_SinglePointHandler):
 class EntryHandler(_SinglePointHandler):
     @property
     def p3(self):
-        return self.p_i(extra_index=2)
+        return self.point_n(extra_index=2)
 
     @property
     def p2(self):
-        return self.p_i(extra_index=1)
+        return self.point_n(extra_index=1)
 
     @property
     def p1(self):
         """First entry point"""
-        return self.p_i(extra_index=0)
+        return self.point_n(extra_index=0)
 
     @property
     def t3(self):
-        return self.t_i(extra_index=2)
+        return self.time_n(extra_index=2)
 
     @property
     def t2(self):
-        return self.t_i(extra_index=1)
+        return self.time_n(extra_index=1)
 
     @property
     def t1(self):
-        return self.t_i(extra_index=0)
+        return self.time_n(extra_index=0)
 
     @property
     def critical_angle(self):
@@ -169,5 +144,3 @@ class EntryHandler(_SinglePointHandler):
         return Acceleration(
             p1=self.p1, p2=self.p2, p3=self.p3,
             t1=self.t1, t2=self.t2, t3=self.t3).acceleration
-
-

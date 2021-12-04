@@ -27,7 +27,7 @@ can be deanonymized. Not all are examined here.
 [Bug 1517: Reduce precision of time for Javascript](https://gitweb.torproject.org/user/mikeperry/tor-browser.git/commit/?h=bug1517)
 > This clamps Javascript's time precision to 100ms for most things, without
 altering event delivery or responsiveness. It also clamps keyboard events
-(such as keypress, keyup, keydown, etc) to 250ms resolution, to mitigate
+(such as keypress, keyup, keydown, etc.) to 250ms resolution, to mitigate
 keystroke fingerprinting.
 
 
