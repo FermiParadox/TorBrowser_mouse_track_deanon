@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from analysis.metrics_dataclasses import TimesXY
+from analysis.metrics_base import ITXY
 from analysis.physics import Speed2Points, Slope2Points, Acceleration
 
 """
@@ -15,12 +15,12 @@ class _SinglePointHandler(ABC):
     # Currently up to two extra points are needed from a critical point
     MAX_EXTRA_INDEX = 2
 
-    def __init__(self, crit_index: int, all_txy: TimesXY):
-        self.x_list = all_txy.x
-        self.y_list = all_txy.y
-        self.t_list = all_txy.time
+    def __init__(self, crit_index: int, all_itxy: ITXY):
+        self.x_list = all_itxy.x
+        self.y_list = all_itxy.y
+        self.t_list = all_itxy.time
         self.crit_index = crit_index
-        self.max_index = len(self.x_list) - 1
+        self.max_index = all_itxy.indices[-1]
 
     def index_too_small(self):
         return self.crit_index - self.MAX_EXTRA_INDEX < 0

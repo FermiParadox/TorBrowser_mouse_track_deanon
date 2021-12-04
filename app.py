@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, Response, make_response
 
-from users.user_base import IDGenerator
+from analysis.user_base import IDGenerator
 from analysis.user_handling import UserCreator, UserHandler
 
 app = Flask(__name__)

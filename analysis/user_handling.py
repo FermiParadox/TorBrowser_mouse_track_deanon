@@ -2,9 +2,18 @@ from dataclasses import dataclass, field
 
 from analysis.analysis import ExitMetrics, EntryMetrics
 from analysis.conversion import DataExtractor
-from analysis.metrics_dataclasses import ITXY
+from analysis.metrics_base import ITXY
 from analysis.plotting import Plotter
-from users.user_base import User
+from analysis.user_base import User
+
+
+def is_tor_user(user: User):
+    """Tor-user times always end in '00'
+    because of the 100ms time-resolution imposed in JS."""
+    all_modulo = (i % 100 for i in user.all_itxy.time)
+    if any(all_modulo):
+        return False
+    return True
 
 
 class AllUsers(set):
@@ -40,11 +49,9 @@ class UserCreator:
 
         return User(id=extractor.user_id,
                     ip=extractor.user_ip,
-                    all_txy=extractor.txy_lists,
-                    entry_txy_lists=extractor.entry_txy,
-                    exit_txy_lists=extractor.exit_txy,
-                    exit_indices=extractor.exit_indices(),
-                    entry_indices=extractor.entry_indices())
+                    all_itxy=extractor.itxy_lists,
+                    entry_itxy=extractor.entry_itxy,
+                    exit_itxy=extractor.exit_itxy)
 
 
 class UserHandler:
@@ -52,33 +59,33 @@ class UserHandler:
         self.user: User = user
 
     def _exit_angles(self):
-        metrics = ExitMetrics(all_txy=self.user.all_txy,
-                              crit_indices=self.user.exit_indices)
+        metrics = ExitMetrics(all_itxy=self.user.all_itxy,
+                              crit_indices=self.user.exit_itxy.indices)
         return metrics.critical_angles()
 
     def _entry_angles(self):
-        metrics = EntryMetrics(all_txy=self.user.all_txy,
-                               crit_indices=self.user.entry_indices)
+        metrics = EntryMetrics(all_itxy=self.user.all_itxy,
+                               crit_indices=self.user.entry_itxy.indices)
         return metrics.critical_angles()
 
     def _exit_speeds(self):
-        metrics = ExitMetrics(all_txy=self.user.all_txy,
-                              crit_indices=self.user.exit_indices)
+        metrics = ExitMetrics(all_itxy=self.user.all_itxy,
+                              crit_indices=self.user.exit_itxy.indices)
         return metrics.critical_speeds()
 
     def _entry_speeds(self):
-        metrics = EntryMetrics(all_txy=self.user.all_txy,
-                               crit_indices=self.user.entry_indices)
+        metrics = EntryMetrics(all_itxy=self.user.all_itxy,
+                               crit_indices=self.user.entry_itxy.indices)
         return metrics.critical_speeds()
 
     def _exit_accelerations(self):
-        metrics = ExitMetrics(all_txy=self.user.all_txy,
-                              crit_indices=self.user.exit_indices)
+        metrics = ExitMetrics(all_itxy=self.user.all_itxy,
+                              crit_indices=self.user.exit_itxy.indices)
         return metrics.critical_accelerations()
 
     def _entry_accelerations(self):
-        metrics = EntryMetrics(all_txy=self.user.all_txy,
-                               crit_indices=self.user.entry_indices)
+        metrics = EntryMetrics(all_itxy=self.user.all_itxy,
+                               crit_indices=self.user.entry_itxy.indices)
         return metrics.critical_accelerations()
 
     def calc_and_store_metrics(self):
@@ -93,18 +100,18 @@ class UserHandler:
         all_users.add(self.user)
 
     def plot_and_show_mouse_movement(self):
-        x_all = self.user.all_txy.x
-        y_all = self.user.all_txy.y
+        x_all = self.user.all_itxy.x
+        y_all = self.user.all_itxy.y
 
         plotter = Plotter(user_id=self.user.id)
         plotter.plot_all_x_y(x=x_all, y=y_all)
 
-        exit_x_list = self.user.exit_txy_lists.x
-        exit_y_list = self.user.exit_txy_lists.y
+        exit_x_list = self.user.exit_itxy.x
+        exit_y_list = self.user.exit_itxy.y
         plotter.plot_exit_xy(x=exit_x_list, y=exit_y_list)
 
-        entry_x_list = self.user.entry_txy_lists.x
-        entry_y_list = self.user.entry_txy_lists.y
+        entry_x_list = self.user.entry_itxy.x
+        entry_y_list = self.user.entry_itxy.y
         plotter.plot_entry_xy(x=entry_x_list, y=entry_y_list)
 
         plotter.decorate_graphs_and_show()
@@ -127,10 +134,17 @@ class Similarity:
         self.angles_diff = abs(self.entry_angle - self.exit_angle)
 
 
-def is_tor_user(user: User):
-    """Tor-user times always end in '00'
-    because of the 100ms time-resolution imposed in JS."""
-    all_modulo = (i % 100 for i in user.all_txy.time)
-    if any(all_modulo):
-        return False
-    return True
+all_similarities = []
+
+
+def add_similarities(user):
+    for u in all_users:
+        ...
+
+
+def tor_users():
+    return (user for user in all_users if is_tor_user(user=user))
+
+
+for u in tor_users():
+    add_similarities(u)
