@@ -125,3 +125,12 @@ class Similarity:
 
     def __post_init__(self):
         self.angles_diff = abs(self.entry_angle - self.exit_angle)
+
+
+def is_tor_user(user: User):
+    """Tor-user times always end in '00'
+    because of the 100ms time-resolution imposed in JS."""
+    all_modulo = (i % 100 for i in user.all_txy.time)
+    if any(all_modulo):
+        return False
+    return True
