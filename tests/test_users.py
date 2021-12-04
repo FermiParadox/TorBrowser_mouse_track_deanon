@@ -3,7 +3,7 @@ from unittest import TestCase
 
 from users.user_base import IDGenerator, User
 from analysis.metrics_dataclasses import TimesXY
-from users.user_handling import AllUsers
+from analysis.user_handling import AllUsers
 
 
 class TestUser(TestCase):

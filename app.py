@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, Response, make_response
 
 from users.user_base import IDGenerator
-from users.user_handling import UserCreator
+from analysis.user_handling import UserCreator, UserHandler
 
 app = Flask(__name__)
 
@@ -14,11 +14,12 @@ async def index():
 
 
 def print_metrics():
-    user_handler = UserCreator(req=request)
-    user_handler.create_and_insert_user()
-    user = user_handler.user
-    user.calc_and_store_metrics()
-    user.plot_and_show_mouse_movement()
+    user = UserCreator(req=request).user()
+    user_handler = UserHandler(user=user)
+    user_handler.calc_and_store_metrics()
+    user_handler.insert_user()
+    user_handler.calc_and_store_metrics()
+    user_handler.plot_and_show_mouse_movement()
     print(f"t exit {user.exit_times}")
     print(f"t entry {user.entry_times}")
     print(f"angles exit {user.exit_angles}")

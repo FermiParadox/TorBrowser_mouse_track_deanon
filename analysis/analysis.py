@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from typing import Type, Union
 
 from analysis.metrics_dataclasses import TimesXY
@@ -56,4 +55,3 @@ class ExitMetrics(_Metrics):
 class EntryMetrics(_Metrics):
     def __init__(self, all_txy: TimesXY, crit_indices):
         super().__init__(all_txy=all_txy, crit_type=EntryType, crit_indices=crit_indices)
-

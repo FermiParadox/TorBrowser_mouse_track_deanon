@@ -30,3 +30,13 @@ class TimesXY:
         self.time.append(txy_point.time)
         self.x.append(txy_point.x)
         self.y.append(txy_point.y)
+
+
+@dataclass
+class ITXY:
+    index: List[int] = field(default_factory=list)
+    time: List[int] = field(default_factory=list)
+    x: List[int] = field(default_factory=list)
+    y: List[int] = field(default_factory=list)
+
+
