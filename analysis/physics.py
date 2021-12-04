@@ -1,5 +1,6 @@
-from math import atan2, degrees
+from math import atan, degrees
 from scipy.spatial import distance
+from scipy.stats import linregress
 
 
 class Slope2Points:
@@ -15,9 +16,12 @@ class Slope2Points:
     def dx(self):
         return self.p2[0] - self.p1[0]
 
+    def slope(self):
+        return linregress().slope
+
     @property
     def angle(self):
-        return degrees(atan2(self.dy, self.dx))
+        return degrees(atan(self.slope()))
 
 
 class Speed2Points:

@@ -25,7 +25,7 @@ class _Metrics:
         angles = []
         for i in self.crit_indices:
             handler = self.point_handler(crit_index=i, all_itxy=self.all_itxy)
-            angle = handler.critical_angle
+            angle = handler.angle
             if angle:
                 angles.append(angle)
         return angles
@@ -34,7 +34,7 @@ class _Metrics:
         speeds = []
         for i in self.crit_indices:
             handler = self.point_handler(crit_index=i, all_itxy=self.all_itxy)
-            speed = handler.critical_speed
+            speed = handler.speed
             speeds.append(speed)
         return speeds
 
@@ -42,7 +42,7 @@ class _Metrics:
         accelerations = []
         for i in self.crit_indices:
             handler = self.point_handler(crit_index=i, all_itxy=self.all_itxy)
-            acceleration = handler.critical_acceleration
+            acceleration = handler.acceleration
             accelerations.append(acceleration)
         return accelerations
 

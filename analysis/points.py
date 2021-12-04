@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 
 from analysis.metrics_base import ITXY
 from analysis.physics import Speed2Points, Slope2Points, Acceleration
@@ -11,7 +11,7 @@ A better solution would be (linear) fitting of more than 2 points.
 """
 
 
-class _SinglePointHandler(ABC):
+class _EntryOrExitHandler(ABC):
     # Currently up to two extra points are needed from a critical point
     MAX_EXTRA_INDEX = 2
 
@@ -36,11 +36,6 @@ class _SinglePointHandler(ABC):
         index = self.crit_index + extra_index
         return self.t_list[index]
 
-    @property
-    @abstractmethod
-    def p3(self):
-        pass
-
     def space_n(self, extra_index):
         pass
 
@@ -51,7 +46,7 @@ class _SinglePointHandler(ABC):
         pass
 
 
-class ExitHandler(_SinglePointHandler):
+class ExitHandler(_EntryOrExitHandler):
     @property
     def p3(self):
         return self.point_n(extra_index=0)
@@ -77,27 +72,27 @@ class ExitHandler(_SinglePointHandler):
         return self.time_n(extra_index=-2)
 
     @property
-    def critical_angle(self):
+    def angle(self):
         if self.index_too_small:
             return None
         return Slope2Points(p1=self.p2, p2=self.p3).angle
 
     @property
-    def critical_speed(self):
+    def speed(self):
         if self.index_too_small:
             return None
         return Speed2Points(p1=self.p2, p2=self.p3,
                             t1=self.t2, t2=self.t3).speed
 
     @property
-    def critical_acceleration(self):
+    def acceleration(self):
         if self.index_too_small:
             return None
         return Acceleration(p1=self.p1, p2=self.p2, p3=self.p3,
                             t1=self.t1, t2=self.t2, t3=self.t3).acceleration
 
 
-class EntryHandler(_SinglePointHandler):
+class EntryHandler(_EntryOrExitHandler):
     @property
     def p3(self):
         return self.point_n(extra_index=2)
@@ -124,21 +119,21 @@ class EntryHandler(_SinglePointHandler):
         return self.time_n(extra_index=0)
 
     @property
-    def critical_angle(self):
+    def angle(self):
         """Return approximate angle when exiting browser."""
         if self.index_too_large:
             return None
         return Slope2Points(p1=self.p1, p2=self.p2).angle
 
     @property
-    def critical_speed(self):
+    def speed(self):
         if self.index_too_large:
             return None
         return Speed2Points(p1=self.p1, p2=self.p2,
                             t1=self.t1, t2=self.t2).speed
 
     @property
-    def critical_acceleration(self):
+    def acceleration(self):
         if self.index_too_large:
             return None
         return Acceleration(
