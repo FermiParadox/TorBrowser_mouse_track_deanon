@@ -1,19 +1,12 @@
 from dataclasses import dataclass, field
+from itertools import combinations
 
 from analysis.analysis import ExitMetrics, EntryMetrics
 from analysis.conversion import DataExtractor
-from analysis.metrics_base import ITXY
+from analysis.metrics_base import ITXY, ITXYPoint
 from analysis.plotting import Plotter
+from analysis.point_types import ENTRY_OR_EXIT_TYPE
 from analysis.user_base import User
-
-
-def is_tor_user(user: User):
-    """Tor-user times always end in '00'
-    because of the 100ms time-resolution imposed in JS."""
-    all_modulo = (i % 100 for i in user.all_itxy.time)
-    if any(all_modulo):
-        return False
-    return True
 
 
 class AllUsers(set):
@@ -30,7 +23,7 @@ class AllUsers(set):
         instead of "editing" it.
         Not very efficient, but should be ok for testing.
 
-        By default `add` has no effect if the element is already present,
+        By default, `add` has no effect if the element is already present,
         meaning new data points wouldn't be stored."""
         self.discard(other)
         super().add(other)
@@ -118,33 +111,87 @@ class UserHandler:
 
 
 @dataclass
-class Similarity:
+class Comparison:
     user1: User
     user2: User
-    times_diff: int
+    matched_exits: int
+    matched_entries: int
+
+
+@dataclass
+class PointMatch:
+    p1: ITXYPoint
+    p2: ITXYPoint
+    type_p1: ENTRY_OR_EXIT_TYPE
+
+    exit_angle: float = field(init=False)
+    entry_angle: float = field(init=False)
     angles_diff: float = field(init=False)
 
-    exit_itxy: ITXY
-    exit_angle: float
-
-    entry_itxy: ITXY
-    entry_angle: float
-
-    def __post_init__(self):
-        self.angles_diff = abs(self.entry_angle - self.exit_angle)
+    def store_angles_diff(self, entry_angle, exit_angle):
+        self.angles_diff = abs(entry_angle - exit_angle)
 
 
-all_similarities = []
+@dataclass
+class PointMatches:
+    user1: User
+    user2: User
+    exit_to_entry_matches: list
+    entry_to_exit_matches: list
 
 
-def add_similarities(user):
-    for u in all_users:
-        ...
+def user_combinations():
+    return combinations(all_users, 2)
 
 
-def tor_users():
-    return (user for user in all_users if is_tor_user(user=user))
+def is_tor_user(user: User):
+    """Tor-user times always end in '00'
+    because of the 100ms time-resolution imposed in JS."""
+    all_modulo = (i % 100 for i in user.all_itxy.time)
+    if any(all_modulo):
+        return False
+    return True
 
 
-for u in tor_users():
-    add_similarities(u)
+def user_combinations_containing_tor():
+    comps = []
+    for comp in user_combinations():
+        if is_tor_user(comp[0]) or is_tor_user(comp[1]):
+            comps.append(comp)
+    return comps
+
+
+class PointMatchCreator:
+    MAX_DELTA_T = 120  # milliseconds
+
+    def __init__(self, user1: User, user2: User, index: int, entry_or_exit_type: ENTRY_OR_EXIT_TYPE):
+        self.index = index
+        self.entry_or_exit_type = entry_or_exit_type
+        self.user2 = user2
+        self.user1 = user1
+
+    @staticmethod
+    def time_diff_in_bounds(p1: ITXYPoint, p2: ITXYPoint):
+        return abs(p1.time - p2.time) <= PointMatchCreator.MAX_DELTA_T
+
+    def single_point_match(self, p1, p2):
+        if self.time_diff_in_bounds(p1, p2):
+            return PointMatch(p1=p1, p2=p2, type_p1=self.entry_or_exit_type)
+
+    def point_matches(self):
+        exit_to_entry_matches = []
+        for p1 in self.user1.exit_itxy.as_points():
+            for p2 in self.user2.entry_itxy.as_points():
+                exit_to_entry_matches.append(self.single_point_match(p1=p1, p2=p2))
+
+        entry_to_exit_matches = []
+        for p1 in self.user1.entry_itxy.as_points():
+            for p2 in self.user2.exit_itxy.as_points():
+                entry_to_exit_matches.append(self.single_point_match(p1=p1, p2=p2))
+
+        all_matches = PointMatches(user1=self.user1, user2=self.user2,
+                                   exit_to_entry_matches=exit_to_entry_matches,
+                                   entry_to_exit_matches=entry_to_exit_matches)
+
+        return all_matches
+

@@ -61,4 +61,4 @@ if __name__ == "__main__":
     app.run(debug=True)
 
 # Run in terminal:
-#   gunicorn -w 4 -b 0.0.0.0:65000 application:app
+#   gunicorn -w 4 -b 0.0.0.0:65000 app:app

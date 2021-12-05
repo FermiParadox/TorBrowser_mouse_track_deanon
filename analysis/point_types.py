@@ -1,10 +1,16 @@
-class ExitOrEntryType:
+from typing import Type
+
+
+class _ExitOrEntryTypeBase:
     pass
 
 
-class ExitType(ExitOrEntryType):
+class ExitType(_ExitOrEntryTypeBase):
     pass
 
 
-class EntryType(ExitOrEntryType):
+class EntryType(_ExitOrEntryTypeBase):
     pass
+
+
+ENTRY_OR_EXIT_TYPE = Type[_ExitOrEntryTypeBase]

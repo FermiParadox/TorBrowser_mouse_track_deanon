@@ -1,4 +1,5 @@
 from abc import ABC
+from typing import Type, Union
 
 from analysis.metrics_base import ITXY
 from analysis.physics import Speed2Points, Slope2Points, Acceleration
@@ -139,3 +140,6 @@ class EntryHandler(_EntryOrExitHandler):
         return Acceleration(
             p1=self.p1, p2=self.p2, p3=self.p3,
             t1=self.t1, t2=self.t2, t3=self.t3).acceleration
+
+
+ENTRY_OR_EXIT_HANDLER = Type[Union[ExitHandler, EntryHandler]]
