@@ -1,4 +1,4 @@
-from analysis.itxy_base import ITXYE
+from analysis.itxye_base import ITXYE
 from analysis.point_types import ExitType, EntryType, ENTRY_OR_EXIT_TYPE
 
 from analysis.points import ExitHandler, EntryHandler, ENTRY_OR_EXIT_HANDLER

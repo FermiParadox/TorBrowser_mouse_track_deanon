@@ -4,7 +4,7 @@ from typing import Iterator
 
 from analysis.ip_base import IPv6_or_IPv4_obj
 from analysis.itwva_base import IWVAE
-from analysis.itxy_base import ITXYE, ITXYEPoint
+from analysis.itxye_base import ITXYE, ITXYEPoint
 from analysis.point_types import ExitType, EntryType
 
 

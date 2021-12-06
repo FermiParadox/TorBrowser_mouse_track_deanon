@@ -1,7 +1,7 @@
 from ipaddress import ip_address
 
 from analysis.ip_base import IPv6_or_IPv4_obj
-from analysis.itxy_base import ITXYE
+from analysis.itxye_base import ITXYE
 from analysis.point_types import UndefinedCritType, EntryType, ExitType
 
 POINT_SPLITTER = ":"

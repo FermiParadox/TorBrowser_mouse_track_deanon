@@ -5,7 +5,7 @@ from typing import List, Iterator, Tuple
 from analysis.analysis import ExitMetricsCalc, EntryMetricsCalc
 from analysis.conversion import DataExtractor
 from analysis.itwva_base import IWVAE
-from analysis.itxy_base import ITXYEPoint
+from analysis.itxye_base import ITXYEPoint
 from analysis.plotting import Plotter
 from analysis.point_types import ENTRY_OR_EXIT_TYPE, ExitType, EntryType
 from analysis.user_base import User

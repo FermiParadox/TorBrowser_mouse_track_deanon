@@ -2,7 +2,7 @@ from ipaddress import ip_address
 from unittest import TestCase
 
 from analysis.itwva_base import IWVAE
-from analysis.itxy_base import ITXYE
+from analysis.itxye_base import ITXYE
 
 
 class Test_is_tor_user(TestCase):
