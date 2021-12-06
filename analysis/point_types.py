@@ -13,10 +13,6 @@ class EntryType(_ExitOrEntryTypeBase):
     pass
 
 
-class UndefinedCritType(_ExitOrEntryTypeBase):
-    pass
-
-
 class NotExitOrEntry(_ExitOrEntryTypeBase):
     pass
 

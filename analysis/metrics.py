@@ -1,3 +1,5 @@
+from typing import Iterator
+
 from analysis.itxye_base import ITXYE
 from analysis.point_types import ExitType, EntryType, ENTRY_OR_EXIT_TYPE
 
@@ -5,7 +7,7 @@ from analysis.points import ExitHandler, EntryHandler, ENTRY_OR_EXIT_HANDLER
 
 
 class _MetricsCalculator:
-    def __init__(self, all_itxye: ITXYE, crit_type: ENTRY_OR_EXIT_TYPE, crit_indices):
+    def __init__(self, all_itxye: ITXYE, crit_type: ENTRY_OR_EXIT_TYPE, crit_indices: Iterator[int]):
         self.crit_indices = crit_indices
         self.crit_type = crit_type
         self.all_itxye = all_itxye
@@ -17,7 +19,7 @@ class _MetricsCalculator:
         else:
             return EntryHandler
 
-    def critical_angles(self):
+    def critical_angles(self) -> Iterator[float]:
         angles = []
         for i in self.crit_indices:
             handler = self.point_handler(crit_index=i, all_itxye=self.all_itxye)
@@ -26,7 +28,7 @@ class _MetricsCalculator:
                 angles.append(angle)
         return angles
 
-    def critical_speeds(self):
+    def critical_speeds(self) -> Iterator[float]:
         speeds = []
         for i in self.crit_indices:
             handler = self.point_handler(crit_index=i, all_itxye=self.all_itxye)
@@ -34,7 +36,7 @@ class _MetricsCalculator:
             speeds.append(speed)
         return speeds
 
-    def critical_accelerations(self):
+    def critical_accelerations(self) -> Iterator[float]:
         accelerations = []
         for i in self.crit_indices:
             handler = self.point_handler(crit_index=i, all_itxye=self.all_itxye)
@@ -44,10 +46,10 @@ class _MetricsCalculator:
 
 
 class ExitMetricsCalc(_MetricsCalculator):
-    def __init__(self, all_itxye: ITXYE, crit_indices):
+    def __init__(self, all_itxye: ITXYE, crit_indices: Iterator[int]):
         super().__init__(all_itxye=all_itxye, crit_type=ExitType, crit_indices=crit_indices)
 
 
 class EntryMetricsCalc(_MetricsCalculator):
-    def __init__(self, all_itxye: ITXYE, crit_indices):
+    def __init__(self, all_itxye: ITXYE, crit_indices: Iterator[int]):
         super().__init__(all_itxye=all_itxye, crit_type=EntryType, crit_indices=crit_indices)

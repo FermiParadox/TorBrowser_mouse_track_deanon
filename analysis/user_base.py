@@ -13,7 +13,7 @@ class IDGenerator:
     IDs_Used = set()
 
     @staticmethod
-    def unique_id():
+    def unique_id() -> int:
         while 1:
             generated_id = secrets.randbelow(IDGenerator.MAX_ID_NUM)
             if generated_id not in IDGenerator.IDs_Used:
@@ -33,8 +33,6 @@ class User:
     def __post_init__(self):
         self.exit_itxye = self._exit_itxye()
         self.entry_itxye = self._entry_itxye()
-
-        print(self.exit_itxye)
 
         self.exit_times = self.exit_itxye.time
         self.exit_indices = self.exit_itxye.indices

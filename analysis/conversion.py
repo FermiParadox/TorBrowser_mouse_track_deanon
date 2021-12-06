@@ -2,7 +2,7 @@ from ipaddress import ip_address
 
 from analysis.ip_base import IPv6_or_IPv4_obj
 from analysis.itxye_base import ITXYE
-from analysis.point_types import UndefinedCritType, EntryType, ExitType
+from analysis.point_types import NotExitOrEntry, EntryType, ExitType
 
 POINT_SPLITTER = ":"
 COORDINATE_SPLITTER = ","
@@ -28,7 +28,7 @@ class ITXYStrToArray:
             itxye_lists.time.append(int(t))
             itxye_lists.x.append(int(x))
             itxye_lists.y.append(-int(y))  # y-axis goes downwards in browsers unlike cartesian
-            itxye_lists.e.append(UndefinedCritType)
+            itxye_lists.e.append(NotExitOrEntry)
 
         return itxye_lists
 
@@ -37,9 +37,9 @@ class DataExtractor:
     def __init__(self, req):
         self.req = req
         self.json = req.json
-        self.itxye_lists = ITXYStrToArray(data_string=self._mouse_txy_str).itxye_lists
-        self.maximum_itxye_index = self.itxye_lists.indices[-1]
-        self.insert_exit_entry()
+        self._itxye_lists = ITXYStrToArray(data_string=self._mouse_txy_str).itxye_lists
+        self.maximum_itxye_index = self._itxye_lists.indices[-1]
+        self.itxye_lists = self._itxye_lists_with_e()
 
     @property
     def _mouse_txy_str(self) -> str:
@@ -78,7 +78,7 @@ class DataExtractor:
         entry_itxye = ITXYE()
 
         for entry_i in self.entry_indices():
-            txy_point = self.itxye_lists.get_point_by_index(index=entry_i)
+            txy_point = self._itxye_lists.get_point_by_index(index=entry_i)
             entry_itxye.append_point(txy_point)
         return entry_itxye
 
@@ -87,12 +87,14 @@ class DataExtractor:
         exit_itxye = ITXYE()
 
         for exit_i in self.exit_indices():
-            itxye_point = self.itxye_lists.get_point_by_index(index=exit_i)
+            itxye_point = self._itxye_lists.get_point_by_index(index=exit_i)
             exit_itxye.append_point(itxye_point)
         return exit_itxye
 
-    def insert_exit_entry(self) -> None:
+    def _itxye_lists_with_e(self) -> ITXYE:
+        itxye_lists_with_e = self._itxye_lists
         for exit_index in self.exit_indices():
-            self.itxye_lists.e[exit_index] = ExitType
+            itxye_lists_with_e.e[exit_index] = ExitType
         for exit_index in self.entry_indices():
-            self.itxye_lists.e[exit_index] = EntryType
+            itxye_lists_with_e.e[exit_index] = EntryType
+        return itxye_lists_with_e

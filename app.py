@@ -18,7 +18,6 @@ def print_metrics():
     user_handler = UserHandler(user=user)
     user_handler.calc_and_store_metrics()
     user_handler.insert_user()
-    user_handler.calc_and_store_metrics()
     user_handler.plot_and_show_mouse_movement()
     print(f"t exit {user.exit_times}")
     print(f"t entry {user.entry_times}")

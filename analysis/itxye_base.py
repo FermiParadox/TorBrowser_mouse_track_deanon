@@ -5,6 +5,21 @@ from analysis.point_types import ENTRY_OR_EXIT_TYPE
 
 
 @dataclass
+class XYPoint:
+    x: int
+    y: int
+
+    def as_tuple(self):
+        return self.x, self.y
+
+
+@dataclass
+class XY:
+    x: List[int] = field(default_factory=list)
+    y: List[int] = field(default_factory=list)
+
+
+@dataclass
 class ITXYEPoint:
     """The index of a point in the full data arrays.
 
@@ -53,4 +68,3 @@ class ITXYE:
                              x=point[2],
                              y=point[3],
                              e=point[4])
-

@@ -1,68 +1,81 @@
-from math import atan, degrees
+from math import atan, degrees, atan2
 from scipy.spatial import distance
 from scipy.stats import linregress
 
+from analysis.itxye_base import XYPoint, XY
 
-class Slope2Points:
-    def __init__(self, p1, p2):
-        self.p2 = p2
-        self.p1 = p1
+
+class AngleCalc:
+    def __init__(self, xy1: XYPoint, xy2: XYPoint, xy_bundle: XY = None):
+        self.xy2 = xy2
+        self.xy1 = xy1
+        self.xy_bundle = xy_bundle
 
     @property
     def dy(self):
-        return self.p2[1] - self.p1[1]
+        return self.xy2.y - self.xy1.y
 
     @property
     def dx(self):
-        return self.p2[0] - self.p1[0]
+        if self.xy_bundle:
+            return self.xy_bundle.x[-1] - self.xy_bundle.x[-2]
+        return self.xy2.x - self.xy1.x
 
     def slope(self):
-        return linregress().slope
+        return linregress(self.xy_bundle.x, self.xy_bundle.y).slope
 
-    @property
+    @staticmethod
+    def angle_from_slope(dx, slope):
+        w = degrees(atan(slope))
+        if dx < 0:
+            w += 180
+        return w
+
+    def angle_from_2_points(self):
+        return degrees(atan2(self.dy, self.dx))
+
     def angle(self):
-        return degrees(atan(self.slope()))
+        if self.xy_bundle:
+            return self.angle_from_slope(dx=self.dx, slope=self.slope())
+        return self.angle_from_2_points()
 
 
 class Speed2Points:
-    def __init__(self, p1, p2, t1, t2):
-        self.t2 = t2
-        self.t1 = t1
-        self.p2 = p2
-        self.p1 = p1
+    """Velocity is defined as "pixels between 2 points (or more)",
+    assuming the points are recorded on equal intervals.
 
-    @property
-    def dt(self):
-        return self.t2 - self.t1
+    The assumption might be false if affected by browser or PC workload.
+    """
+
+    # The distance between 2 diagonal pixels is sqrt(2)
+    # Below that the angles are inaccurate.
+    SLOW_SPEED = 2
+
+    def __init__(self, xy1, xy2):
+        self.xy1 = xy1
+        self.xy2 = xy2
 
     @property
     def distance(self):
-        return distance.euclidean(self.p1, self.p2)
+        return distance.euclidean([self.xy1.x, self.xy1.y], [self.xy2.x, self.xy2.y])
 
     @property
-    def speed(self):
-        return self.distance / self.dt
+    def velocity(self):
+        return self.distance
 
 
 class Acceleration:
-    def __init__(self, p1, p2, p3, t1, t2, t3):
-        self.t3 = t3
-        self.p3 = p3
-        self.t2 = t2
-        self.t1 = t1
-        self.p2 = p2
-        self.p1 = p1
-
-    @property
-    def dt(self):
-        return self.t3 - self.t1
+    def __init__(self, xy1, xy2, xy3):
+        self.xy3 = xy3
+        self.xy2 = xy2
+        self.xy1 = xy1
 
     @property
     def dv(self):
-        speed_1 = Speed2Points(p1=self.p1, p2=self.p2, t1=self.t1, t2=self.t2).speed
-        speed_2 = Speed2Points(p1=self.p2, p2=self.p3, t1=self.t2, t2=self.t3).speed
+        speed_1 = Speed2Points(xy1=self.xy1, xy2=self.xy2).velocity
+        speed_2 = Speed2Points(xy1=self.xy2, xy2=self.xy3).velocity
         return speed_2 - speed_1
 
     @property
     def acceleration(self):
-        return self.dv / self.dt
+        return self.dv
