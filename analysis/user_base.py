@@ -44,7 +44,7 @@ class User:
         self.entry_x = self.entry_itxye.x
         self.entry_y = self.entry_itxye.y
 
-    def all_itxye_as_points(self):
+    def all_itxye_as_points(self) -> Iterator[ITXYEPoint]:
         return [p for p in self.all_itxye.as_points()]
 
     def exit_points(self) -> Iterator[ITXYEPoint]:

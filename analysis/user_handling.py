@@ -39,11 +39,11 @@ class UserCreator:
         self.req = req
         self.user: User
 
-    def user(self):
+    def user(self) -> User:
         extractor = DataExtractor(req=self.req)
-        return User(id=extractor.user_id,
-                    ip=extractor.user_ip,
-                    all_itxye=extractor.itxye_lists,
+        return User(id=extractor.user_id(),
+                    ip=extractor.user_ip(),
+                    all_itxye=extractor.itxye_lists(),
                     metrics=IWVAE())
 
 
