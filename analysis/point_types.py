@@ -13,4 +13,12 @@ class EntryType(_ExitOrEntryTypeBase):
     pass
 
 
+class UndefinedCritType(_ExitOrEntryTypeBase):
+    pass
+
+
+class NotExitOrEntry(_ExitOrEntryTypeBase):
+    pass
+
+
 ENTRY_OR_EXIT_TYPE = Type[_ExitOrEntryTypeBase]

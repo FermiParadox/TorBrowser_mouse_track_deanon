@@ -1,13 +1,15 @@
 from dataclasses import dataclass, field
 from typing import List
 
+from analysis.point_types import ENTRY_OR_EXIT_TYPE
+
 
 @dataclass
-class ITXYPoint:
+class ITXYEPoint:
     """The index of a point in the full data arrays.
 
-    e.g. an ITXY object that stores only exits
-    has I as the index of the point in the initial ITXY object that contains all points.
+    e.g. an ITXYE object that stores only exits
+    has I as the index of the point in the initial ITXYE object that contains all points.
 
     This allows easy mapping of all data points and their respective metrics.
     """
@@ -15,26 +17,30 @@ class ITXYPoint:
     time: int
     x: int
     y: int
+    e: ENTRY_OR_EXIT_TYPE
 
 
 @dataclass
-class ITXY:
+class ITXYE:
     indices: List[int] = field(default_factory=list)
     time: List[int] = field(default_factory=list)
     x: List[int] = field(default_factory=list)
     y: List[int] = field(default_factory=list)
+    e: List[ENTRY_OR_EXIT_TYPE] = field(default_factory=list)
 
     def get_point_by_index(self, index):
-        return ITXYPoint(index=index,
-                         time=self.time[index],
-                         x=self.x[index],
-                         y=self.y[index])
+        return ITXYEPoint(index=index,
+                          time=self.time[index],
+                          x=self.x[index],
+                          y=self.y[index],
+                          e=self.e[index])
 
-    def append_point(self, itxy_point: ITXYPoint):
-        self.indices.append(itxy_point.index)
-        self.time.append(itxy_point.time)
-        self.x.append(itxy_point.x)
-        self.y.append(itxy_point.y)
+    def append_point(self, itxye_point: ITXYEPoint):
+        self.indices.append(itxye_point.index)
+        self.time.append(itxye_point.time)
+        self.x.append(itxye_point.x)
+        self.y.append(itxye_point.y)
+        self.e.append(itxye_point.e)
 
     def as_points(self):
         return zip(self.indices, self.time, self.x, self.y)

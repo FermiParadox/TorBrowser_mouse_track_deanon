@@ -1,7 +1,7 @@
 from abc import ABC
 from typing import Type, Union
 
-from analysis.itxy_base import ITXY
+from analysis.itxy_base import ITXYE
 from analysis.physics import Speed2Points, Slope2Points, Acceleration
 
 """
@@ -13,15 +13,15 @@ A better solution would be (linear) fitting of more than 2 points.
 
 
 class _EntryOrExitHandler(ABC):
-    # Currently up to two extra points are needed from a critical point
+    # Currently, up to two extra points are needed from a critical point
     MAX_EXTRA_INDEX = 2
 
-    def __init__(self, crit_index: int, all_itxy: ITXY):
-        self.x_list = all_itxy.x
-        self.y_list = all_itxy.y
-        self.t_list = all_itxy.time
+    def __init__(self, crit_index: int, all_itxye: ITXYE):
+        self.x_list = all_itxye.x
+        self.y_list = all_itxye.y
+        self.t_list = all_itxye.time
         self.crit_index = crit_index
-        self.max_index = all_itxy.indices[-1]
+        self.max_index = all_itxye.indices[-1]
 
     def index_too_small(self):
         return self.crit_index - self.MAX_EXTRA_INDEX < 0

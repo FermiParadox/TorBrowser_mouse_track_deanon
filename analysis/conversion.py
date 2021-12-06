@@ -1,7 +1,8 @@
 from ipaddress import ip_address
 
 from analysis.ip_base import IPv6_or_IPv4_obj
-from analysis.itxy_base import ITXY
+from analysis.itxy_base import ITXYE
+from analysis.point_types import UndefinedCritType, EntryType, ExitType
 
 POINT_SPLITTER = ":"
 COORDINATE_SPLITTER = ","
@@ -11,6 +12,7 @@ class ITXYStrToArray:
     """The client provides a string like
     "1520095100,25,690:1520095100, 30, 650:"
     """
+
     def __init__(self, data_string):
         self.txy_string = data_string
 
@@ -18,24 +20,26 @@ class ITXYStrToArray:
         return [s for s in self.txy_string.split(POINT_SPLITTER) if s]
 
     @property
-    def itxy_lists(self) -> ITXY:
-        itxy_lists = ITXY()
+    def itxye_lists(self) -> ITXYE:
+        itxye_lists = ITXYE()
         for i, p in enumerate(self.points_as_list_of_strings()):
             t, x, y = p.split(',')
-            itxy_lists.indices.append(i)
-            itxy_lists.time.append(int(t))
-            itxy_lists.x.append(int(x))
-            itxy_lists.y.append(-int(y))     # y axis goes downwards in browsers unlike cartesian
+            itxye_lists.indices.append(i)
+            itxye_lists.time.append(int(t))
+            itxye_lists.x.append(int(x))
+            itxye_lists.y.append(-int(y))  # y-axis goes downwards in browsers unlike cartesian
+            itxye_lists.e.append(UndefinedCritType)
 
-        return itxy_lists
+        return itxye_lists
 
 
 class DataExtractor:
     def __init__(self, req):
         self.req = req
         self.json = req.json
-        self.itxy_lists = ITXYStrToArray(data_string=self._mouse_txy_str).itxy_lists
-        self.maximum_itxy_index = self.itxy_lists.indices[-1] - 1
+        self.itxye_lists = ITXYStrToArray(data_string=self._mouse_txy_str).itxye_lists
+        self.maximum_itxye_index = self.itxye_lists.indices[-1]
+        self.insert_exit_entry()
 
     @property
     def _mouse_txy_str(self) -> str:
@@ -56,7 +60,7 @@ class DataExtractor:
         return [int(s) for s in self._exit_indices_str().split(POINT_SPLITTER) if s]
 
     def entry_point_index_out_of_range(self, index) -> bool:
-        return index > self.maximum_itxy_index
+        return index > self.maximum_itxye_index
 
     def entry_indices(self) -> list:
         entry_i_list = [0, ]  # first point in TXY, is always an entry point
@@ -70,19 +74,25 @@ class DataExtractor:
         return entry_i_list
 
     @property
-    def entry_itxy(self) -> ITXY:
-        entry_itxy = ITXY()
+    def entry_itxye(self) -> ITXYE:
+        entry_itxye = ITXYE()
 
         for entry_i in self.entry_indices():
-            txy_point = self.itxy_lists.get_point_by_index(index=entry_i)
-            entry_itxy.append_point(txy_point)
-        return entry_itxy
+            txy_point = self.itxye_lists.get_point_by_index(index=entry_i)
+            entry_itxye.append_point(txy_point)
+        return entry_itxye
 
     @property
-    def exit_itxy(self) -> ITXY:
-        exit_itxy = ITXY()
+    def exit_itxye(self) -> ITXYE:
+        exit_itxye = ITXYE()
 
         for exit_i in self.exit_indices():
-            itxy_point = self.itxy_lists.get_point_by_index(index=exit_i)
-            exit_itxy.append_point(itxy_point)
-        return exit_itxy
+            itxye_point = self.itxye_lists.get_point_by_index(index=exit_i)
+            exit_itxye.append_point(itxye_point)
+        return exit_itxye
+
+    def insert_exit_entry(self) -> None:
+        for exit_index in self.exit_indices():
+            self.itxye_lists.e[exit_index] = ExitType
+        for exit_index in self.entry_indices():
+            self.itxye_lists.e[exit_index] = EntryType

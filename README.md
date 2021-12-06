@@ -51,7 +51,7 @@ browser events perhaps can affect it.
 ## Exit and entry point distances on both browsers
 
 Measuring the entry-exit distance between points in a browser 
-and comparing it with other browsers would probably deanonymize 
+and comparing it with other browsers would probably de-anonymize 
 the user.
 
 
