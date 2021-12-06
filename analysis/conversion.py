@@ -1,7 +1,7 @@
 from ipaddress import ip_address
 
 from analysis.ip_base import IPv6_or_IPv4_obj
-from analysis.metrics_base import ITXY
+from analysis.itxy_base import ITXY
 
 POINT_SPLITTER = ":"
 COORDINATE_SPLITTER = ","

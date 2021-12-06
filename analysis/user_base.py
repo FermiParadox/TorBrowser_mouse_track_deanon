@@ -1,8 +1,10 @@
 import secrets
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import List
 
 from analysis.ip_base import IPv6_or_IPv4_obj
-from analysis.metrics_base import ITXY
+from analysis.itwva_base import ITWVA
+from analysis.itxy_base import ITXY
 
 
 class IDGenerator:
@@ -24,6 +26,8 @@ class User:
     all_itxy: ITXY
     exit_itxy: ITXY  # last point of position stored, before browser switching
     entry_itxy: ITXY  # first point after refocusing browser
+
+    metrics: ITWVA
 
     def __post_init__(self):
         self.exit_times = self.exit_itxy.time

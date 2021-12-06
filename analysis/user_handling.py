@@ -1,11 +1,12 @@
 from dataclasses import dataclass, field
 from itertools import combinations
+from typing import List, Iterator, Tuple
 
-from analysis.analysis import ExitMetrics, EntryMetrics
+from analysis.analysis import ExitMetricsCalc, EntryMetricsCalc
 from analysis.conversion import DataExtractor
-from analysis.metrics_base import ITXY, ITXYPoint
+from analysis.itxy_base import ITXY, ITXYPoint
 from analysis.plotting import Plotter
-from analysis.point_types import ENTRY_OR_EXIT_TYPE
+from analysis.point_types import ENTRY_OR_EXIT_TYPE, ExitType, EntryType
 from analysis.user_base import User
 
 
@@ -48,40 +49,40 @@ class UserCreator:
 
 
 class UserHandler:
-    def __init__(self, user):
-        self.user: User = user
+    def __init__(self, user: User):
+        self.user = user
 
     def _exit_angles(self):
-        metrics = ExitMetrics(all_itxy=self.user.all_itxy,
-                              crit_indices=self.user.exit_itxy.indices)
+        metrics = ExitMetricsCalc(all_itxy=self.user.all_itxy,
+                                  crit_indices=self.user.exit_itxy.indices)
         return metrics.critical_angles()
 
     def _entry_angles(self):
-        metrics = EntryMetrics(all_itxy=self.user.all_itxy,
-                               crit_indices=self.user.entry_itxy.indices)
+        metrics = EntryMetricsCalc(all_itxy=self.user.all_itxy,
+                                   crit_indices=self.user.entry_itxy.indices)
         return metrics.critical_angles()
 
     def _exit_speeds(self):
-        metrics = ExitMetrics(all_itxy=self.user.all_itxy,
-                              crit_indices=self.user.exit_itxy.indices)
+        metrics = ExitMetricsCalc(all_itxy=self.user.all_itxy,
+                                  crit_indices=self.user.exit_itxy.indices)
         return metrics.critical_speeds()
 
     def _entry_speeds(self):
-        metrics = EntryMetrics(all_itxy=self.user.all_itxy,
-                               crit_indices=self.user.entry_itxy.indices)
+        metrics = EntryMetricsCalc(all_itxy=self.user.all_itxy,
+                                   crit_indices=self.user.entry_itxy.indices)
         return metrics.critical_speeds()
 
     def _exit_accelerations(self):
-        metrics = ExitMetrics(all_itxy=self.user.all_itxy,
-                              crit_indices=self.user.exit_itxy.indices)
+        metrics = ExitMetricsCalc(all_itxy=self.user.all_itxy,
+                                  crit_indices=self.user.exit_itxy.indices)
         return metrics.critical_accelerations()
 
     def _entry_accelerations(self):
-        metrics = EntryMetrics(all_itxy=self.user.all_itxy,
-                               crit_indices=self.user.entry_itxy.indices)
+        metrics = EntryMetricsCalc(all_itxy=self.user.all_itxy,
+                                   crit_indices=self.user.entry_itxy.indices)
         return metrics.critical_accelerations()
 
-    def calc_and_store_metrics(self):
+    def calc_and_store_metrics(self) -> None:
         self.user.exit_angles = self._exit_angles()
         self.user.entry_angles = self._entry_angles()
         self.user.exit_speeds = self._exit_speeds()
@@ -89,10 +90,10 @@ class UserHandler:
         self.user.exit_accelerations = self._exit_accelerations()
         self.user.entry_accelerations = self._entry_accelerations()
 
-    def insert_user(self):
+    def insert_user(self) -> None:
         all_users.add(self.user)
 
-    def plot_and_show_mouse_movement(self):
+    def plot_and_show_mouse_movement(self) -> None:
         x_all = self.user.all_itxy.x
         y_all = self.user.all_itxy.y
 
@@ -119,32 +120,34 @@ class Comparison:
 
 
 @dataclass
-class PointMatch:
+class SingleMatch:
     p1: ITXYPoint
     p2: ITXYPoint
     type_p1: ENTRY_OR_EXIT_TYPE
-
-    exit_angle: float = field(init=False)
-    entry_angle: float = field(init=False)
+    exit_angle: float
+    entry_angle: float
     angles_diff: float = field(init=False)
 
-    def store_angles_diff(self, entry_angle, exit_angle):
+    def __post_init__(self):
+        self.store_angles_diff(self.entry_angle, self.exit_angle)
+
+    def store_angles_diff(self, entry_angle, exit_angle) -> None:
         self.angles_diff = abs(entry_angle - exit_angle)
 
 
 @dataclass
-class PointMatches:
+class Matches:
     user1: User
     user2: User
-    exit_to_entry_matches: list
-    entry_to_exit_matches: list
+    exit_to_entry_matches: List[SingleMatch]
+    entry_to_exit_matches: List[SingleMatch]
 
 
-def user_combinations():
+def user_combinations() -> Iterator[Tuple[User, User]]:
     return combinations(all_users, 2)
 
 
-def is_tor_user(user: User):
+def is_tor_user(user: User) -> bool:
     """Tor-user times always end in '00'
     because of the 100ms time-resolution imposed in JS."""
     all_modulo = (i % 100 for i in user.all_itxy.time)
@@ -153,7 +156,7 @@ def is_tor_user(user: User):
     return True
 
 
-def user_combinations_containing_tor():
+def user_combinations_containing_tor() -> Iterator[Tuple[User, User]]:
     comps = []
     for comp in user_combinations():
         if is_tor_user(comp[0]) or is_tor_user(comp[1]):
@@ -161,37 +164,44 @@ def user_combinations_containing_tor():
     return comps
 
 
-class PointMatchCreator:
-    MAX_DELTA_T = 120  # milliseconds
+class MatchesCreator:
+    TOR_RESOLUTION = 100
+    MAX_DELTA_T = TOR_RESOLUTION + 20  # milliseconds
 
-    def __init__(self, user1: User, user2: User, index: int, entry_or_exit_type: ENTRY_OR_EXIT_TYPE):
-        self.index = index
-        self.entry_or_exit_type = entry_or_exit_type
-        self.user2 = user2
+    def __init__(self, user1: User, user2: User):
         self.user1 = user1
+        self.user2 = user2
 
     @staticmethod
-    def time_diff_in_bounds(p1: ITXYPoint, p2: ITXYPoint):
-        return abs(p1.time - p2.time) <= PointMatchCreator.MAX_DELTA_T
+    def time_diff_in_bounds(p1: ITXYPoint, p2: ITXYPoint) -> float:
+        return abs(p1.time - p2.time) <= MatchesCreator.MAX_DELTA_T
 
-    def single_point_match(self, p1, p2):
+    def _single_point_match(self, p1: ITXYPoint, p2: ITXYPoint, type_p1: ENTRY_OR_EXIT_TYPE) -> SingleMatch:
         if self.time_diff_in_bounds(p1, p2):
-            return PointMatch(p1=p1, p2=p2, type_p1=self.entry_or_exit_type)
+            # TODO
+            p1_angle = self.user1.exit_angles
+            return SingleMatch(p1=p1, p2=p2, type_p1=type_p1, entry_angle=..., exit_angle=...)
 
-    def point_matches(self):
-        exit_to_entry_matches = []
+    def _exit_to_entry_matches(self) -> List[SingleMatch]:
+        matches = []
         for p1 in self.user1.exit_itxy.as_points():
             for p2 in self.user2.entry_itxy.as_points():
-                exit_to_entry_matches.append(self.single_point_match(p1=p1, p2=p2))
+                matches.append(self._single_point_match(p1=p1, p2=p2, type_p1=ExitType))
+        return matches
 
-        entry_to_exit_matches = []
+    def _entry_to_exit_matches(self) -> List[SingleMatch]:
+        matches = []
         for p1 in self.user1.entry_itxy.as_points():
             for p2 in self.user2.exit_itxy.as_points():
-                entry_to_exit_matches.append(self.single_point_match(p1=p1, p2=p2))
+                matches.append(self._single_point_match(p1=p1, p2=p2, type_p1=EntryType))
+        return matches
 
-        all_matches = PointMatches(user1=self.user1, user2=self.user2,
-                                   exit_to_entry_matches=exit_to_entry_matches,
-                                   entry_to_exit_matches=entry_to_exit_matches)
+    def point_matches(self) -> Matches:
+        return Matches(user1=self.user1, user2=self.user2,
+                       exit_to_entry_matches=self._exit_to_entry_matches(),
+                       entry_to_exit_matches=self._entry_to_exit_matches())
 
-        return all_matches
 
+def compare_all_users():
+    for comp in user_combinations_containing_tor():
+        u1, u2 = comp

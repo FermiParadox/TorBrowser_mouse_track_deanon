@@ -1,13 +1,10 @@
-from analysis.metrics_base import ITXY
+from analysis.itxy_base import ITXY
 from analysis.point_types import ExitType, EntryType, ENTRY_OR_EXIT_TYPE
 
 from analysis.points import ExitHandler, EntryHandler, ENTRY_OR_EXIT_HANDLER
 
-TOR_RESOLUTION = 100
-MAX_DELTA_TIME = TOR_RESOLUTION + 20
 
-
-class _Metrics:
+class _MetricsCalculator:
     def __init__(self, all_itxy: ITXY, crit_type: ENTRY_OR_EXIT_TYPE, crit_indices):
         self.crit_indices = crit_indices
         self.crit_type = crit_type
@@ -46,11 +43,11 @@ class _Metrics:
         return accelerations
 
 
-class ExitMetrics(_Metrics):
+class ExitMetricsCalc(_MetricsCalculator):
     def __init__(self, all_itxy: ITXY, crit_indices):
         super().__init__(all_itxy=all_itxy, crit_type=ExitType, crit_indices=crit_indices)
 
 
-class EntryMetrics(_Metrics):
+class EntryMetricsCalc(_MetricsCalculator):
     def __init__(self, all_itxy: ITXY, crit_indices):
         super().__init__(all_itxy=all_itxy, crit_type=EntryType, crit_indices=crit_indices)

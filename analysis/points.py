@@ -1,7 +1,7 @@
 from abc import ABC
 from typing import Type, Union
 
-from analysis.metrics_base import ITXY
+from analysis.itxy_base import ITXY
 from analysis.physics import Speed2Points, Slope2Points, Acceleration
 
 """

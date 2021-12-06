@@ -2,7 +2,7 @@ from ipaddress import ip_address
 from unittest import TestCase
 
 from analysis.user_base import IDGenerator, User
-from analysis.metrics_base import ITXY
+from analysis.itxy_base import ITXY
 from analysis.user_handling import AllUsers
 
 

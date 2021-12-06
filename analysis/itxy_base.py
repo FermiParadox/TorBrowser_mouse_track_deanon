@@ -4,6 +4,13 @@ from typing import List
 
 @dataclass
 class ITXYPoint:
+    """The index of a point in the full data arrays.
+
+    e.g. an ITXY object that stores only exits
+    has I as the index of the point in the initial ITXY object that contains all points.
+
+    This allows easy mapping of all data points and their respective metrics.
+    """
     index: int
     time: int
     x: int
@@ -31,3 +38,4 @@ class ITXY:
 
     def as_points(self):
         return zip(self.indices, self.time, self.x, self.y)
+
