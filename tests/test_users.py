@@ -12,16 +12,12 @@ class TestUser(TestCase):
         user_id = 1525
         self.u1_0000 = User(id=user_id,
                             ip=ip_address("0.0.0.0"),
-                            all_itxy=ITXYE([1, 2], [11, 22], [111, 222]),
-                            exit_itxy=ITXYE(),
-                            entry_itxy=ITXYE(),
+                            all_itxye=ITXYE([1, 2], [11, 22], [111, 222]),
                             metrics=IWVAE())
 
         self.u2_5000 = User(id=user_id,
                             ip=ip_address("5.0.0.0"),
-                            all_itxy=ITXYE([1, 2, 3], [11, 22, 33], [111, 222, 333]),
-                            exit_itxy=ITXYE(),
-                            entry_itxy=ITXYE(),
+                            all_itxye=ITXYE([1, 2, 3], [11, 22, 33], [111, 222, 333]),
                             metrics=IWVAE())
 
     def test_same_id_considered_same_user(self):
@@ -45,31 +41,23 @@ class TestAllUsers(TestCase):
     def setUp(self) -> None:
         self.u1 = User(id=111,
                        ip=ip_address("0.42.0.0"),
-                       all_itxy=ITXYE(),
-                       exit_itxy=ITXYE(),
-                       entry_itxy=ITXYE(),
+                       all_itxye=ITXYE(),
                        metrics=IWVAE())
 
         self.u2 = User(id=3333,
                        ip=ip_address("0.0.7.0"),
-                       all_itxy=ITXYE(),
-                       exit_itxy=ITXYE(),
-                       entry_itxy=ITXYE(),
+                       all_itxye=ITXYE(),
                        metrics=IWVAE())
 
         self.u3_initial = User(id=5252525,
                                ip=ip_address("52.0.0.0"),
-                               all_itxy=ITXYE(),
-                               exit_itxy=ITXYE(),
-                               entry_itxy=ITXYE(),
+                               all_itxye=ITXYE(),
                                metrics=IWVAE())
 
         self.txy_updated = ITXYE([66, 33], [1, 2], [11, 22], [111, 222])
         self.u3_updated = User(id=5252525,
                                ip=ip_address("52.0.0.0"),
-                               all_itxy=self.txy_updated,
-                               exit_itxy=ITXYE(),
-                               entry_itxy=ITXYE(),
+                               all_itxye=self.txy_updated,
                                metrics=IWVAE())
 
     def test_displayed_id_exists_when_adding_user(self):

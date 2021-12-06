@@ -44,8 +44,6 @@ class UserCreator:
         return User(id=extractor.user_id,
                     ip=extractor.user_ip,
                     all_itxye=extractor.itxye_lists,
-                    entry_itxye=extractor.entry_itxye,
-                    exit_itxye=extractor.exit_itxye,
                     metrics=IWVAE())
 
 
@@ -55,32 +53,32 @@ class UserHandler:
 
     def _exit_angles(self):
         metrics = ExitMetricsCalc(all_itxye=self.user.all_itxye,
-                                  crit_indices=self.user.exit_itxye.indices)
+                                  crit_indices=self.user.exit_indices)
         return metrics.critical_angles()
 
     def _entry_angles(self):
         metrics = EntryMetricsCalc(all_itxye=self.user.all_itxye,
-                                   crit_indices=self.user.entry_itxye.indices)
+                                   crit_indices=self.user.entry_indices)
         return metrics.critical_angles()
 
     def _exit_speeds(self):
         metrics = ExitMetricsCalc(all_itxye=self.user.all_itxye,
-                                  crit_indices=self.user.exit_itxye.indices)
+                                  crit_indices=self.user.exit_indices)
         return metrics.critical_speeds()
 
     def _entry_speeds(self):
         metrics = EntryMetricsCalc(all_itxye=self.user.all_itxye,
-                                   crit_indices=self.user.entry_itxye.indices)
+                                   crit_indices=self.user.entry_indices)
         return metrics.critical_speeds()
 
     def _exit_accelerations(self):
         metrics = ExitMetricsCalc(all_itxye=self.user.all_itxye,
-                                  crit_indices=self.user.exit_itxye.indices)
+                                  crit_indices=self.user.exit_indices)
         return metrics.critical_accelerations()
 
     def _entry_accelerations(self):
         metrics = EntryMetricsCalc(all_itxye=self.user.all_itxye,
-                                   crit_indices=self.user.entry_itxye.indices)
+                                   crit_indices=self.user.entry_indices)
         return metrics.critical_accelerations()
 
     def calc_and_store_metrics(self) -> None:

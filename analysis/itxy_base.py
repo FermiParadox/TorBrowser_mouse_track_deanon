@@ -42,6 +42,15 @@ class ITXYE:
         self.y.append(itxye_point.y)
         self.e.append(itxye_point.e)
 
+    def as_iterator(self):
+        return zip(self.indices, self.time, self.x, self.y, self.e)
+
     def as_points(self):
-        return zip(self.indices, self.time, self.x, self.y)
+        iterator = self.as_iterator()
+        for point in iterator:
+            yield ITXYEPoint(index=point[0],
+                             time=point[1],
+                             x=point[2],
+                             y=point[3],
+                             e=point[4])
 
