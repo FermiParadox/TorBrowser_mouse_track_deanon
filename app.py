@@ -18,17 +18,19 @@ def print_metrics():
     user_handler = UserHandler(user=user)
     user_handler.calc_and_store_metrics()
     user_handler.insert_user()
-    user_handler.plot_and_show_mouse_movement()
     print(f"t entry {user.entry_times}")
     print(f"t exit {user.exit_times}")
     print(f"entry metrics {user.entry_metrics}")
     print(f"exit metrics {user.exit_metrics}")
     print("=" * 50)
+    user_handler.plot_and_show_mouse_movement()
 
 
 def try_print_metrics():
     try:
         print_metrics()
+    except KeyboardInterrupt:
+        raise KeyboardInterrupt
     except Exception as e:
         print(e)
         return Response(status=400)

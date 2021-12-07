@@ -37,7 +37,6 @@ all_users = AllUsers()
 class UserCreator:
     def __init__(self, req):
         self.req = req
-        self.user: User
 
     def user(self) -> User:
         extractor = DataExtractor(req=self.req)
@@ -51,6 +50,9 @@ class UserCreator:
 class UserHandler:
     def __init__(self, user: User):
         self.user = user
+
+    def insert_user(self) -> None:
+        all_users.add(self.user)
 
     def _exit_angles(self) -> Iterator[float]:
         metrics = ExitMetricsCalc(all_itxye=self.user.all_itxye,
@@ -97,9 +99,6 @@ class UserHandler:
         entry_metrics.a = self._entry_accelerations()
         entry_metrics.e = [ENTRY_TYPE for _ in entry_metrics.indices]
 
-    def insert_user(self) -> None:
-        all_users.add(self.user)
-
     def plot_and_show_mouse_movement(self) -> None:
         x_all = self.user.all_itxye.x
         y_all = self.user.all_itxye.y
@@ -128,18 +127,23 @@ class Comparison:
 
 @dataclass
 class SingleMatch:
+    """
+    Stores data related an exit and entry point of two user_IDs,
+    when they appear to be coming from the same user.
+    """
     p1: ITXYEPoint
     p2: ITXYEPoint
     type_p1: EntryOrExitType
-    exit_angle: float
-    entry_angle: float
-    angles_diff: float = field(init=False)
+    dt: float
+    exit_w: float
+    entry_w: float
+    dw: float = field(init=False)
 
     def __post_init__(self):
-        self.store_angles_diff(self.entry_angle, self.exit_angle)
+        self.store_dw(self.entry_w, self.exit_w)
 
-    def store_angles_diff(self, entry_angle, exit_angle) -> None:
-        self.angles_diff = abs(entry_angle - exit_angle)
+    def store_dw(self, entry_w, exit_w) -> None:
+        self.dw = exit_w - entry_w
 
 
 @dataclass
@@ -172,22 +176,35 @@ def user_combinations_containing_tor() -> Iterator[Tuple[User, User]]:
 
 
 class MatchesCreator:
+    # In milliseconds
     TOR_RESOLUTION = 100
-    MAX_DELTA_T = TOR_RESOLUTION + 20  # milliseconds
+    MAX_DELTA_T = TOR_RESOLUTION + 20
+    MIN_DELTA_T = -20
 
     def __init__(self, user1: User, user2: User):
         self.user1 = user1
         self.user2 = user2
 
     @staticmethod
-    def time_diff_in_bounds(p1: ITXYEPoint, p2: ITXYEPoint) -> float:
-        return abs(p1.time - p2.time) <= MatchesCreator.MAX_DELTA_T
+    def dt(p1: ITXYEPoint, p2: ITXYEPoint) -> int:
+        return p2.time - p1.time
+
+    @staticmethod
+    def dt_in_bounds(dt: int) -> bool:
+        return MatchesCreator.MIN_DELTA_T <= dt <= MatchesCreator.MAX_DELTA_T
 
     def _single_point_match(self, p1: ITXYEPoint, p2: ITXYEPoint, type_p1: EntryOrExitType) -> SingleMatch:
-        if self.time_diff_in_bounds(p1, p2):
-            # TODO
-            p1_angle = self.user1.exit_angles
-            return SingleMatch(p1=p1, p2=p2, type_p1=type_p1, entry_angle=..., exit_angle=...)
+        dt = self.dt(p1=p1, p2=p2)
+        if self.dt_in_bounds(dt=dt):
+            p1_i = p1.index
+            p2_i = p2.index
+            if type_p1 == EXIT_TYPE:
+                exit_w = self.user1.exit_metrics.w[p1_i]
+                entry_w = self.user2.entry_metrics.w[p2_i]
+            else:
+                entry_w = self.user1.entry_metrics.w[p1_i]
+                exit_w = self.user2.exit_metrics.w[p2_i]
+            return SingleMatch(p1=p1, p2=p2, type_p1=type_p1, dt=dt, entry_w=entry_w, exit_w=exit_w)
 
     def _exit_to_entry_matches(self) -> List[SingleMatch]:
         matches = []
@@ -209,6 +226,9 @@ class MatchesCreator:
                        entry_to_exit_matches=self._entry_to_exit_matches())
 
 
-def compare_all_users():
+def compare_all_users() -> None:
     for comp in user_combinations_containing_tor():
         u1, u2 = comp
+        for point in u1.exit_metrics.as_points():
+            pass
+
