@@ -10,8 +10,7 @@ class Test_is_tor_user(TestCase):
         from analysis.user_base import User
         self.user = User(id=93847629346,
                          ip=ip_address("0.0.0.0"),
-                         all_itxye=ITXYE([5, 6, 7], [1, 2, 3], [11, 22, 33], [111, 222, 333]),
-                         metrics=IWVAE())
+                         all_itxye=ITXYE([5, 6, 7], [1, 2, 3], [11, 22, 33], [111, 222, 333]))
 
     def test_false(self):
         from analysis.user_handling import is_tor_user

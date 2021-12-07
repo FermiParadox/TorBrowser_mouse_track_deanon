@@ -1,20 +1,16 @@
-from typing import Type
+from dataclasses import dataclass
 
 
-class _ExitOrEntryTypeBase:
-    pass
+@dataclass
+class EntryOrExitType:
+    str: str
+
+    def __repr__(self):
+        return self.str
 
 
-class ExitType(_ExitOrEntryTypeBase):
-    pass
+EXIT_TYPE = EntryOrExitType('EXIT')
 
+ENTRY_TYPE = EntryOrExitType('ENTRY')
 
-class EntryType(_ExitOrEntryTypeBase):
-    pass
-
-
-class NotExitOrEntry(_ExitOrEntryTypeBase):
-    pass
-
-
-ENTRY_OR_EXIT_TYPE = Type[_ExitOrEntryTypeBase]
+NON_CRIT_TYPE = EntryOrExitType('NORMAL')

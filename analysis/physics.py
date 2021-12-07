@@ -11,32 +11,30 @@ class AngleCalc:
         self.xy1 = xy1
         self.xy_bundle = xy_bundle
 
-    @property
-    def dy(self):
+    def dy(self) -> float:
         return self.xy2.y - self.xy1.y
 
-    @property
-    def dx(self):
+    def dx(self) -> float:
         if self.xy_bundle:
             return self.xy_bundle.x[-1] - self.xy_bundle.x[-2]
         return self.xy2.x - self.xy1.x
 
-    def slope(self):
+    def slope(self) -> float:
         return linregress(self.xy_bundle.x, self.xy_bundle.y).slope
 
     @staticmethod
-    def angle_from_slope(dx, slope):
+    def angle_from_slope(dx, slope) -> float:
         w = degrees(atan(slope))
         if dx < 0:
             w += 180
         return w
 
-    def angle_from_2_points(self):
-        return degrees(atan2(self.dy, self.dx))
+    def angle_from_2_points(self) -> float:
+        return degrees(atan2(self.dy(), self.dx()))
 
-    def angle(self):
+    def angle(self) -> float:
         if self.xy_bundle:
-            return self.angle_from_slope(dx=self.dx, slope=self.slope())
+            return self.angle_from_slope(dx=self.dx(), slope=self.slope())
         return self.angle_from_2_points()
 
 
@@ -55,27 +53,23 @@ class Speed2Points:
         self.xy1 = xy1
         self.xy2 = xy2
 
-    @property
-    def distance(self):
+    def distance(self) -> float:
         return distance.euclidean([self.xy1.x, self.xy1.y], [self.xy2.x, self.xy2.y])
 
-    @property
-    def velocity(self):
-        return self.distance
+    def velocity(self) -> float:
+        return self.distance()
 
 
 class Acceleration:
-    def __init__(self, xy1, xy2, xy3):
+    def __init__(self, xy1: XYPoint, xy2: XYPoint, xy3: XYPoint):
         self.xy3 = xy3
         self.xy2 = xy2
         self.xy1 = xy1
 
-    @property
-    def dv(self):
-        speed_1 = Speed2Points(xy1=self.xy1, xy2=self.xy2).velocity
-        speed_2 = Speed2Points(xy1=self.xy2, xy2=self.xy3).velocity
+    def dv(self) -> float:
+        speed_1 = Speed2Points(xy1=self.xy1, xy2=self.xy2).velocity()
+        speed_2 = Speed2Points(xy1=self.xy2, xy2=self.xy3).velocity()
         return speed_2 - speed_1
 
-    @property
-    def acceleration(self):
-        return self.dv
+    def acceleration(self) -> float:
+        return self.dv()

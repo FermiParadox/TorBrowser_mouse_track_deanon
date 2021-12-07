@@ -5,7 +5,7 @@ from typing import Iterator
 from analysis.ip_base import IPv6_or_IPv4_obj
 from analysis.itwva_base import IWVAE
 from analysis.itxye_base import ITXYE, ITXYEPoint
-from analysis.point_types import ExitType, EntryType
+from analysis.point_types import EXIT_TYPE, ENTRY_TYPE
 
 
 class IDGenerator:
@@ -28,7 +28,8 @@ class User:
 
     exit_itxye: ITXYE = field(default_factory=ITXYE)
     entry_itxye: ITXYE = field(default_factory=ITXYE)
-    metrics: IWVAE = field(default_factory=IWVAE)
+    exit_metrics: IWVAE = field(default_factory=IWVAE)
+    entry_metrics: IWVAE = field(default_factory=IWVAE)
 
     def __post_init__(self):
         self.exit_itxye = self._exit_itxye()
@@ -48,10 +49,10 @@ class User:
         return [p for p in self.all_itxye.as_points()]
 
     def exit_points(self) -> Iterator[ITXYEPoint]:
-        return (p for p in self.all_itxye_as_points() if p.e == ExitType)
+        return (p for p in self.all_itxye_as_points() if p.e == EXIT_TYPE)
 
     def entry_points(self) -> Iterator[ITXYEPoint]:
-        return (p for p in self.all_itxye_as_points() if p.e == EntryType)
+        return (p for p in self.all_itxye_as_points() if p.e == ENTRY_TYPE)
 
     def _exit_itxye(self) -> ITXYE:
         return ITXYE(indices=[p.index for p in self.exit_points()],

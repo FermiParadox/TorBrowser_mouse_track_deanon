@@ -1,15 +1,28 @@
 from abc import ABC
 from typing import Type, Union
 
-from analysis.itxye_base import ITXYE
+from analysis.itxye_base import ITXYE, XYPoint
 from analysis.physics import Speed2Points, AngleCalc, Acceleration
 
 """
 When calculating angle, speed, etc. using only the last 2 points 
 causes huge errors at low mouse speeds, 
 due to pixels being chessboard-like boxes.
-A better solution would be (linear) fitting of more than 2 points.
+
+A better solution would be (linear) fitting of more than 2 points,
+when the speed is low.
 """
+
+
+class MetricValueUndefined:
+    """
+    Some metrics can't be determined always.
+
+    E.g. the angle of an exit point when there is only 1 point.
+    """
+
+
+METRIC_TYPE = Union[float, Type[MetricValueUndefined]]
 
 
 class _EntryOrExitHandler(ABC):
@@ -23,73 +36,65 @@ class _EntryOrExitHandler(ABC):
         self.crit_index = crit_index
         self.max_index = all_itxye.indices[-1]
 
-    def index_too_small(self):
-        return ...
+    def index_too_small(self) -> bool:
+        return self.index_total_less_than_0()
 
-    def index_too_large(self):
-        return ...
+    def index_too_large(self) -> bool:
+        return self.index_exceeds_max_array()
 
-    def index_exceeds_max_array(self):
+    def index_exceeds_max_array(self) -> bool:
         return self.crit_index + self.MAX_EXTRA_INDEX > self.max_index
 
-    def index_total_less_than_0(self):
+    def index_total_less_than_0(self) -> bool:
         return self.crit_index - self.MAX_EXTRA_INDEX < 0
 
-    def point_n(self, extra_index):
+    def point_n(self, extra_index) -> XYPoint:
         index = self.crit_index + extra_index
-        return self.x_list[index], self.y_list[index]
+        return XYPoint(self.x_list[index], self.y_list[index])
 
-    def space_n(self, extra_index):
+    def space_n(self, extra_index) -> METRIC_TYPE:
         pass
 
-    def velocity_n(self, extra_index):
+    def velocity_n(self, extra_index) -> METRIC_TYPE:
         pass
 
-    def acceleration_n(self, extra_index):
+    def acceleration_n(self, extra_index) -> METRIC_TYPE:
         pass
 
 
 class ExitHandler(_EntryOrExitHandler):
-    @property
-    def angle(self):
-        if self.index_too_small:
-            return None
-        return AngleCalc(xy1=self.p2, xy2=self.p3).angle
+    def angle(self) -> METRIC_TYPE:
+        if self.index_too_small():
+            return MetricValueUndefined
+        return AngleCalc(xy1=self.point_n(-1), xy2=self.point_n(0)).angle()
 
-    @property
-    def speed(self):
-        if self.index_too_small:
-            return None
-        return Speed2Points(xy1=self.p2, xy2=self.p3).velocity
+    def speed(self) -> METRIC_TYPE:
+        if self.index_too_small():
+            return MetricValueUndefined
+        return Speed2Points(xy1=self.point_n(-1), xy2=self.point_n(0)).velocity()
 
-    @property
-    def acceleration(self):
-        if self.index_too_small:
-            return None
-        return Acceleration(p1=self.p1, p2=self.p2, p3=self.p3).acceleration
+    def acceleration(self) -> METRIC_TYPE:
+        if self.index_too_small():
+            return MetricValueUndefined
+        return Acceleration(xy1=self.point_n(-2), xy2=self.point_n(-1), xy3=self.point_n(0)).acceleration()
 
 
 class EntryHandler(_EntryOrExitHandler):
-    @property
-    def angle(self):
+    def angle(self) -> METRIC_TYPE:
         """Return approximate angle when exiting browser."""
-        if self.index_too_large:
-            return None
-        return AngleCalc(xy1=self.p1, xy2=self.p2).angle
+        if self.index_too_large():
+            return MetricValueUndefined
+        return AngleCalc(xy1=self.point_n(0), xy2=self.point_n(1)).angle()
 
-    @property
-    def speed(self):
-        if self.index_too_large:
-            return None
-        return Speed2Points(xy1=self.p1, xy2=self.p2).velocity
+    def speed(self) -> METRIC_TYPE:
+        if self.index_too_large():
+            return MetricValueUndefined
+        return Speed2Points(xy1=self.point_n(0), xy2=self.point_n(1)).velocity()
 
-    @property
-    def acceleration(self):
-        if self.index_too_large:
-            return None
-        return Acceleration(
-            p1=self.p1, p2=self.p2, p3=self.p3,
-            t1=self.t1, t2=self.t2, t3=self.t3).acceleration
+    def acceleration(self) -> METRIC_TYPE:
+        if self.index_too_large():
+            return MetricValueUndefined
+        return Acceleration(xy1=self.point_n(0), xy2=self.point_n(1), xy3=self.point_n(2)).acceleration()
 
 
 ENTRY_OR_EXIT_HANDLER = Type[Union[ExitHandler, EntryHandler]]

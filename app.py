@@ -19,14 +19,10 @@ def print_metrics():
     user_handler.calc_and_store_metrics()
     user_handler.insert_user()
     user_handler.plot_and_show_mouse_movement()
-    print(f"t exit {user.exit_times}")
     print(f"t entry {user.entry_times}")
-    print(f"angles exit {user.exit_angles}")
-    print(f"angles entry {user.entry_angles}")
-    # print(f"speed exit {user.exit_speeds()}")
-    # print(f"speed entry {user.entry_speeds()}")
-    # print(f"a exit {user.exit_accelerations()}")
-    # print(f"a entry {user.entry_accelerations()}")
+    print(f"t exit {user.exit_times}")
+    print(f"entry metrics {user.entry_metrics}")
+    print(f"exit metrics {user.exit_metrics}")
     print("=" * 50)
 
 

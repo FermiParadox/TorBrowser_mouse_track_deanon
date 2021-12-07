@@ -7,7 +7,7 @@ from analysis.conversion import DataExtractor
 from analysis.itwva_base import IWVAE
 from analysis.itxye_base import ITXYEPoint
 from analysis.plotting import Plotter
-from analysis.point_types import ENTRY_OR_EXIT_TYPE, ExitType, EntryType
+from analysis.point_types import EntryOrExitType, EXIT_TYPE, ENTRY_TYPE
 from analysis.user_base import User
 
 
@@ -44,7 +44,8 @@ class UserCreator:
         return User(id=extractor.user_id(),
                     ip=extractor.user_ip(),
                     all_itxye=extractor.itxye_lists(),
-                    metrics=IWVAE())
+                    exit_metrics=IWVAE(),
+                    entry_metrics=IWVAE())
 
 
 class UserHandler:
@@ -82,12 +83,19 @@ class UserHandler:
         return metrics.critical_accelerations()
 
     def calc_and_store_metrics(self) -> None:
-        self.user.exit_speeds = self._exit_speeds()
-        self.user.entry_speeds = self._entry_speeds()
-        self.user.exit_angles = self._exit_angles()
-        self.user.entry_angles = self._entry_angles()
-        self.user.exit_accelerations = self._exit_accelerations()
-        self.user.entry_accelerations = self._entry_accelerations()
+        exit_metrics = self.user.exit_metrics
+        exit_metrics.indices = [p.index for p in self.user.all_itxye.as_points() if p.e == EXIT_TYPE]
+        exit_metrics.v = self._exit_speeds()
+        exit_metrics.w = self._exit_angles()
+        exit_metrics.a = self._exit_accelerations()
+        exit_metrics.e = [EXIT_TYPE for _ in exit_metrics.indices]
+
+        entry_metrics = self.user.entry_metrics
+        entry_metrics.indices = [p.index for p in self.user.all_itxye.as_points() if p.e == ENTRY_TYPE]
+        entry_metrics.v = self._entry_speeds()
+        entry_metrics.w = self._entry_angles()
+        entry_metrics.a = self._entry_accelerations()
+        entry_metrics.e = [ENTRY_TYPE for _ in entry_metrics.indices]
 
     def insert_user(self) -> None:
         all_users.add(self.user)
@@ -122,7 +130,7 @@ class Comparison:
 class SingleMatch:
     p1: ITXYEPoint
     p2: ITXYEPoint
-    type_p1: ENTRY_OR_EXIT_TYPE
+    type_p1: EntryOrExitType
     exit_angle: float
     entry_angle: float
     angles_diff: float = field(init=False)
@@ -175,7 +183,7 @@ class MatchesCreator:
     def time_diff_in_bounds(p1: ITXYEPoint, p2: ITXYEPoint) -> float:
         return abs(p1.time - p2.time) <= MatchesCreator.MAX_DELTA_T
 
-    def _single_point_match(self, p1: ITXYEPoint, p2: ITXYEPoint, type_p1: ENTRY_OR_EXIT_TYPE) -> SingleMatch:
+    def _single_point_match(self, p1: ITXYEPoint, p2: ITXYEPoint, type_p1: EntryOrExitType) -> SingleMatch:
         if self.time_diff_in_bounds(p1, p2):
             # TODO
             p1_angle = self.user1.exit_angles
@@ -185,14 +193,14 @@ class MatchesCreator:
         matches = []
         for p1 in self.user1.exit_itxye.as_points():
             for p2 in self.user2.entry_itxye.as_points():
-                matches.append(self._single_point_match(p1=p1, p2=p2, type_p1=ExitType))
+                matches.append(self._single_point_match(p1=p1, p2=p2, type_p1=EXIT_TYPE))
         return matches
 
     def _entry_to_exit_matches(self) -> List[SingleMatch]:
         matches = []
         for p1 in self.user1.entry_itxye.as_points():
             for p2 in self.user2.exit_itxye.as_points():
-                matches.append(self._single_point_match(p1=p1, p2=p2, type_p1=EntryType))
+                matches.append(self._single_point_match(p1=p1, p2=p2, type_p1=ENTRY_TYPE))
         return matches
 
     def point_matches(self) -> Matches:

@@ -2,7 +2,7 @@ from ipaddress import ip_address
 
 from analysis.ip_base import IPv6_or_IPv4_obj
 from analysis.itxye_base import ITXYE
-from analysis.point_types import NotExitOrEntry, EntryType, ExitType
+from analysis.point_types import NON_CRIT_TYPE, ENTRY_TYPE, EXIT_TYPE
 
 POINT_SPLITTER = ":"
 COORDINATE_SPLITTER = ","
@@ -28,7 +28,7 @@ class ITXYStrToArray:
             itxye_lists.time.append(int(t))
             itxye_lists.x.append(int(x))
             itxye_lists.y.append(-int(y))  # y-axis goes downwards in browsers unlike cartesian
-            itxye_lists.e.append(NotExitOrEntry)
+            itxye_lists.e.append(NON_CRIT_TYPE)
 
         return itxye_lists
 
@@ -72,7 +72,7 @@ class DataExtractor:
     def itxye_lists(self) -> ITXYE:
         itxye_lists_with_e = self._itxye_lists
         for exit_index in self.exit_indices():
-            itxye_lists_with_e.e[exit_index] = ExitType
+            itxye_lists_with_e.e[exit_index] = EXIT_TYPE
         for exit_index in self.entry_indices():
-            itxye_lists_with_e.e[exit_index] = EntryType
+            itxye_lists_with_e.e[exit_index] = ENTRY_TYPE
         return itxye_lists_with_e
