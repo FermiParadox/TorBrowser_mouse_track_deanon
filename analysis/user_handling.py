@@ -168,15 +168,29 @@ class PointMatch:
     dt: float
     exit_w: float
     entry_w: float
+    exit_v: float
+    entry_v: float
+    exit_a: float
+    entry_a: float
     dw: float = field(init=False, default=None)
     dv: float = field(init=False, default=None)
     da: float = field(init=False, default=None)
 
     def __post_init__(self):
         self.store_dw(self.entry_w, self.exit_w)
+        self.store_dv(self.entry_v, self.exit_v)
+        self.store_da(self.entry_a, self.exit_a)
 
     def store_dw(self, entry_w, exit_w) -> None:
         self.dw = exit_w - entry_w
+
+    def store_dv(self, entry_v, exit_v) -> None:
+        if entry_v and exit_v:
+            self.dv = exit_v - entry_v
+
+    def store_da(self, entry_a, exit_a) -> None:
+        if entry_a and exit_a:
+            self.da = exit_a - entry_a
 
 
 @dataclass
@@ -189,7 +203,7 @@ class UserMatch:
     match_id: str = field(init=False, default=None)
 
     def __post_init__(self):
-        self.match_id = f"{self.user1.id}{self.user2.id}"
+        self.match_id = f"{self.user1.id},{self.user2.id}"
 
     def __eq__(self, other):
         return self.match_id == other.match_id
@@ -202,8 +216,24 @@ class MatchesSet(ReAddingSet):
     def add(self, other: UserMatch) -> None:
         super().add(other)
 
+    def print_matches(self):
+        print("All matches:")
+        for m in self:
+            for p in m.exit_to_entry_matches:
+                print("-------")
+                print(f"dt = {p.dt}")
+                print(f"dw = {p.dw}")
+                print(f"dv = {p.dv}")
+                print(f"da = {p.da}")
+            for p in m.entry_to_exit_matches:
+                print("-------")
+                print(f"dt = {p.dt}")
+                print(f"dw = {p.dw}")
+                print(f"dv = {p.dv}")
+                print(f"da = {p.da}")
 
-all_matches: Set[UserMatch] = MatchesSet()
+
+all_matches = MatchesSet()
 matches_within_range: Set[UserMatch] = MatchesSet()
 
 
@@ -231,25 +261,34 @@ class UserMatchCreator:
             p1_i = p1.index
             p2_i = p2.index
             if type_p1 == EXIT_TYPE:
-                exit_w = self.user1.exit_metrics.get_point_by_index(index=p1_i).w
-                entry_w = self.user2.entry_metrics.get_point_by_index(index=p2_i).w
+                exit_p = self.user1.exit_metrics.get_point_by_index(index=p1_i)
+                entry_p = self.user2.entry_metrics.get_point_by_index(index=p2_i)
             else:
-                entry_w = self.user1.entry_metrics.get_point_by_index(index=p1_i).w
-                exit_w = self.user2.exit_metrics.get_point_by_index(index=p2_i).w
-            return PointMatch(p1=p1, p2=p2, type_p1=type_p1, dt=dt, entry_w=entry_w, exit_w=exit_w)
+                entry_p = self.user1.entry_metrics.get_point_by_index(index=p1_i)
+                exit_p = self.user2.exit_metrics.get_point_by_index(index=p2_i)
+
+            return PointMatch(p1=p1, p2=p2, type_p1=type_p1, dt=dt,
+                              entry_w=entry_p.w, exit_w=exit_p.w,
+                              entry_v=entry_p.v, exit_v=exit_p.v,
+                              entry_a=entry_p.a, exit_a=exit_p.a,
+                              )
 
     def _exit_to_entry_matches(self) -> List[PointMatch]:
         matches = []
         for p1 in self.user1.exit_itxye.as_points():
             for p2 in self.user2.entry_itxye.as_points():
-                matches.append(self._single_point_match(p1=p1, p2=p2, type_p1=EXIT_TYPE))
+                point_match = self._single_point_match(p1=p1, p2=p2, type_p1=EXIT_TYPE)
+                if point_match:
+                    matches.append(point_match)
         return matches
 
     def _entry_to_exit_matches(self) -> List[PointMatch]:
         matches = []
         for p1 in self.user1.entry_itxye.as_points():
             for p2 in self.user2.exit_itxye.as_points():
-                matches.append(self._single_point_match(p1=p1, p2=p2, type_p1=ENTRY_TYPE))
+                point_match = self._single_point_match(p1=p1, p2=p2, type_p1=ENTRY_TYPE)
+                if point_match:
+                    matches.append(point_match)
         return matches
 
     def user_match(self) -> UserMatch:

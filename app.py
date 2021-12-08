@@ -26,9 +26,7 @@ def print_metrics():
 
     match_creator = UserMatchHandler()
     match_creator.insert_all_matches()
-    print("All matches:")
-    for m in all_matches:
-        print(m)
+    all_matches.print_matches()
     print("=" * 50)
     user_handler.plot_and_show_mouse_movement()
 
