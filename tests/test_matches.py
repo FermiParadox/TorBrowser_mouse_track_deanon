@@ -1,4 +1,3 @@
-from random import randint
 from unittest import TestCase
 
 from analysis.itxye_base import ITXYEPoint
@@ -7,8 +6,8 @@ from analysis.point_types import EntryOrExitType
 
 class TestMatchesCreator(TestCase):
     def setUp(self) -> None:
-        from analysis.user_handling import MatchesCreator
-        self.MatchesCreator = MatchesCreator
+        from analysis.user_handling import UserMatchCreator
+        self.MatchesCreator = UserMatchCreator
 
         self.p1 = ITXYEPoint(index=0, time=0, x=1, y=512, e=EntryOrExitType(''))
         self.p2 = ITXYEPoint(index=1, time=623, x=512535, y=623, e=EntryOrExitType(''))

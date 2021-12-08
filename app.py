@@ -29,8 +29,6 @@ def print_metrics():
 def try_print_metrics():
     try:
         print_metrics()
-    except KeyboardInterrupt:
-        raise KeyboardInterrupt
     except Exception as e:
         print(e)
         return Response(status=400)
