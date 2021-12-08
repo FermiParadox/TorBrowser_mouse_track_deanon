@@ -76,4 +76,3 @@ class Test_Combinations(TestCase):
         combs = {(self.u1, self.u2), (self.u1, self.u3), (self.u2, self.u3)}
         tor_combs = self.Combinations._tor_user_combs(combs)
         self.assertEqual(3, len(tor_combs))
-

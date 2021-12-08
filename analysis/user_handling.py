@@ -1,17 +1,29 @@
 from dataclasses import dataclass, field
 from itertools import combinations
-from typing import List, Iterator, Tuple, Set, Union, Collection
+from typing import List, Iterator, Tuple, Set, Collection
 
 from analysis.metrics import ExitMetricsCalc, EntryMetricsCalc
 from analysis.conversion import DataExtractor
-from analysis.itwva_base import IWVAE
+from analysis.iwvae_base import IWVAE
 from analysis.itxye_base import ITXYEPoint
 from analysis.plotting import Plotter
 from analysis.point_types import EntryOrExitType, EXIT_TYPE, ENTRY_TYPE
 from analysis.user_base import User
 
 
-class AllUsers(set):
+class ReAddingSet(set):
+    def add(self, other) -> None:
+        """When added element is already present, it replaces the existing one,
+        instead of "editing" it.
+        Not very efficient, but should be ok for testing.
+
+        By default, `add` has no effect if the element is already present,
+        meaning new data points wouldn't be stored."""
+        self.discard(other)
+        super().add(other)
+
+
+class AllUsers(ReAddingSet):
     @property
     def ips(self):
         return {str(u.ip) for u in self}
@@ -21,13 +33,6 @@ class AllUsers(set):
         return {str(u.id) for u in self}
 
     def add(self, other: User) -> None:
-        """When added element is already present, it replaces the existing one,
-        instead of "editing" it.
-        Not very efficient, but should be ok for testing.
-
-        By default, `add` has no effect if the element is already present,
-        meaning new data points wouldn't be stored."""
-        self.discard(other)
         super().add(other)
 
 
@@ -117,27 +122,6 @@ class UserHandler:
         plotter.decorate_graphs_and_show()
 
 
-@dataclass
-class PointMatch:
-    """
-    Stores data related an exit and entry point of two user_IDs,
-    when they appear to be coming from the same user.
-    """
-    p1: ITXYEPoint
-    p2: ITXYEPoint
-    type_p1: EntryOrExitType
-    dt: float
-    exit_w: float
-    entry_w: float
-    dw: float = field(init=False)
-
-    def __post_init__(self):
-        self.store_dw(self.entry_w, self.exit_w)
-
-    def store_dw(self, entry_w, exit_w) -> None:
-        self.dw = exit_w - entry_w
-
-
 def is_tor_user(user: User) -> bool:
     """Tor-user times always end in '00'
     because of the 100ms time-resolution imposed in JS."""
@@ -167,8 +151,32 @@ class Combinations:
 
     @staticmethod
     def tor_user_combs(users_iter: Collection[User]) -> USER_COMBS_TYPE:
-        all_combs = Combinations.user_combs(users_iter=users_iter)
-        return Combinations._tor_user_combs(all_combs=all_combs)
+        # all_combs = Combinations.user_combs(users_iter=users_iter)
+        # TODO temp disable, revert.   v
+        return Combinations.user_combs(users_iter=users_iter)
+
+
+@dataclass
+class PointMatch:
+    """
+    Stores data related an exit and entry point of two user_IDs,
+    when they appear to be coming from the same user.
+    """
+    p1: ITXYEPoint
+    p2: ITXYEPoint
+    type_p1: EntryOrExitType
+    dt: float
+    exit_w: float
+    entry_w: float
+    dw: float = field(init=False, default=None)
+    dv: float = field(init=False, default=None)
+    da: float = field(init=False, default=None)
+
+    def __post_init__(self):
+        self.store_dw(self.entry_w, self.exit_w)
+
+    def store_dw(self, entry_w, exit_w) -> None:
+        self.dw = exit_w - entry_w
 
 
 @dataclass
@@ -178,9 +186,25 @@ class UserMatch:
     exit_to_entry_matches: List[PointMatch]
     entry_to_exit_matches: List[PointMatch]
 
+    match_id: str = field(init=False, default=None)
 
-all_matches: Set[UserMatch] = set()
-matches_within_range: Set[UserMatch] = set()
+    def __post_init__(self):
+        self.match_id = f"{self.user1.id}{self.user2.id}"
+
+    def __eq__(self, other):
+        return self.match_id == other.match_id
+
+    def __hash__(self):
+        return hash(self.match_id)
+
+
+class MatchesSet(ReAddingSet):
+    def add(self, other: UserMatch) -> None:
+        super().add(other)
+
+
+all_matches: Set[UserMatch] = MatchesSet()
+matches_within_range: Set[UserMatch] = MatchesSet()
 
 
 class UserMatchCreator:
@@ -207,11 +231,11 @@ class UserMatchCreator:
             p1_i = p1.index
             p2_i = p2.index
             if type_p1 == EXIT_TYPE:
-                exit_w = self.user1.exit_metrics.w[p1_i]
-                entry_w = self.user2.entry_metrics.w[p2_i]
+                exit_w = self.user1.exit_metrics.get_point_by_index(index=p1_i).w
+                entry_w = self.user2.entry_metrics.get_point_by_index(index=p2_i).w
             else:
-                entry_w = self.user1.entry_metrics.w[p1_i]
-                exit_w = self.user2.exit_metrics.w[p2_i]
+                entry_w = self.user1.entry_metrics.get_point_by_index(index=p1_i).w
+                exit_w = self.user2.exit_metrics.get_point_by_index(index=p2_i).w
             return PointMatch(p1=p1, p2=p2, type_p1=type_p1, dt=dt, entry_w=entry_w, exit_w=exit_w)
 
     def _exit_to_entry_matches(self) -> List[PointMatch]:

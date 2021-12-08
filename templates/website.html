@@ -38,7 +38,7 @@
 
     function showUserID() {
         const userID = getStoredUserID();
-        document.getElementById("key_pressed")
+        document.getElementById("user_ID")
             .innerText = `User ID assigned: ${userID}`;
     }
 
@@ -96,7 +96,7 @@
         storePosition(t, x, y);
     }
 
-    async function sendData(e) {
+    async function sendData() {
         const index = totalPointsTXY();
         storeMouseExitTXYIndices(index);
         const t_xy_data = JSON.stringify({

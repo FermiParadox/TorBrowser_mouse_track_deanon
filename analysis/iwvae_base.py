@@ -30,11 +30,12 @@ class IWVAE:
     e: List[EntryOrExitType] = field(default_factory=list)
 
     def get_point_by_index(self, index):
-        return IWVAEPoint(index=index,
-                          w=self.w[index],
-                          v=self.v[index],
-                          a=self.a[index],
-                          e=self.e[index])
+        n = self.indices.index(index)
+        return IWVAEPoint(index=n,
+                          w=self.w[n],
+                          v=self.v[n],
+                          a=self.a[n],
+                          e=self.e[n])
 
     def append_point(self, iwvae_point: IWVAEPoint):
         self.indices.append(iwvae_point.index)

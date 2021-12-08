@@ -1,7 +1,7 @@
 from ipaddress import ip_address
 from unittest import TestCase
 
-from analysis.itwva_base import IWVAE
+from analysis.iwvae_base import IWVAE
 from analysis.user_base import IDGenerator, User
 from analysis.itxye_base import ITXYE
 from analysis.user_handling import AllUsers
