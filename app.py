@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, Response, make_response
 
 from analysis.user_base import IDGenerator
-from analysis.user_handling import UserCreator, UserHandler, UserMatchHandler, all_matches
+from analysis.user_handling import UserCreator, UserHandler, UserPairHandler, all_matches
 
 app = Flask(__name__)
 
@@ -24,9 +24,8 @@ def print_metrics():
     print(f"exit metrics {user.exit_metrics}")
     print("=" * 50)
 
-    match_creator = UserMatchHandler()
-    match_creator.insert_all_matches()
-    all_matches.print_matches()
+    UserPairHandler().insert_valid_pairs()
+    all_matches.print_pairs()
     print("=" * 50)
     user_handler.plot_and_show_mouse_movement()
 

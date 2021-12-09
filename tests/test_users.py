@@ -1,10 +1,8 @@
 from ipaddress import ip_address
 from unittest import TestCase
 
-from analysis.iwvae_base import IWVAE
 from analysis.user_base import IDGenerator, User
 from analysis.itxye_base import ITXYE
-from analysis.user_handling import AllUsers
 
 
 class TestUser(TestCase):
@@ -35,63 +33,3 @@ class TestIDGenerator(TestCase):
         self.assertEqual(generator.unique_id(), 3)
 
 
-class TestAllUsers(TestCase):
-    def setUp(self) -> None:
-        self.u1 = User(id=111,
-                       ip=ip_address("0.42.0.0"),
-                       all_itxye=ITXYE())
-
-        self.u2 = User(id=3333,
-                       ip=ip_address("0.0.7.0"),
-                       all_itxye=ITXYE())
-
-        self.u3_initial = User(id=5252525,
-                               ip=ip_address("52.0.0.0"),
-                               all_itxye=ITXYE())
-
-        self.txy_updated = ITXYE([66, 33], [1, 2], [11, 22], [111, 222])
-        self.u3_updated = User(id=5252525,
-                               ip=ip_address("52.0.0.0"),
-                               all_itxye=self.txy_updated)
-
-    def test_displayed_id_exists_when_adding_user(self):
-        stored_user = self.u1
-
-        users_list = AllUsers()
-        users_list.add(stored_user)
-
-        self.assertEqual(users_list.ids.pop(), str(stored_user.id))
-
-    def test_displayed_ip_exists_when_adding_user(self):
-        stored_user = self.u1
-
-        users_list = AllUsers()
-        users_list.add(stored_user)
-
-        self.assertEqual(users_list.ips.pop(), str(stored_user.ip))
-
-    def test_all_ids_added_when_unique(self):
-        users_list = AllUsers()
-
-        users_list.add(self.u1)
-        users_list.add(self.u2)
-        users_list.add(self.u3_initial)
-
-        self.assertEqual(len(users_list), 3)
-
-    def test_no_duplicate_ids(self):
-        users_list = AllUsers()
-
-        users_list.add(self.u3_initial)
-        users_list.add(self.u3_updated)
-
-        self.assertEqual(len(users_list), 1)
-
-    def test_previous_user_data_replaced(self):
-        users_list = AllUsers()
-
-        users_list.add(self.u3_initial)
-        users_list.add(self.u3_updated)
-
-        user = users_list.pop()
-        self.assertEqual(user.all_itxye, self.txy_updated)

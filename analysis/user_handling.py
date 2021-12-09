@@ -2,6 +2,8 @@ from dataclasses import dataclass, field
 from itertools import combinations
 from typing import List, Iterator, Tuple, Set, Collection
 
+from scipy.spatial import distance
+
 from analysis.metrics import ExitMetricsCalc, EntryMetricsCalc
 from analysis.conversion import DataExtractor
 from analysis.iwvae_base import IWVAE
@@ -131,6 +133,10 @@ def is_tor_user(user: User) -> bool:
     return True
 
 
+def are_tor_users(users: Collection[User]) -> bool:
+    return all(is_tor_user(u) for u in users)
+
+
 class Combinations:
     USER_COMBS_TYPE = Iterator[Tuple[User, User]]
 
@@ -150,10 +156,18 @@ class Combinations:
         return combs
 
     @staticmethod
-    def tor_user_combs(users_iter: Collection[User]) -> USER_COMBS_TYPE:
+    def tor_users_combs(users_iter: Collection[User]) -> USER_COMBS_TYPE:
         # all_combs = Combinations.user_combs(users_iter=users_iter)
         # TODO temp disable, revert.   v
         return Combinations.user_combs(users_iter=users_iter)
+
+
+class PointMatchLimits:
+    MAX_DW = 30
+    MAX_DV = 50
+    MAX_DA = 50
+    # assuming the user stops moving during CTR TAB this can be set to 1:
+    MAX_DX_OR_DY_FOR_TOR_USERS = 10
 
 
 @dataclass
@@ -172,14 +186,24 @@ class PointMatch:
     entry_v: float
     exit_a: float
     entry_a: float
+    both_tor_users: bool
     dw: float = field(init=False, default=None)
     dv: float = field(init=False, default=None)
     da: float = field(init=False, default=None)
+    # dx, dy meaningful only when using CTR TAB in Tor.
+    #   That is, both userIDs belong to the same Tor browser.
+    dx: float = field(init=False, default=None)
+    dy: float = field(init=False, default=None)
+
+    valid_match: bool = field(init=False, default=False)
 
     def __post_init__(self):
         self.store_dw(self.entry_w, self.exit_w)
         self.store_dv(self.entry_v, self.exit_v)
         self.store_da(self.entry_a, self.exit_a)
+        self.dx = self._dx()
+        self.dy = self._dy()
+        self.valid_match = self._valid_match()
 
     def store_dw(self, entry_w, exit_w) -> None:
         self.dw = exit_w - entry_w
@@ -188,13 +212,39 @@ class PointMatch:
         if entry_v and exit_v:
             self.dv = exit_v - entry_v
 
+    def _dx(self):
+        if self.p2.x and self.p1.x:
+            return self.p2.x - self.p1.x
+
+    def _dy(self):
+        if self.p2.y and self.p1.y:
+            return self.p2.y - self.p1.y
+
     def store_da(self, entry_a, exit_a) -> None:
         if entry_a and exit_a:
             self.da = exit_a - entry_a
 
+    def _valid_match_tor_and_normal(self) -> bool:
+        if self.dw <= PointMatchLimits.MAX_DW:
+            if self.dv <= PointMatchLimits.MAX_DV:
+                if self.da <= PointMatchLimits.MAX_DA:
+                    return True
+        return False
+
+    def _valid_match_both_tor(self) -> bool:
+        ds = distance.euclidean(self.dx, self.dy)
+        if ds <= PointMatchLimits.MAX_DX_OR_DY_FOR_TOR_USERS:
+            return True
+        return False
+
+    def _valid_match(self) -> bool:
+        if self.both_tor_users:
+            return self._valid_match_both_tor()
+        return self._valid_match_tor_and_normal()
+
 
 @dataclass
-class UserMatch:
+class UsersPair:
     user1: User
     user2: User
     exit_to_entry_matches: List[PointMatch]
@@ -212,40 +262,46 @@ class UserMatch:
         return hash(self.match_id)
 
 
-class MatchesSet(ReAddingSet):
-    def add(self, other: UserMatch) -> None:
+class UserPairsSet(ReAddingSet):
+    def add(self, other: UsersPair) -> None:
         super().add(other)
 
-    def print_matches(self):
-        print("All matches:")
+    def print_pairs(self):
+        print("=" * 60)
+        print("All pairs matched:")
         for m in self:
+            print("=" * 30)
+            print("Exit points matched")
             for p in m.exit_to_entry_matches:
-                print("-------")
+                print("-" * 15)
                 print(f"dt = {p.dt}")
                 print(f"dw = {p.dw}")
                 print(f"dv = {p.dv}")
                 print(f"da = {p.da}")
+            print("=" * 30)
+            print("Entry points matched")
             for p in m.entry_to_exit_matches:
-                print("-------")
+                print("-" * 15)
                 print(f"dt = {p.dt}")
                 print(f"dw = {p.dw}")
                 print(f"dv = {p.dv}")
                 print(f"da = {p.da}")
 
 
-all_matches = MatchesSet()
-matches_within_range: Set[UserMatch] = MatchesSet()
+all_matches = UserPairsSet()
+matches_within_range: Set[UsersPair] = UserPairsSet()
 
 
 class UserMatchCreator:
     # In milliseconds
     TOR_RESOLUTION = 100
     MAX_DELTA_T = TOR_RESOLUTION + 20
-    MIN_DELTA_T = -20
+    MIN_DELTA_T = -5
 
     def __init__(self, user1: User, user2: User):
         self.user1 = user1
         self.user2 = user2
+        self.both_tor_users = are_tor_users([user1, user2])
 
     @staticmethod
     def dt(p1: ITXYEPoint, p2: ITXYEPoint) -> int:
@@ -271,6 +327,7 @@ class UserMatchCreator:
                               entry_w=entry_p.w, exit_w=exit_p.w,
                               entry_v=entry_p.v, exit_v=exit_p.v,
                               entry_a=entry_p.a, exit_a=exit_p.a,
+                              both_tor_users=self.both_tor_users
                               )
 
     def _exit_to_entry_matches(self) -> List[PointMatch]:
@@ -291,23 +348,55 @@ class UserMatchCreator:
                     matches.append(point_match)
         return matches
 
-    def user_match(self) -> UserMatch:
-        return UserMatch(user1=self.user1, user2=self.user2,
+    def user_match(self) -> UsersPair:
+        return UsersPair(user1=self.user1, user2=self.user2,
                          exit_to_entry_matches=self._exit_to_entry_matches(),
                          entry_to_exit_matches=self._entry_to_exit_matches())
 
-    def insert_match(self) -> None:
-        all_matches.add(self.user_match())
 
-
-class UserMatchHandler:
+class UserPairHandler:
+    MIN_VALID_POINTS = 4
+    MIN_VALID_POINTS_PERCENTAGE = 0.2
 
     @staticmethod
-    def insert_all_matches() -> None:
-        for comb in Combinations.tor_user_combs(users_iter=all_users):
+    def _all_user_pairs() -> UserPairsSet:
+        matches = UserPairsSet()
+        for comb in Combinations.tor_users_combs(users_iter=all_users):
             tor_u1, u2 = comb
             match_creator = UserMatchCreator(user1=tor_u1, user2=u2)
-            match_creator.insert_match()
+            matches.add(match_creator.user_match())
+        return matches
 
-    def insert_matches_within_range(self) -> None:
-        pass
+    def _is_valid_pair(self, user_pair: UsersPair) -> bool:
+        valid_points = []
+        matched_points = user_pair.entry_to_exit_matches + user_pair.exit_to_entry_matches
+        if not matched_points:
+            return False
+        for p in matched_points:
+            if p.valid_match:
+                valid_points.append(p)
+
+        total_valid_points = len(valid_points)
+        total_points = len(valid_points)
+        percent_valid = total_valid_points / total_points
+
+        if percent_valid < self.MIN_VALID_POINTS_PERCENTAGE:
+            return False
+        if total_valid_points < self.MIN_VALID_POINTS:
+            return False
+
+        return True
+
+    def _valid_pairs(self) -> UserPairsSet:
+        valid_pairs = UserPairsSet()
+
+        user_pair: UsersPair
+        for user_pair in self._all_user_pairs():
+            if not self._is_valid_pair(user_pair=user_pair):
+                continue
+            valid_pairs.add(user_pair)
+        return valid_pairs
+
+    def insert_valid_pairs(self) -> None:
+        for pair in self._valid_pairs():
+            all_matches.add(pair)

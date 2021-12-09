@@ -32,7 +32,7 @@ class TestMatchesCreator(TestCase):
         self.assertTrue(self.MatchesCreator.dt_in_bounds(dt=110))
 
     def test_dt_in_bounds_more_than_min(self):
-        self.assertTrue(self.MatchesCreator.dt_in_bounds(dt=-10))
+        self.assertTrue(self.MatchesCreator.dt_in_bounds(dt=-5))
 
     def test_dt_in_bounds_more_than_max(self):
         self.assertFalse(self.MatchesCreator.dt_in_bounds(dt=150))
