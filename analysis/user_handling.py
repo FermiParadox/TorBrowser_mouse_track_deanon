@@ -209,25 +209,21 @@ class PointMatch:
         self.dw = exit_w - entry_w
 
     def store_dv(self, entry_v, exit_v) -> None:
-        if entry_v and exit_v:
-            self.dv = exit_v - entry_v
+        self.dv = exit_v - entry_v
 
     def _dx(self):
-        if self.p2.x and self.p1.x:
-            return self.p2.x - self.p1.x
+        return self.p2.x - self.p1.x
 
     def _dy(self):
-        if self.p2.y and self.p1.y:
-            return self.p2.y - self.p1.y
+        return self.p2.y - self.p1.y
 
     def store_da(self, entry_a, exit_a) -> None:
-        if entry_a and exit_a:
-            self.da = exit_a - entry_a
+        self.da = exit_a - entry_a
 
     def _valid_match_tor_and_normal(self) -> bool:
-        if self.dw <= PointMatchLimits.MAX_DW:
-            if self.dv <= PointMatchLimits.MAX_DV:
-                if self.da <= PointMatchLimits.MAX_DA:
+        if abs(self.dw) <= PointMatchLimits.MAX_DW:
+            if abs(self.dv) <= PointMatchLimits.MAX_DV:
+                if abs(self.da) <= PointMatchLimits.MAX_DA:
                     return True
         return False
 
