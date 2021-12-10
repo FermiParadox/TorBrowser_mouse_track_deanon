@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from typing import List
 
+from analysis.itxye_base import ITXYEPoint
 from analysis.point_types import EntryExitType
 
 
@@ -28,6 +29,9 @@ class IWVAE:
     v: List[float] = field(default_factory=list)
     a: List[float] = field(default_factory=list)
     e: List[EntryExitType] = field(default_factory=list)
+
+    def get_metrics_by_point(self, p: ITXYEPoint):
+        return self.get_point_by_index(index=p.index)
 
     def get_point_by_index(self, index):
         n = self.indices.index(index)

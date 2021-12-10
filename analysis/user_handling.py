@@ -164,10 +164,13 @@ class Combinations:
 
 class PointMatchLimits:
     MAX_DW = 30
+    # Velocity and acceleration differences
+    #   are probably not very relevant.
     MAX_DV = 50
     MAX_DA = 50
-    # assuming the user stops moving during CTR TAB this can be set to 1:
-    MAX_DX_OR_DY_FOR_TOR_USERS = 10
+    # Assuming the user usually stops moving during CTR TAB
+    #   this can be set to 1 (it would reduce false positives).
+    MAX_DS_FOR_TOR_USERS = 10
 
 
 @dataclass
@@ -178,7 +181,6 @@ class PointMatch:
     """
     p1: ITXYEPoint
     p2: ITXYEPoint
-    type_p1: EntryExitType
     dt: float
     exit_w: float
     entry_w: float
@@ -220,7 +222,7 @@ class PointMatch:
     def store_da(self, entry_a, exit_a) -> None:
         self.da = exit_a - entry_a
 
-    def _valid_match_tor_and_normal(self) -> bool:
+    def _valid_match_tor_plus_normal(self) -> bool:
         if abs(self.dw) <= PointMatchLimits.MAX_DW:
             if abs(self.dv) <= PointMatchLimits.MAX_DV:
                 if abs(self.da) <= PointMatchLimits.MAX_DA:
@@ -228,15 +230,22 @@ class PointMatch:
         return False
 
     def _valid_match_both_tor(self) -> bool:
+        """
+        When both userIDs belong to the same Tor Browser
+        the x,y-axis of both tabs are nearly identical.
+
+        There might be a small difference if the mouse was moving
+        during the key press.
+        """
         ds = distance.euclidean(self.dx, self.dy)
-        if ds <= PointMatchLimits.MAX_DX_OR_DY_FOR_TOR_USERS:
+        if ds <= PointMatchLimits.MAX_DS_FOR_TOR_USERS:
             return True
         return False
 
     def _valid_match(self) -> bool:
         if self.both_tor_users:
             return self._valid_match_both_tor()
-        return self._valid_match_tor_and_normal()
+        return self._valid_match_tor_plus_normal()
 
 
 @dataclass
@@ -262,7 +271,7 @@ class UserPairsSet(ReAddingSet):
     def add(self, other: UsersPair) -> None:
         super().add(other)
 
-    def print_pairs(self):
+    def print_pairs(self) -> None:
         print("=" * 60)
         print("All pairs matched:")
         for m in self:
@@ -290,7 +299,9 @@ all_matches = UserPairsSet()
 class UserMatchCreator:
     # In milliseconds
     TOR_RESOLUTION = 100
-    MAX_DELTA_T = TOR_RESOLUTION + 20
+    POSSIBLE_BROWSER_ERROR_ON_SAME_MACHINE = 5
+    DEAD_ZONE_TIME = 20     # between the two browsers
+    MAX_DELTA_T = TOR_RESOLUTION + POSSIBLE_BROWSER_ERROR_ON_SAME_MACHINE + DEAD_ZONE_TIME
     MIN_DELTA_T = -5
 
     def __init__(self, user1: User, user2: User):
@@ -299,15 +310,21 @@ class UserMatchCreator:
         self.both_tor_users = are_tor_users([user1, user2])
 
     @staticmethod
-    def dt(p1: ITXYEPoint, p2: ITXYEPoint) -> int:
-        return p2.time - p1.time
+    def dt(p1: ITXYEPoint, p2: ITXYEPoint, type_p1: EntryExitType) -> int:
+        if type_p1 == EXIT_TYPE:
+            p_out = p1
+            p_in = p2
+        else:
+            p_out = p2
+            p_in = p1
+        return p_in.time - p_out.time
 
     @staticmethod
     def dt_in_bounds(dt: int) -> bool:
         return UserMatchCreator.MIN_DELTA_T <= dt <= UserMatchCreator.MAX_DELTA_T
 
     def _single_point_match(self, p1: ITXYEPoint, p2: ITXYEPoint, type_p1: EntryExitType) -> PointMatch:
-        dt = self.dt(p1=p1, p2=p2)
+        dt = self.dt(p1=p1, p2=p2, type_p1=type_p1)
         if self.dt_in_bounds(dt=dt):
             p1_i = p1.index
             p2_i = p2.index
@@ -318,7 +335,7 @@ class UserMatchCreator:
                 entry_p = self.user1.entry_metrics.get_point_by_index(index=p1_i)
                 exit_p = self.user2.exit_metrics.get_point_by_index(index=p2_i)
 
-            return PointMatch(p1=p1, p2=p2, type_p1=type_p1, dt=dt,
+            return PointMatch(p1=p1, p2=p2, dt=dt,
                               entry_w=entry_p.w, exit_w=exit_p.w,
                               entry_v=entry_p.v, exit_v=exit_p.v,
                               entry_a=entry_p.a, exit_a=exit_p.a,
@@ -362,17 +379,22 @@ class UserPairHandler:
             matches.add(match_creator.user_match())
         return matches
 
-    def _were_lucky_matches(self, percent_valid):
+    def _were_lucky_matches(self, percent_valid) -> bool:
         return percent_valid < self.MIN_VALID_POINTS_PERCENTAGE
 
-    def _not_enough_valid(self, total_valid_points):
+    def _not_enough_valid(self, total_valid_points) -> bool:
         return total_valid_points < self.MIN_VALID_POINTS
 
+    @staticmethod
+    def _zero_matches(matched_points) -> bool:
+        return not matched_points
+
     def _is_valid_pair(self, user_pair: UsersPair) -> bool:
-        valid_points = []
         matched_points = user_pair.entry_to_exit_matches + user_pair.exit_to_entry_matches
-        if not matched_points:
+        if self._zero_matches(matched_points):
             return False
+
+        valid_points = []
         for p in matched_points:
             if p.valid_match:
                 valid_points.append(p)

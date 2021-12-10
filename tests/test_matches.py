@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from analysis.itxye_base import ITXYEPoint
-from analysis.point_types import EntryExitType
+from analysis.point_types import EntryExitType, EXIT_TYPE, ENTRY_TYPE
 
 
 class TestMatchesCreator(TestCase):
@@ -14,19 +14,22 @@ class TestMatchesCreator(TestCase):
 
     def test_dt_0(self):
         self.p1.time = self.p2.time
-        self.assertEqual(0, self.MatchesCreator.dt(p1=self.p1, p2=self.p2))
+        self.assertEqual(0, self.MatchesCreator.dt(p1=self.p1, p2=self.p2, type_p1=EXIT_TYPE))
+        self.assertEqual(0, self.MatchesCreator.dt(p1=self.p1, p2=self.p2, type_p1=ENTRY_TYPE))
 
     def test_dt_5(self):
         dt = 5
         self.p1.time = self.p2.time
         self.p2.time += dt
-        self.assertEqual(dt, self.MatchesCreator.dt(p1=self.p1, p2=self.p2))
+        self.assertEqual(5, self.MatchesCreator.dt(p1=self.p1, p2=self.p2, type_p1=EXIT_TYPE))
+        self.assertEqual(5, self.MatchesCreator.dt(p1=self.p2, p2=self.p1, type_p1=ENTRY_TYPE))
 
     def test_dt_minus_5(self):
         dt = -5
         self.p1.time = self.p2.time
         self.p2.time += dt
-        self.assertEqual(dt, self.MatchesCreator.dt(p1=self.p1, p2=self.p2))
+        self.assertEqual(-5, self.MatchesCreator.dt(p1=self.p1, p2=self.p2, type_p1=EXIT_TYPE))
+        self.assertEqual(-5, self.MatchesCreator.dt(p1=self.p2, p2=self.p1, type_p1=ENTRY_TYPE))
 
     def test_dt_in_bounds_less_than_max(self):
         self.assertTrue(self.MatchesCreator.dt_in_bounds(dt=110))
