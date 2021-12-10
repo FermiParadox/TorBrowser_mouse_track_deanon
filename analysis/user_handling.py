@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from itertools import combinations
-from typing import List, Iterator, Tuple, Set, Collection
+from typing import List, Iterator, Tuple, Collection
 
 from scipy.spatial import distance
 
@@ -285,7 +285,6 @@ class UserPairsSet(ReAddingSet):
 
 
 all_matches = UserPairsSet()
-matches_within_range: Set[UsersPair] = UserPairsSet()
 
 
 class UserMatchCreator:
@@ -363,6 +362,12 @@ class UserPairHandler:
             matches.add(match_creator.user_match())
         return matches
 
+    def _were_lucky_matches(self, percent_valid):
+        return percent_valid < self.MIN_VALID_POINTS_PERCENTAGE
+
+    def _not_enough_valid(self, total_valid_points):
+        return total_valid_points < self.MIN_VALID_POINTS
+
     def _is_valid_pair(self, user_pair: UsersPair) -> bool:
         valid_points = []
         matched_points = user_pair.entry_to_exit_matches + user_pair.exit_to_entry_matches
@@ -376,9 +381,9 @@ class UserPairHandler:
         total_points = len(valid_points)
         percent_valid = total_valid_points / total_points
 
-        if percent_valid < self.MIN_VALID_POINTS_PERCENTAGE:
+        if self._were_lucky_matches(percent_valid):
             return False
-        if total_valid_points < self.MIN_VALID_POINTS:
+        if self._not_enough_valid(total_valid_points):
             return False
 
         return True
