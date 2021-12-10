@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from analysis.itxye_base import ITXYEPoint
-from analysis.point_types import EntryOrExitType
+from analysis.point_types import EntryExitType
 
 
 class TestMatchesCreator(TestCase):
@@ -9,8 +9,8 @@ class TestMatchesCreator(TestCase):
         from analysis.user_handling import UserMatchCreator
         self.MatchesCreator = UserMatchCreator
 
-        self.p1 = ITXYEPoint(index=0, time=0, x=1, y=512, e=EntryOrExitType(''))
-        self.p2 = ITXYEPoint(index=1, time=623, x=512535, y=623, e=EntryOrExitType(''))
+        self.p1 = ITXYEPoint(index=0, time=0, x=1, y=512, e=EntryExitType(''))
+        self.p2 = ITXYEPoint(index=1, time=623, x=512535, y=623, e=EntryExitType(''))
 
     def test_dt_0(self):
         self.p1.time = self.p2.time

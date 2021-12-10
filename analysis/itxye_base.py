@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import List
 
-from analysis.point_types import EntryOrExitType
+from analysis.point_types import EntryExitType
 
 
 @dataclass
@@ -32,7 +32,7 @@ class ITXYEPoint:
     time: int
     x: int
     y: int
-    e: EntryOrExitType
+    e: EntryExitType
 
 
 @dataclass
@@ -41,7 +41,7 @@ class ITXYE:
     time: List[int] = field(default_factory=list)
     x: List[int] = field(default_factory=list)
     y: List[int] = field(default_factory=list)
-    e: List[EntryOrExitType] = field(default_factory=list)
+    e: List[EntryExitType] = field(default_factory=list)
 
     def get_point_by_index(self, index):
         return ITXYEPoint(index=index,

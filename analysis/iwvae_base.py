@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import List
 
-from analysis.point_types import EntryOrExitType
+from analysis.point_types import EntryExitType
 
 
 @dataclass
@@ -18,7 +18,7 @@ class IWVAEPoint:
     w: float  # angle
     v: float  # velocity
     a: float  # acceleration
-    e: EntryOrExitType
+    e: EntryExitType
 
 
 @dataclass
@@ -27,7 +27,7 @@ class IWVAE:
     w: List[float] = field(default_factory=list)
     v: List[float] = field(default_factory=list)
     a: List[float] = field(default_factory=list)
-    e: List[EntryOrExitType] = field(default_factory=list)
+    e: List[EntryExitType] = field(default_factory=list)
 
     def get_point_by_index(self, index):
         n = self.indices.index(index)

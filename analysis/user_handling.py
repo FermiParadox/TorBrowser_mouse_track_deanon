@@ -9,7 +9,7 @@ from analysis.conversion import DataExtractor
 from analysis.iwvae_base import IWVAE
 from analysis.itxye_base import ITXYEPoint
 from analysis.plotting import Plotter
-from analysis.point_types import EntryOrExitType, EXIT_TYPE, ENTRY_TYPE
+from analysis.point_types import EntryExitType, EXIT_TYPE, ENTRY_TYPE
 from analysis.user_base import User
 
 
@@ -178,7 +178,7 @@ class PointMatch:
     """
     p1: ITXYEPoint
     p2: ITXYEPoint
-    type_p1: EntryOrExitType
+    type_p1: EntryExitType
     dt: float
     exit_w: float
     entry_w: float
@@ -307,7 +307,7 @@ class UserMatchCreator:
     def dt_in_bounds(dt: int) -> bool:
         return UserMatchCreator.MIN_DELTA_T <= dt <= UserMatchCreator.MAX_DELTA_T
 
-    def _single_point_match(self, p1: ITXYEPoint, p2: ITXYEPoint, type_p1: EntryOrExitType) -> PointMatch:
+    def _single_point_match(self, p1: ITXYEPoint, p2: ITXYEPoint, type_p1: EntryExitType) -> PointMatch:
         dt = self.dt(p1=p1, p2=p2)
         if self.dt_in_bounds(dt=dt):
             p1_i = p1.index

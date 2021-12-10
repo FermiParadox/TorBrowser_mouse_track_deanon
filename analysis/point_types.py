@@ -2,15 +2,15 @@ from dataclasses import dataclass
 
 
 @dataclass
-class EntryOrExitType:
+class EntryExitType:
     str: str
 
     def __repr__(self):
         return self.str
 
 
-EXIT_TYPE = EntryOrExitType('EXIT')
+EXIT_TYPE = EntryExitType('EXIT')
 
-ENTRY_TYPE = EntryOrExitType('ENTRY')
+ENTRY_TYPE = EntryExitType('ENTRY')
 
-NON_CRIT_TYPE = EntryOrExitType('NORMAL')
+NON_CRIT_TYPE = EntryExitType('NORMAL')

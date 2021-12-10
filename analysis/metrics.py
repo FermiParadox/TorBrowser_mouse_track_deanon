@@ -3,7 +3,7 @@ from typing import Iterator, Union, Type
 
 from analysis.itxye_base import ITXYE, XYPoint
 from analysis.physics import AngleCalc, Speed2Points, Acceleration
-from analysis.point_types import EXIT_TYPE, ENTRY_TYPE, EntryOrExitType
+from analysis.point_types import EXIT_TYPE, ENTRY_TYPE, EntryExitType
 
 """
 When calculating angle, speed, etc. using only the last 2 points 
@@ -102,7 +102,7 @@ ENTRY_OR_EXIT_HANDLER = Type[Union[ExitHandler, EntryHandler]]
 
 
 class _MetricsCalculator:
-    def __init__(self, all_itxye: ITXYE, crit_type: EntryOrExitType, crit_indices: Iterator[int]):
+    def __init__(self, all_itxye: ITXYE, crit_type: EntryExitType, crit_indices: Iterator[int]):
         self.crit_indices = crit_indices
         self.crit_type = crit_type
         self.all_itxye = all_itxye
