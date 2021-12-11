@@ -30,7 +30,7 @@ def print_metrics():
     user_handler.plot_and_show_mouse_movement()
 
 
-def try_print_metrics():
+def safe_print_metrics():
     try:
         print_metrics()
     except Exception as e:
@@ -45,7 +45,7 @@ PREVENT_SERVER_CRASH = 0
 @app.route("/store-txy", methods=["POST"])
 async def store_mouse_position():
     if PREVENT_SERVER_CRASH:
-        return try_print_metrics()
+        return safe_print_metrics()
 
     print_metrics()
     return Response(status=204)
