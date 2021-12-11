@@ -379,7 +379,7 @@ class UserPairHandler:
             matches.add(match_creator.user_match())
         return matches
 
-    def _were_lucky_matches(self, percent_valid) -> bool:
+    def _matches_due_to_luck(self, percent_valid) -> bool:
         return percent_valid < self.MIN_VALID_POINTS_PERCENTAGE
 
     def _not_enough_valid(self, total_valid_points) -> bool:
@@ -403,7 +403,7 @@ class UserPairHandler:
         total_points = len(valid_points)
         percent_valid = total_valid_points / total_points
 
-        if self._were_lucky_matches(percent_valid):
+        if self._matches_due_to_luck(percent_valid):
             return False
         if self._not_enough_valid(total_valid_points):
             return False

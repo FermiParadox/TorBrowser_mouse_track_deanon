@@ -21,7 +21,7 @@ NORMAL_USER_TIMES = [1638636689730, 1638636689747, 1638636689764, 1638636689781,
                      1638636690398]
 
 
-class Test_is_tor_user(TestCase):
+class TestIsTorUser(TestCase):
     def setUp(self) -> None:
         from analysis.user_base import User
         self.user = User(id=93847629346,
@@ -41,7 +41,7 @@ class Test_is_tor_user(TestCase):
         self.assertTrue(is_tor_user(user=self.user))
 
 
-class Test_Combinations(TestCase):
+class TestCombinations(TestCase):
     def setUp(self) -> None:
         from analysis.user_handling import Combinations
         from analysis.user_base import User

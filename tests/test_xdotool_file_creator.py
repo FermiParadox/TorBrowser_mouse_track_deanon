@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 
-class Test_xdotool_angle(TestCase):
+class TestXdotoolAngle(TestCase):
     def test_90deg(self):
         from calibration.angle_conversion import _xdotool_angle
 
