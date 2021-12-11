@@ -7,7 +7,7 @@ from scipy.spatial import distance
 from analysis.metrics import ExitMetricsCalc, EntryMetricsCalc
 from analysis.str_parser import DataExtractor
 from analysis.iwvae_base import IWVAE
-from analysis.itxye_base import ITXYEPoint
+from analysis.itxye_base import ITXYEPoint, XYPoint
 from analysis.plotting import Plotter
 from analysis.point_types import EntryExitType, EXIT_TYPE, ENTRY_TYPE
 from analysis.user_base import User
@@ -255,6 +255,8 @@ class UsersPair:
     exit_to_entry_matches: List[PointMatch]
     entry_to_exit_matches: List[PointMatch]
 
+    center_mass1: XYPoint = field(init=False, default=None)
+    center_mass2: XYPoint = field(init=False, default=None)
     match_id: str = field(init=False, default=None)
 
     def __post_init__(self):
@@ -300,9 +302,9 @@ class UserMatchCreator:
     # In milliseconds
     TOR_RESOLUTION = 100
     POSSIBLE_BROWSER_ERROR_ON_SAME_MACHINE = 5
-    DEAD_ZONE_TIME = 20     # between the two browsers
+    DEAD_ZONE_TIME = 20  # mouse between the two browsers
     MAX_DELTA_T = TOR_RESOLUTION + POSSIBLE_BROWSER_ERROR_ON_SAME_MACHINE + DEAD_ZONE_TIME
-    MIN_DELTA_T = -5
+    MIN_DELTA_T = - POSSIBLE_BROWSER_ERROR_ON_SAME_MACHINE
 
     def __init__(self, user1: User, user2: User):
         self.user1 = user1
@@ -339,8 +341,7 @@ class UserMatchCreator:
                               entry_w=entry_p.w, exit_w=exit_p.w,
                               entry_v=entry_p.v, exit_v=exit_p.v,
                               entry_a=entry_p.a, exit_a=exit_p.a,
-                              both_tor_users=self.both_tor_users
-                              )
+                              both_tor_users=self.both_tor_users)
 
     def _exit_to_entry_matches(self) -> List[PointMatch]:
         matches = []
@@ -367,7 +368,7 @@ class UserMatchCreator:
 
 
 class UserPairHandler:
-    MIN_VALID_POINTS = 4
+    MIN_VALID_POINTS = 3
     MIN_VALID_POINTS_PERCENTAGE = 0.2
 
     @staticmethod
@@ -410,7 +411,7 @@ class UserPairHandler:
 
         return True
 
-    def _valid_pairs(self) -> UserPairsSet:
+    def _valid_user_pairs(self) -> UserPairsSet:
         valid_pairs = UserPairsSet()
 
         user_pair: UsersPair
@@ -420,6 +421,6 @@ class UserPairHandler:
             valid_pairs.add(user_pair)
         return valid_pairs
 
-    def insert_valid_pairs(self) -> None:
-        for pair in self._valid_pairs():
+    def insert_valid_user_pairs(self) -> None:
+        for pair in self._valid_user_pairs():
             all_matches.add(pair)

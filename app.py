@@ -24,7 +24,7 @@ def print_metrics():
     print(f"exit metrics {user.exit_metrics}")
     print("=" * 50)
 
-    UserPairHandler().insert_valid_pairs()
+    UserPairHandler().insert_valid_user_pairs()
     all_matches.print_pairs()
     print("=" * 50)
     user_handler.plot_and_show_mouse_movement()

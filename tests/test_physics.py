@@ -2,6 +2,7 @@ from unittest import TestCase
 from random import randint
 
 from analysis.itxye_base import XYPoint
+from analysis.physics import center_point
 
 
 class TestAngleCalc(TestCase):
@@ -109,6 +110,26 @@ class TestAcceleration3Points(TestCase):
         xy3 = XYPoint(x=85, y=25)
         v1 = distance.euclidean(xy2.as_tuple(), xy1.as_tuple())
         v2 = distance.euclidean(xy3.as_tuple(), xy2.as_tuple())
-        acceleration_expected = (v2 - v1) 
+        acceleration_expected = (v2 - v1)
         acceleration = self.Acceleration(xy1=xy1, xy2=xy2, xy3=xy3).acceleration()
         self.assertAlmostEqual(acceleration_expected, acceleration)
+
+
+class TestCenterPoint(TestCase):
+    def test_0_0(self):
+        x = [-3, 0, 1, 2]
+        y = [-10, 2, 4, 4]
+        cm = center_point(x_array=x, y_array=y)
+        self.assertEqual(cm, (0, 0))
+
+    def test_minus_1_plus_0point5(self):
+        x = [-4, 2]
+        y = [0, 1]
+        cm = center_point(x_array=x, y_array=y)
+        self.assertEqual(cm, (-1, 0.5))
+
+    def test_different_size(self):
+        x = [-3, 0]
+        y = [-10, 2, 4, 4]
+        self.assertRaises(ValueError, center_point, x_array=x, y_array=y)
+

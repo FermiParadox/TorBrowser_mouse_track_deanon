@@ -1,6 +1,9 @@
 from math import atan, degrees, atan2
+from typing import List, Tuple
+
 from scipy.spatial import distance
 from scipy.stats import linregress
+from numpy import average
 
 from analysis.itxye_base import XYPoint, XY
 
@@ -39,7 +42,7 @@ class AngleCalc:
 
 
 class Speed2Points:
-    """Velocity is defined as "pixels between 2 points (or more)",
+    """Velocity is defined as "pixels between 2 points",
     assuming the points are recorded on equal intervals.
 
     The assumption might be false if affected by browser or PC workload.
@@ -73,3 +76,13 @@ class Acceleration:
 
     def acceleration(self) -> float:
         return self.dv()
+
+
+def center_point(x_array: List[int], y_array: List[int]) -> Tuple[float, float]:
+    len_x = len(x_array)
+    len_y = len(y_array)
+    if len_x != len_y:
+        raise ValueError(f"Arrays of different dims. {len_x} != {len_y}")
+    x_average = average(x_array)
+    y_average = average(y_array)
+    return x_average, y_average
