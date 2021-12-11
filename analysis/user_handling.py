@@ -5,9 +5,10 @@ from typing import List, Iterator, Tuple, Collection
 from scipy.spatial import distance
 
 from analysis.metrics import ExitMetricsCalc, EntryMetricsCalc
+from analysis.physics import center_point
 from analysis.str_parser import DataExtractor
 from analysis.iwvae_base import IWVAE
-from analysis.itxye_base import ITXYEPoint, XYPoint
+from analysis.itxye_base import ITXYEPoint, XYFloatPoint
 from analysis.plotting import Plotter
 from analysis.point_types import EntryExitType, EXIT_TYPE, ENTRY_TYPE
 from analysis.user_base import User
@@ -255,8 +256,8 @@ class UsersPair:
     exit_to_entry_matches: List[PointMatch]
     entry_to_exit_matches: List[PointMatch]
 
-    center_mass1: XYPoint = field(init=False, default=None)
-    center_mass2: XYPoint = field(init=False, default=None)
+    center1: XYFloatPoint
+    center2: XYFloatPoint
     match_id: str = field(init=False, default=None)
 
     def __post_init__(self):
@@ -276,8 +277,11 @@ class UserPairsSet(ReAddingSet):
     def print_pairs(self) -> None:
         print("=" * 60)
         print("All pairs matched:")
+        m: UsersPair
         for m in self:
             print("=" * 30)
+            print(f"Center {m.center1}")
+            print(f"Center {m.center2}")
             print("Exit points matched")
             for p in m.exit_to_entry_matches:
                 print("-" * 15)
@@ -310,6 +314,9 @@ class UserMatchCreator:
         self.user1 = user1
         self.user2 = user2
         self.both_tor_users = are_tor_users([user1, user2])
+        self.exit_to_entry_matches = self._exit_to_entry_matches()
+        self.entry_to_exit_matches = self._entry_to_exit_matches()
+        self.exit_and_entry_matches = self.exit_to_entry_matches + self.entry_to_exit_matches
 
     @staticmethod
     def dt(p1: ITXYEPoint, p2: ITXYEPoint, type_p1: EntryExitType) -> int:
@@ -361,10 +368,33 @@ class UserMatchCreator:
                     matches.append(point_match)
         return matches
 
+    @staticmethod
+    def _center(point_matches: List[PointMatch], user_num: int) -> XYFloatPoint:
+        x_array = []
+        y_array = []
+        for p_match in point_matches:
+            if user_num == 1:
+                p = p_match.p1
+            elif user_num == 2:
+                p = p_match.p2
+            else:
+                raise ValueError(f"user_num must be 1 or 2. Not {user_num}.")
+            x_array.append(p.x)
+            y_array.append(p.y)
+        return center_point(x_array=x_array, y_array=y_array)
+
+    def center1(self) -> XYFloatPoint:
+        return self._center(point_matches=self.exit_and_entry_matches, user_num=1)
+
+    def center2(self) -> XYFloatPoint:
+        return self._center(point_matches=self.exit_and_entry_matches, user_num=2)
+
     def user_match(self) -> UsersPair:
         return UsersPair(user1=self.user1, user2=self.user2,
-                         exit_to_entry_matches=self._exit_to_entry_matches(),
-                         entry_to_exit_matches=self._entry_to_exit_matches())
+                         exit_to_entry_matches=self.exit_to_entry_matches,
+                         entry_to_exit_matches=self.entry_to_exit_matches,
+                         center1=self.center1(),
+                         center2=self.center2())
 
 
 class UserPairHandler:
@@ -390,7 +420,7 @@ class UserPairHandler:
     def _zero_matches(matched_points) -> bool:
         return not matched_points
 
-    def _is_valid_pair(self, user_pair: UsersPair) -> bool:
+    def _is_valid_user_pair(self, user_pair: UsersPair) -> bool:
         matched_points = user_pair.entry_to_exit_matches + user_pair.exit_to_entry_matches
         if self._zero_matches(matched_points):
             return False
@@ -416,7 +446,7 @@ class UserPairHandler:
 
         user_pair: UsersPair
         for user_pair in self._all_user_pairs():
-            if not self._is_valid_pair(user_pair=user_pair):
+            if not self._is_valid_user_pair(user_pair=user_pair):
                 continue
             valid_pairs.add(user_pair)
         return valid_pairs

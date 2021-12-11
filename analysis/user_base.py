@@ -9,7 +9,7 @@ from analysis.point_types import EXIT_TYPE, ENTRY_TYPE
 
 
 class IDGenerator:
-    MAX_ID_NUM = 10 ** 9
+    MAX_ID_NUM = 10 ** 3
     IDs_Used = set()
 
     @staticmethod

@@ -1,3 +1,11 @@
+"""
+WARNING: xdotool doesn't provide points as expected.
+    It seems to delay its exit from the browser,
+    displayed as 2 denser points before exit.
+
+    Check if there's an optional flag that fixes it.
+"""
+
 from calibration.angle_conversion import _xdotool_angle
 
 START_SLEEP = 3

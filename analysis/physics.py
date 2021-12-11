@@ -5,7 +5,7 @@ from scipy.spatial import distance
 from scipy.stats import linregress
 from numpy import average
 
-from analysis.itxye_base import XYPoint, XY
+from analysis.itxye_base import XYPoint, XY, XYFloatPoint
 
 
 class AngleCalc:
@@ -78,11 +78,11 @@ class Acceleration:
         return self.dv()
 
 
-def center_point(x_array: List[int], y_array: List[int]) -> Tuple[float, float]:
+def center_point(x_array: List[int], y_array: List[int]) -> XYFloatPoint:
     len_x = len(x_array)
     len_y = len(y_array)
     if len_x != len_y:
         raise ValueError(f"Arrays of different dims. {len_x} != {len_y}")
     x_average = average(x_array)
     y_average = average(y_array)
-    return x_average, y_average
+    return XYFloatPoint(x=x_average, y=y_average)

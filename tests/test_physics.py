@@ -119,14 +119,14 @@ class TestCenterPoint(TestCase):
     def test_0_0(self):
         x = [-3, 0, 1, 2]
         y = [-10, 2, 4, 4]
-        cm = center_point(x_array=x, y_array=y)
-        self.assertEqual(cm, (0, 0))
+        cp = center_point(x_array=x, y_array=y)
+        self.assertEqual((cp.x, cp.y), (0, 0))
 
     def test_minus_1_plus_0point5(self):
         x = [-4, 2]
         y = [0, 1]
-        cm = center_point(x_array=x, y_array=y)
-        self.assertEqual(cm, (-1, 0.5))
+        cp = center_point(x_array=x, y_array=y)
+        self.assertEqual((cp.x, cp.y), (-1, 0.5))
 
     def test_different_size(self):
         x = [-3, 0]

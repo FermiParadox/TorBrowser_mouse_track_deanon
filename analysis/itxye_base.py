@@ -14,6 +14,15 @@ class XYPoint:
 
 
 @dataclass
+class XYFloatPoint:
+    x: float
+    y: float
+
+    def as_tuple(self):
+        return self.x, self.y
+
+
+@dataclass
 class XY:
     x: List[int] = field(default_factory=list)
     y: List[int] = field(default_factory=list)
