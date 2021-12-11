@@ -1,4 +1,5 @@
 from ipaddress import ip_address
+from typing import List
 
 from analysis.ip_base import IPv6_or_IPv4_obj
 from analysis.itxye_base import ITXYE
@@ -52,8 +53,13 @@ class DataExtractor:
     def _exit_indices_str(self) -> str:
         return self.json["mouse_exit_txy_indices"]
 
-    def exit_indices(self) -> list:
+    def _exit_indices(self) -> list:
         return [int(s) for s in self._exit_indices_str().split(POINT_SPLITTER) if s]
+
+    def exit_indices(self) -> list:
+        indices_list = self._exit_indices() + AltTabPoints.exit_indices(itxye=self._itxye_lists)
+        indices_list.sort()
+        return indices_list
 
     def entry_point_index_out_of_range(self, index) -> bool:
         return index > self.maximum_itxye_index
@@ -76,3 +82,38 @@ class DataExtractor:
         for exit_index in self.entry_indices():
             itxye_lists_with_e.e[exit_index] = ENTRY_TYPE
         return itxye_lists_with_e
+
+
+class AltTabPoints:
+    """
+    When pressing ALT TAB in Tor, the ALT key isn't registered.
+
+    It could be deduced from seeing the mouse stationary for a while,
+    then suddenly appearing in a distant location.
+
+    WARNING: prone to false positives.
+    The same pattern is probably observed when:
+        - using CTR SHIFT PRINTSCREEN.
+        - a popup window appears
+        - ALT TABs to a non browser window
+    Thankfully, it has to coincide with respective critical point in the other browser
+    to become a false positive.
+    """
+
+    TIME_INACTIVE_THRESHOLD = 2000
+
+    def __init__(self, itxye_lists: ITXYE):
+        self.itxye_lists = itxye_lists
+
+    @staticmethod
+    def exit_indices(itxye: ITXYE) -> List[int]:
+        extra_indices = []
+        times = itxye.time
+        for i, t in enumerate(times):
+            if i + 1 not in itxye.indices:
+                break
+
+            t_next = times[i + 1]
+            if t_next - t > AltTabPoints.TIME_INACTIVE_THRESHOLD:
+                extra_indices.append(i)
+        return extra_indices

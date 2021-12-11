@@ -5,7 +5,7 @@ from typing import List, Iterator, Tuple, Collection
 from scipy.spatial import distance
 
 from analysis.metrics import ExitMetricsCalc, EntryMetricsCalc
-from analysis.conversion import DataExtractor
+from analysis.str_parser import DataExtractor
 from analysis.iwvae_base import IWVAE
 from analysis.itxye_base import ITXYEPoint
 from analysis.plotting import Plotter
