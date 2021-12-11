@@ -57,7 +57,7 @@ class DataExtractor:
         return [int(s) for s in self._exit_indices_str().split(POINT_SPLITTER) if s]
 
     def exit_indices(self) -> list:
-        indices_list = self._exit_indices() + AltTabPoints.exit_indices(itxye=self._itxye_lists)
+        indices_list = self._exit_indices() + AltTabPoints().exit_indices(itxye=self._itxye_lists)
         indices_list.sort()
         return indices_list
 
@@ -102,11 +102,12 @@ class AltTabPoints:
 
     TIME_INACTIVE_THRESHOLD = 2000
 
-    def __init__(self, itxye_lists: ITXYE):
-        self.itxye_lists = itxye_lists
-
     @staticmethod
-    def exit_indices(itxye: ITXYE) -> List[int]:
+    def _inactive_for_long_enough(t_start_move, t_stop_move):
+        dt = t_start_move - t_stop_move
+        return dt > AltTabPoints.TIME_INACTIVE_THRESHOLD
+
+    def exit_indices(self, itxye: ITXYE) -> List[int]:
         extra_indices = []
         times = itxye.time
         for i, t in enumerate(times):
@@ -114,6 +115,6 @@ class AltTabPoints:
                 break
 
             t_next = times[i + 1]
-            if t_next - t > AltTabPoints.TIME_INACTIVE_THRESHOLD:
+            if self._inactive_for_long_enough(t_start_move=t_next, t_stop_move=t):
                 extra_indices.append(i)
         return extra_indices
