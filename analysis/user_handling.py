@@ -274,7 +274,7 @@ class UsersPair:
     match_id: str = field(init=False, default=None)
 
     @staticmethod
-    def is_invalid_point_match(p_match: PointMatch):
+    def is_invalid_point_match(p_match: PointMatch) -> bool:
         return not p_match.valid_match
 
     @staticmethod
@@ -303,7 +303,7 @@ class UsersPair:
     def _center2(self) -> XYFloatPoint:
         return self._center(point_matches=self.entry_to_exit_matches, user_num=2)
 
-    def set_centers(self):
+    def set_centers(self) -> None:
         self.center1 = self._center1()
         self.center2 = self._center2()
 
@@ -472,12 +472,17 @@ class UserPairHandler:
         for user_pair in self._all_user_pairs():
             if not self._is_valid_user_pair(user_pair=user_pair):
                 continue
+
+            self._set_user_pair_centers(user_pair=user_pair)
             valid_pairs.add(user_pair)
         return valid_pairs
+
+    @staticmethod
+    def _set_user_pair_centers(user_pair):
+        user_pair.set_centers()
 
     def insert_valid_user_pairs(self) -> None:
         pair: UsersPair
         for pair in self._valid_user_pairs():
-            pair.set_centers()
             all_matches.add(pair)
 
