@@ -2,10 +2,10 @@ import secrets
 from dataclasses import dataclass, field
 from typing import Iterator
 
+import analysis.p_types as p_types
 from analysis.ip_base import IPv6_or_IPv4_obj
 from analysis.iwvae_base import IWVAE
 from analysis.itxye_base import ITXYE, ITXYEPoint
-from analysis.point_types import EXIT_TYPE, ENTRY_TYPE
 
 
 class IDGenerator:
@@ -49,24 +49,22 @@ class User:
         return [p for p in self.all_itxye.as_points()]
 
     def exit_points(self) -> Iterator[ITXYEPoint]:
-        return (p for p in self.all_itxye_as_points() if p.e == EXIT_TYPE)
+        return (p for p in self.all_itxye_as_points() if p.e == p_types.EXIT)
 
     def entry_points(self) -> Iterator[ITXYEPoint]:
-        return (p for p in self.all_itxye_as_points() if p.e == ENTRY_TYPE)
+        return (p for p in self.all_itxye_as_points() if p.e == p_types.ENTRY)
 
     def _exit_itxye(self) -> ITXYE:
-        return ITXYE(indices=[p.index for p in self.exit_points()],
-                     time=[p.time for p in self.exit_points()],
-                     x=[p.x for p in self.exit_points()],
-                     y=[p.y for p in self.exit_points()],
-                     e=[p.e for p in self.exit_points()])
+        itxye = ITXYE()
+        for p in self.exit_points():
+            itxye.append_point(p=p)
+        return itxye
 
     def _entry_itxye(self) -> ITXYE:
-        return ITXYE(indices=[p.index for p in self.entry_points()],
-                     time=[p.time for p in self.entry_points()],
-                     x=[p.x for p in self.entry_points()],
-                     y=[p.y for p in self.entry_points()],
-                     e=[p.e for p in self.entry_points()])
+        itxye = ITXYE()
+        for p in self.entry_points():
+            itxye.append_point(p=p)
+        return itxye
 
     def __eq__(self, other):
         return self.id == other.id

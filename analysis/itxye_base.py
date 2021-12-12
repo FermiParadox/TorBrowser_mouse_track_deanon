@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import List
 
-from analysis.point_types import EntryExitType
+from analysis.p_types import EntryOrExit, KeyOrMouse
 
 
 @dataclass
@@ -41,7 +41,8 @@ class ITXYEPoint:
     time: int
     x: int
     y: int
-    e: EntryExitType
+    e: EntryOrExit
+    k: KeyOrMouse
 
 
 @dataclass
@@ -50,24 +51,28 @@ class ITXYE:
     time: List[int] = field(default_factory=list)
     x: List[int] = field(default_factory=list)
     y: List[int] = field(default_factory=list)
-    e: List[EntryExitType] = field(default_factory=list)
+    e: List[EntryOrExit] = field(default_factory=list)
+    k: List[KeyOrMouse] = field(default_factory=list)
 
-    def get_point_by_index(self, index):
+    def point_by_index(self, index):
         return ITXYEPoint(index=index,
                           time=self.time[index],
                           x=self.x[index],
                           y=self.y[index],
-                          e=self.e[index])
+                          e=self.e[index],
+                          k=self.k[index]
+                          )
 
-    def append_point(self, itxye_point: ITXYEPoint):
-        self.indices.append(itxye_point.index)
-        self.time.append(itxye_point.time)
-        self.x.append(itxye_point.x)
-        self.y.append(itxye_point.y)
-        self.e.append(itxye_point.e)
+    def append_point(self, p: ITXYEPoint):
+        self.indices.append(p.index)
+        self.time.append(p.time)
+        self.x.append(p.x)
+        self.y.append(p.y)
+        self.e.append(p.e)
+        self.k.append(p.k)
 
     def as_iterator(self):
-        return zip(self.indices, self.time, self.x, self.y, self.e)
+        return zip(self.indices, self.time, self.x, self.y, self.e, self.k)
 
     def as_points(self):
         iterator = self.as_iterator()
@@ -76,4 +81,6 @@ class ITXYE:
                              time=point[1],
                              x=point[2],
                              y=point[3],
-                             e=point[4])
+                             e=point[4],
+                             k=point[5]
+                             )

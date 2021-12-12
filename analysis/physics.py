@@ -1,5 +1,5 @@
 from math import atan, degrees, atan2
-from typing import List, Tuple
+from typing import List
 
 from scipy.spatial import distance
 from scipy.stats import linregress

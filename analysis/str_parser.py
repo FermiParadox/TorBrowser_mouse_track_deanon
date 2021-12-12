@@ -1,9 +1,10 @@
 from ipaddress import ip_address
 from typing import List
+from scipy.spatial import distance
 
+import analysis.p_types as p_types
 from analysis.ip_base import IPv6_or_IPv4_obj
 from analysis.itxye_base import ITXYE
-from analysis.point_types import NON_CRIT_TYPE, ENTRY_TYPE, EXIT_TYPE
 
 POINT_SPLITTER = ":"
 COORDINATE_SPLITTER = ","
@@ -29,7 +30,8 @@ class ITXYStrToArray:
             itxye_lists.time.append(int(t))
             itxye_lists.x.append(int(x))
             itxye_lists.y.append(-int(y))  # y-axis goes downwards in browsers unlike cartesian
-            itxye_lists.e.append(NON_CRIT_TYPE)
+            itxye_lists.e.append(p_types.EntryOrExit())
+            itxye_lists.k.append(p_types.KeyOrMouse())
 
         return itxye_lists
 
@@ -53,21 +55,24 @@ class DataExtractor:
     def _exit_indices_str(self) -> str:
         return self.json["mouse_exit_txy_indices"]
 
-    def _exit_indices(self) -> list:
+    def _mouse_exit_indices(self) -> List[int]:
         return [int(s) for s in self._exit_indices_str().split(POINT_SPLITTER) if s]
 
-    def exit_indices(self) -> list:
-        indices_list = self._exit_indices() + AltTabPoints().exit_indices(itxye=self._itxye_lists)
+    def _key_exit_indices(self) -> List[int]:
+        return AltTabPoints().exit_indices(itxye=self._itxye_lists)
+
+    def exit_indices(self) -> List[int]:
+        indices_list = self._mouse_exit_indices() + self._key_exit_indices()
         indices_list.sort()
         return indices_list
 
     def entry_point_index_out_of_range(self, index) -> bool:
         return index > self.maximum_itxye_index
 
-    def entry_indices(self) -> list:
+    def _entry_indices_base(self, exit_indices) -> List[int]:
         entry_i_list = [0, ]  # first point in TXY, is always an entry point
 
-        for exit_i in self.exit_indices():
+        for exit_i in exit_indices:
             # the next point after an exit point, is always an entry point
             entry_i = exit_i + 1
             if self.entry_point_index_out_of_range(index=entry_i):
@@ -75,13 +80,32 @@ class DataExtractor:
             entry_i_list.append(entry_i)
         return entry_i_list
 
+    def _mouse_entry_indices(self) -> List[int]:
+        return self._entry_indices_base(exit_indices=self._mouse_exit_indices())
+
+    def _key_entry_indices(self) -> List[int]:
+        return self._entry_indices_base(exit_indices=self._key_exit_indices())
+
     def itxye_lists(self) -> ITXYE:
-        itxye_lists_with_e = self._itxye_lists
-        for exit_index in self.exit_indices():
-            itxye_lists_with_e.e[exit_index] = EXIT_TYPE
-        for exit_index in self.entry_indices():
-            itxye_lists_with_e.e[exit_index] = ENTRY_TYPE
-        return itxye_lists_with_e
+        full_itxye_lists = self._itxye_lists
+
+        for mouse_exit_i in self._mouse_exit_indices():
+            full_itxye_lists.e[mouse_exit_i] = p_types.Exit()
+            full_itxye_lists.k[mouse_exit_i] = p_types.Mouse()
+
+        for key_exit_i in self._key_exit_indices():
+            full_itxye_lists.e[key_exit_i] = p_types.Exit()
+            full_itxye_lists.k[key_exit_i] = p_types.Key()
+
+        for mouse_entry_i in self._mouse_entry_indices():
+            full_itxye_lists.e[mouse_entry_i] = p_types.Entry()
+            full_itxye_lists.k[mouse_entry_i] = p_types.Mouse()
+
+        for key_entry_i in self._key_entry_indices():
+            full_itxye_lists.e[key_entry_i] = p_types.Entry()
+            full_itxye_lists.k[key_entry_i] = p_types.Key()
+
+        return full_itxye_lists
 
 
 class AltTabPoints:
@@ -101,20 +125,28 @@ class AltTabPoints:
     """
 
     TIME_INACTIVE_THRESHOLD = 2000
+    DISTANCE_THRESHOLD = 200
 
     @staticmethod
-    def _inactive_for_long_enough(t_start_move, t_stop_move):
-        dt = t_start_move - t_stop_move
-        return dt > AltTabPoints.TIME_INACTIVE_THRESHOLD
+    def _inactivity_adequate(t2: int, t1: int) -> bool:
+        return t2 - t1 > AltTabPoints.TIME_INACTIVE_THRESHOLD
+
+    @staticmethod
+    def _distance_adequate(s: float) -> bool:
+        return s > AltTabPoints.DISTANCE_THRESHOLD
 
     def exit_indices(self, itxye: ITXYE) -> List[int]:
         extra_indices = []
-        times = itxye.time
-        for i, t in enumerate(times):
+        for i, t1, x1, y1, *_ in itxye.as_iterator():
             if i + 1 not in itxye.indices:
                 break
 
-            t_next = times[i + 1]
-            if self._inactive_for_long_enough(t_start_move=t_next, t_stop_move=t):
+            t2 = itxye.time[i + 1]
+
+            x2 = itxye.x[i + 1]
+            y2 = itxye.y[i + 1]
+
+            space = distance.euclidean([x1, y1], [x2, y2])
+            if self._inactivity_adequate(t2=t2, t1=t1) and self._distance_adequate(s=space):
                 extra_indices.append(i)
         return extra_indices

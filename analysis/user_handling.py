@@ -4,13 +4,15 @@ from typing import List, Iterator, Tuple, Collection
 
 from scipy.spatial import distance
 
+import analysis.p_types as p_types
 from analysis.metrics import ExitMetricsCalc, EntryMetricsCalc
 from analysis.physics import center_point
 from analysis.str_parser import DataExtractor
 from analysis.iwvae_base import IWVAE
 from analysis.itxye_base import ITXYEPoint, XYFloatPoint
 from analysis.plotting import Plotter
-from analysis.point_types import EntryExitType, EXIT_TYPE, ENTRY_TYPE
+
+
 from analysis.user_base import User
 
 
@@ -94,18 +96,20 @@ class UserHandler:
 
     def calc_and_store_metrics(self) -> None:
         exit_metrics = self.user.exit_metrics
-        exit_metrics.indices = [p.index for p in self.user.all_itxye.as_points() if p.e == EXIT_TYPE]
+        exit_metrics.indices = [p.index for p in self.user.all_itxye.as_points() if p.e == p_types.EXIT]
         exit_metrics.v = self._exit_speeds()
         exit_metrics.w = self._exit_angles()
         exit_metrics.a = self._exit_accelerations()
-        exit_metrics.e = [EXIT_TYPE for _ in exit_metrics.indices]
+        exit_metrics.e = [p_types.EXIT for _ in exit_metrics.indices]
+        exit_metrics.k = [self.user.all_itxye.point_by_index(index=i) for i in exit_metrics.indices]
 
         entry_metrics = self.user.entry_metrics
-        entry_metrics.indices = [p.index for p in self.user.all_itxye.as_points() if p.e == ENTRY_TYPE]
+        entry_metrics.indices = [p.index for p in self.user.all_itxye.as_points() if p.e == p_types.ENTRY]
         entry_metrics.v = self._entry_speeds()
         entry_metrics.w = self._entry_angles()
         entry_metrics.a = self._entry_accelerations()
-        entry_metrics.e = [ENTRY_TYPE for _ in entry_metrics.indices]
+        entry_metrics.e = [p_types.ENTRY for _ in entry_metrics.indices]
+        entry_metrics.k = [self.user.all_itxye.point_by_index(index=i) for i in entry_metrics.indices]
 
     def plot_and_show_mouse_movement(self) -> None:
         x_all = self.user.all_itxye.x
@@ -171,7 +175,7 @@ class PointMatchLimits:
     MAX_DA = 50
     # Assuming the user usually stops moving during CTR TAB
     #   this can be set to 1 (it would reduce false positives).
-    MAX_DS_FOR_TOR_USERS = 10
+    MAX_DS_2TOR_USERS = 10
 
 
 @dataclass
@@ -182,6 +186,7 @@ class PointMatch:
     """
     p1: ITXYEPoint
     p2: ITXYEPoint
+    type_p1: p_types.EntryOrExit
     dt: float
     exit_w: float
     entry_w: float
@@ -195,42 +200,49 @@ class PointMatch:
     da: float = field(init=False, default=None)
     # dx, dy meaningful only when using CTR TAB in Tor.
     #   That is, both userIDs belong to the same Tor browser.
-    dx: float = field(init=False, default=None)
-    dy: float = field(init=False, default=None)
+    dx_2tor: float = field(init=False, default=None)
+    dy_2tor: float = field(init=False, default=None)
 
     valid_match: bool = field(init=False, default=False)
 
     def __post_init__(self):
-        self.store_dw(self.entry_w, self.exit_w)
-        self.store_dv(self.entry_v, self.exit_v)
-        self.store_da(self.entry_a, self.exit_a)
-        self.dx = self._dx()
-        self.dy = self._dy()
+        self._store_dw(self.entry_w, self.exit_w)
+        self._store_dv(self.entry_v, self.exit_v)
+        self._store_da(self.entry_a, self.exit_a)
+        self.dx_2tor = self._dx_2tor()
+        self.dy_2tor = self._dy_2tor()
         self.valid_match = self._valid_match()
 
-    def store_dw(self, entry_w, exit_w) -> None:
+    def _store_dw(self, entry_w, exit_w) -> None:
         self.dw = exit_w - entry_w
 
-    def store_dv(self, entry_v, exit_v) -> None:
+    def _store_dv(self, entry_v, exit_v) -> None:
         self.dv = exit_v - entry_v
 
-    def _dx(self):
+    def _dx_2tor(self):
         return self.p2.x - self.p1.x
 
-    def _dy(self):
+    def _dy_2tor(self):
         return self.p2.y - self.p1.y
 
-    def store_da(self, entry_a, exit_a) -> None:
+    def _store_da(self, entry_a, exit_a) -> None:
         self.da = exit_a - entry_a
 
+    def _dw_in_range(self) -> bool:
+        return abs(self.dw) <= PointMatchLimits.MAX_DW
+
+    def _dv_in_range(self) -> bool:
+        return abs(self.dv) <= PointMatchLimits.MAX_DV
+
+    def _da_in_range(self) -> bool:
+        return abs(self.da) <= PointMatchLimits.MAX_DA
+
     def _valid_match_tor_plus_normal(self) -> bool:
-        if abs(self.dw) <= PointMatchLimits.MAX_DW:
-            if abs(self.dv) <= PointMatchLimits.MAX_DV:
-                if abs(self.da) <= PointMatchLimits.MAX_DA:
-                    return True
+        if self._dw_in_range() and self._dv_in_range() and self._da_in_range():
+            return True
         return False
 
-    def _valid_match_both_tor(self) -> bool:
+    def _ds_tor_to_tor_in_range(self) -> bool:
         """
         When both userIDs belong to the same Tor Browser
         the x,y-axis of both tabs are nearly identical.
@@ -238,8 +250,10 @@ class PointMatch:
         There might be a small difference if the mouse was moving
         during the key press.
         """
-        ds = distance.euclidean(self.dx, self.dy)
-        if ds <= PointMatchLimits.MAX_DS_FOR_TOR_USERS:
+        return distance.euclidean(self.dx_2tor, self.dy_2tor) <= PointMatchLimits.MAX_DS_2TOR_USERS
+
+    def _valid_match_both_tor(self) -> bool:
+        if self._ds_tor_to_tor_in_range():
             return True
         return False
 
@@ -319,8 +333,8 @@ class UserMatchCreator:
         self.exit_and_entry_matches = self.exit_to_entry_matches + self.entry_to_exit_matches
 
     @staticmethod
-    def dt(p1: ITXYEPoint, p2: ITXYEPoint, type_p1: EntryExitType) -> int:
-        if type_p1 == EXIT_TYPE:
+    def dt(p1: ITXYEPoint, p2: ITXYEPoint, type_p1: p_types.EntryOrExit) -> int:
+        if type_p1 == p_types.EXIT:
             p_out = p1
             p_in = p2
         else:
@@ -332,29 +346,29 @@ class UserMatchCreator:
     def dt_in_bounds(dt: int) -> bool:
         return UserMatchCreator.MIN_DELTA_T <= dt <= UserMatchCreator.MAX_DELTA_T
 
-    def _single_point_match(self, p1: ITXYEPoint, p2: ITXYEPoint, type_p1: EntryExitType) -> PointMatch:
+    def _single_point_match(self, p1: ITXYEPoint, p2: ITXYEPoint, type_p1: p_types.EntryOrExit) -> PointMatch:
         dt = self.dt(p1=p1, p2=p2, type_p1=type_p1)
         if self.dt_in_bounds(dt=dt):
             p1_i = p1.index
             p2_i = p2.index
-            if type_p1 == EXIT_TYPE:
+            if type_p1 == p_types.EXIT:
                 exit_p = self.user1.exit_metrics.get_point_by_index(index=p1_i)
                 entry_p = self.user2.entry_metrics.get_point_by_index(index=p2_i)
             else:
                 entry_p = self.user1.entry_metrics.get_point_by_index(index=p1_i)
                 exit_p = self.user2.exit_metrics.get_point_by_index(index=p2_i)
 
-            return PointMatch(p1=p1, p2=p2, dt=dt,
+            return PointMatch(p1=p1, p2=p2, type_p1=type_p1, dt=dt,
                               entry_w=entry_p.w, exit_w=exit_p.w,
                               entry_v=entry_p.v, exit_v=exit_p.v,
                               entry_a=entry_p.a, exit_a=exit_p.a,
-                              both_tor_users=self.both_tor_users)
+                              both_tor_users=self.both_tor_users, )
 
     def _exit_to_entry_matches(self) -> List[PointMatch]:
         matches = []
         for p1 in self.user1.exit_itxye.as_points():
             for p2 in self.user2.entry_itxye.as_points():
-                point_match = self._single_point_match(p1=p1, p2=p2, type_p1=EXIT_TYPE)
+                point_match = self._single_point_match(p1=p1, p2=p2, type_p1=p_types.EXIT)
                 if point_match:
                     matches.append(point_match)
         return matches
@@ -363,7 +377,7 @@ class UserMatchCreator:
         matches = []
         for p1 in self.user1.entry_itxye.as_points():
             for p2 in self.user2.exit_itxye.as_points():
-                point_match = self._single_point_match(p1=p1, p2=p2, type_p1=ENTRY_TYPE)
+                point_match = self._single_point_match(p1=p1, p2=p2, type_p1=p_types.ENTRY)
                 if point_match:
                     matches.append(point_match)
         return matches

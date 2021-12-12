@@ -1,9 +1,9 @@
 from abc import ABC
 from typing import Iterator, Union, Type
 
+import analysis.p_types as p_types
 from analysis.itxye_base import ITXYE, XYPoint
 from analysis.physics import AngleCalc, Speed2Points, Acceleration
-from analysis.point_types import EXIT_TYPE, ENTRY_TYPE, EntryExitType
 
 """
 When calculating angle, speed, etc. using only the last 2 points 
@@ -102,14 +102,14 @@ ENTRY_OR_EXIT_HANDLER = Type[Union[ExitHandler, EntryHandler]]
 
 
 class _MetricsCalculator:
-    def __init__(self, all_itxye: ITXYE, crit_type: EntryExitType, crit_indices: Iterator[int]):
+    def __init__(self, all_itxye: ITXYE, crit_type: p_types.EntryOrExit, crit_indices: Iterator[int]):
         self.crit_indices = crit_indices
         self.crit_type = crit_type
         self.all_itxye = all_itxye
         self.point_handler: ENTRY_OR_EXIT_HANDLER = self._point_handler()
 
     def _point_handler(self):
-        if self.crit_type == EXIT_TYPE:
+        if self.crit_type == p_types.Exit():
             return ExitHandler
         else:
             return EntryHandler
@@ -144,9 +144,9 @@ class _MetricsCalculator:
 
 class ExitMetricsCalc(_MetricsCalculator):
     def __init__(self, all_itxye: ITXYE, crit_indices: Iterator[int]):
-        super().__init__(all_itxye=all_itxye, crit_type=EXIT_TYPE, crit_indices=crit_indices)
+        super().__init__(all_itxye=all_itxye, crit_type=p_types.Exit(), crit_indices=crit_indices)
 
 
 class EntryMetricsCalc(_MetricsCalculator):
     def __init__(self, all_itxye: ITXYE, crit_indices: Iterator[int]):
-        super().__init__(all_itxye=all_itxye, crit_type=ENTRY_TYPE, crit_indices=crit_indices)
+        super().__init__(all_itxye=all_itxye, crit_type=p_types.Entry(), crit_indices=crit_indices)
