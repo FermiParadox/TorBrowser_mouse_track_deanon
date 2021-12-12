@@ -1,7 +1,7 @@
 from ipaddress import ip_address
 from unittest import TestCase
 
-from analysis.itxye_base import ITXYE
+from analysis.itxyek_base import ITXYEK
 from analysis.user_base import User
 from analysis.user_handling import AllUsers
 
@@ -26,7 +26,7 @@ class TestIsTorUser(TestCase):
         from analysis.user_base import User
         self.user = User(id=93847629346,
                          ip=ip_address("0.0.0.0"),
-                         all_itxye=ITXYE([5, 6, 7], [1, 2, 3], [11, 22, 33], [111, 222, 333]))
+                         all_itxye=ITXYEK([5, 6, 7], [1, 2, 3], [11, 22, 33], [111, 222, 333]))
 
     def test_false(self):
         from analysis.user_handling import is_tor_user
@@ -48,15 +48,15 @@ class TestCombinations(TestCase):
         self.Combinations = Combinations
         self.u1 = User(id=93847629346,
                        ip=ip_address("0.0.0.0"),
-                       all_itxye=ITXYE([5, 6, 7], [1, 2, 3], [11, 22, 33], [111, 222, 333]))
+                       all_itxye=ITXYEK([5, 6, 7], [1, 2, 3], [11, 22, 33], [111, 222, 333]))
 
         self.u2 = User(id=34574574734,
                        ip=ip_address("127.0.5.0"),
-                       all_itxye=ITXYE([5, 6, 7], [1, 2, 3], [11, 22, 33], [111, 222, 333]))
+                       all_itxye=ITXYEK([5, 6, 7], [1, 2, 3], [11, 22, 33], [111, 222, 333]))
 
         self.u3 = User(id=12346346468,
                        ip=ip_address("87.25.6.0"),
-                       all_itxye=ITXYE([5, 6, 7], [1, 2, 3], [11, 22, 33], [111, 222, 333]))
+                       all_itxye=ITXYEK([5, 6, 7], [1, 2, 3], [11, 22, 33], [111, 222, 333]))
 
     def test_2_users_1_combinations(self):
         combs = self.Combinations.user_combs([self.u1, self.u2])
@@ -84,17 +84,17 @@ class TestAllUsers(TestCase):
     def setUp(self) -> None:
         self.u1 = User(id=111,
                        ip=ip_address("0.42.0.0"),
-                       all_itxye=ITXYE())
+                       all_itxye=ITXYEK())
 
         self.u2 = User(id=3333,
                        ip=ip_address("0.0.7.0"),
-                       all_itxye=ITXYE())
+                       all_itxye=ITXYEK())
 
         self.u3_initial = User(id=5252525,
                                ip=ip_address("52.0.0.0"),
-                               all_itxye=ITXYE())
+                               all_itxye=ITXYEK())
 
-        self.txy_updated = ITXYE([66, 33], [1, 2], [11, 22], [111, 222])
+        self.txy_updated = ITXYEK([66, 33], [1, 2], [11, 22], [111, 222])
         self.u3_updated = User(id=5252525,
                                ip=ip_address("52.0.0.0"),
                                all_itxye=self.txy_updated)

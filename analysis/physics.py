@@ -5,7 +5,7 @@ from scipy.spatial import distance
 from scipy.stats import linregress
 from numpy import average
 
-from analysis.itxye_base import XYPoint, XY, XYFloatPoint
+from analysis.itxyek_base import XYPoint, XY, XYFloatPoint
 
 
 class AngleCalc:

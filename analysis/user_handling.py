@@ -9,7 +9,7 @@ from analysis.metrics import ExitMetricsCalc, EntryMetricsCalc
 from analysis.physics import center_point
 from analysis.str_parser import DataExtractor
 from analysis.iwvae_base import IWVAE
-from analysis.itxye_base import ITXYEPoint, XYFloatPoint
+from analysis.itxyek_base import ITXYEKPoint, XYFloatPoint
 from analysis.plotting import Plotter
 
 
@@ -184,8 +184,8 @@ class PointMatch:
     Stores data related an exit and entry point of two user_IDs,
     when they appear to be coming from the same user.
     """
-    p1: ITXYEPoint
-    p2: ITXYEPoint
+    p1: ITXYEKPoint
+    p2: ITXYEKPoint
     type_p1: p_types.EntryOrExit
     dt: float
     exit_w: float
@@ -333,7 +333,7 @@ class UserMatchCreator:
         self.exit_and_entry_matches = self.exit_to_entry_matches + self.entry_to_exit_matches
 
     @staticmethod
-    def dt(p1: ITXYEPoint, p2: ITXYEPoint, type_p1: p_types.EntryOrExit) -> int:
+    def dt(p1: ITXYEKPoint, p2: ITXYEKPoint, type_p1: p_types.EntryOrExit) -> int:
         if type_p1 == p_types.EXIT:
             p_out = p1
             p_in = p2
@@ -346,7 +346,7 @@ class UserMatchCreator:
     def dt_in_bounds(dt: int) -> bool:
         return UserMatchCreator.MIN_DELTA_T <= dt <= UserMatchCreator.MAX_DELTA_T
 
-    def _single_point_match(self, p1: ITXYEPoint, p2: ITXYEPoint, type_p1: p_types.EntryOrExit) -> PointMatch:
+    def _single_point_match(self, p1: ITXYEKPoint, p2: ITXYEKPoint, type_p1: p_types.EntryOrExit) -> PointMatch:
         dt = self.dt(p1=p1, p2=p2, type_p1=type_p1)
         if self.dt_in_bounds(dt=dt):
             p1_i = p1.index

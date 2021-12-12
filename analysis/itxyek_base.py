@@ -29,11 +29,11 @@ class XY:
 
 
 @dataclass
-class ITXYEPoint:
+class ITXYEKPoint:
     """The index of a point in the full data arrays.
 
-    e.g. an ITXYE object that stores only exits
-    has I as the index of the point in the initial ITXYE object that contains all points.
+    e.g. an ITXYEK object that stores only exits
+    has I as the index of the point in the initial ITXYEK object that contains all points.
 
     This allows easy mapping of all data points and their respective metrics.
     """
@@ -46,7 +46,7 @@ class ITXYEPoint:
 
 
 @dataclass
-class ITXYE:
+class ITXYEK:
     indices: List[int] = field(default_factory=list)
     time: List[int] = field(default_factory=list)
     x: List[int] = field(default_factory=list)
@@ -55,15 +55,15 @@ class ITXYE:
     k: List[KeyOrMouse] = field(default_factory=list)
 
     def point_by_index(self, index):
-        return ITXYEPoint(index=index,
-                          time=self.time[index],
-                          x=self.x[index],
-                          y=self.y[index],
-                          e=self.e[index],
-                          k=self.k[index]
-                          )
+        return ITXYEKPoint(index=index,
+                           time=self.time[index],
+                           x=self.x[index],
+                           y=self.y[index],
+                           e=self.e[index],
+                           k=self.k[index]
+                           )
 
-    def append_point(self, p: ITXYEPoint):
+    def append_point(self, p: ITXYEKPoint):
         self.indices.append(p.index)
         self.time.append(p.time)
         self.x.append(p.x)
@@ -77,10 +77,10 @@ class ITXYE:
     def as_points(self):
         iterator = self.as_iterator()
         for point in iterator:
-            yield ITXYEPoint(index=point[0],
-                             time=point[1],
-                             x=point[2],
-                             y=point[3],
-                             e=point[4],
-                             k=point[5]
-                             )
+            yield ITXYEKPoint(index=point[0],
+                              time=point[1],
+                              x=point[2],
+                              y=point[3],
+                              e=point[4],
+                              k=point[5]
+                              )

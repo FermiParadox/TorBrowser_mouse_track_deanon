@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import List
 
-from analysis.itxye_base import ITXYEPoint
+from analysis.itxyek_base import ITXYEKPoint
 import analysis.p_types as p_types
 
 
@@ -32,7 +32,7 @@ class IWVAE:
     e: List[p_types.EntryOrExit] = field(default_factory=list)
     k: List[p_types.KeyOrMouse] = field(default_factory=list)
 
-    def get_metrics_by_point(self, p: ITXYEPoint):
+    def get_metrics_by_point(self, p: ITXYEKPoint):
         return self.get_point_by_index(index=p.index)
 
     def get_point_by_index(self, index):

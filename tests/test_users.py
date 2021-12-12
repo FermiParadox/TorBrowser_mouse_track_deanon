@@ -2,7 +2,7 @@ from ipaddress import ip_address
 from unittest import TestCase
 
 from analysis.user_base import IDGenerator, User
-from analysis.itxye_base import ITXYE
+from analysis.itxyek_base import ITXYEK
 
 
 class TestUser(TestCase):
@@ -10,11 +10,11 @@ class TestUser(TestCase):
         user_id = 1525
         self.u1_0000 = User(id=user_id,
                             ip=ip_address("0.0.0.0"),
-                            all_itxye=ITXYE([1, 2], [11, 22], [111, 222]))
+                            all_itxye=ITXYEK([1, 2], [11, 22], [111, 222]))
 
         self.u2_5000 = User(id=user_id,
                             ip=ip_address("5.0.0.0"),
-                            all_itxye=ITXYE([1, 2, 3], [11, 22, 33], [111, 222, 333]))
+                            all_itxye=ITXYEK([1, 2, 3], [11, 22, 33], [111, 222, 333]))
 
     def test_same_id_considered_same_user(self):
         self.assertEqual(self.u1_0000, self.u2_5000)

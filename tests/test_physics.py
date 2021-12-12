@@ -1,7 +1,7 @@
 from unittest import TestCase
 from random import randint
 
-from analysis.itxye_base import XYPoint
+from analysis.itxyek_base import XYPoint
 from analysis.physics import center_point
 
 

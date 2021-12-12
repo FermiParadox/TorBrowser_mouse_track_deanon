@@ -2,7 +2,7 @@ from abc import ABC
 from typing import Iterator, Union, Type
 
 import analysis.p_types as p_types
-from analysis.itxye_base import ITXYE, XYPoint
+from analysis.itxyek_base import ITXYEK, XYPoint
 from analysis.physics import AngleCalc, Speed2Points, Acceleration
 
 """
@@ -30,7 +30,7 @@ class _EntryOrExitHandler(ABC):
     # Currently, up to two extra points are needed from a critical point
     MAX_EXTRA_INDEX = 2
 
-    def __init__(self, crit_index: int, all_itxye: ITXYE):
+    def __init__(self, crit_index: int, all_itxye: ITXYEK):
         self.x_list = all_itxye.x
         self.y_list = all_itxye.y
         self.t_list = all_itxye.time
@@ -102,7 +102,7 @@ ENTRY_OR_EXIT_HANDLER = Type[Union[ExitHandler, EntryHandler]]
 
 
 class _MetricsCalculator:
-    def __init__(self, all_itxye: ITXYE, crit_type: p_types.EntryOrExit, crit_indices: Iterator[int]):
+    def __init__(self, all_itxye: ITXYEK, crit_type: p_types.EntryOrExit, crit_indices: Iterator[int]):
         self.crit_indices = crit_indices
         self.crit_type = crit_type
         self.all_itxye = all_itxye
@@ -143,10 +143,10 @@ class _MetricsCalculator:
 
 
 class ExitMetricsCalc(_MetricsCalculator):
-    def __init__(self, all_itxye: ITXYE, crit_indices: Iterator[int]):
+    def __init__(self, all_itxye: ITXYEK, crit_indices: Iterator[int]):
         super().__init__(all_itxye=all_itxye, crit_type=p_types.Exit(), crit_indices=crit_indices)
 
 
 class EntryMetricsCalc(_MetricsCalculator):
-    def __init__(self, all_itxye: ITXYE, crit_indices: Iterator[int]):
+    def __init__(self, all_itxye: ITXYEK, crit_indices: Iterator[int]):
         super().__init__(all_itxye=all_itxye, crit_type=p_types.Entry(), crit_indices=crit_indices)

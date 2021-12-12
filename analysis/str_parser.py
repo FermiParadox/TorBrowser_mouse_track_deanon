@@ -4,7 +4,7 @@ from scipy.spatial import distance
 
 import analysis.p_types as p_types
 from analysis.ip_base import IPv6_or_IPv4_obj
-from analysis.itxye_base import ITXYE
+from analysis.itxyek_base import ITXYEK
 
 POINT_SPLITTER = ":"
 COORDINATE_SPLITTER = ","
@@ -22,8 +22,8 @@ class ITXYStrToArray:
         return [s for s in self.txy_string.split(POINT_SPLITTER) if s]
 
     @property
-    def itxye_lists(self) -> ITXYE:
-        itxye_lists = ITXYE()
+    def itxye_lists(self) -> ITXYEK:
+        itxye_lists = ITXYEK()
         for i, p in enumerate(self.points_as_list_of_strings()):
             t, x, y = p.split(',')
             itxye_lists.indices.append(i)
@@ -86,7 +86,7 @@ class DataExtractor:
     def _key_entry_indices(self) -> List[int]:
         return self._entry_indices_base(exit_indices=self._key_exit_indices())
 
-    def itxye_lists(self) -> ITXYE:
+    def itxye_lists(self) -> ITXYEK:
         full_itxye_lists = self._itxye_lists
 
         for mouse_exit_i in self._mouse_exit_indices():
@@ -135,7 +135,7 @@ class AltTabPoints:
     def _distance_adequate(s: float) -> bool:
         return s > AltTabPoints.DISTANCE_THRESHOLD
 
-    def exit_indices(self, itxye: ITXYE) -> List[int]:
+    def exit_indices(self, itxye: ITXYEK) -> List[int]:
         extra_indices = []
         for i, t1, x1, y1, *_ in itxye.as_iterator():
             if i + 1 not in itxye.indices:

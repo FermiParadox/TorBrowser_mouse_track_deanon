@@ -5,7 +5,7 @@ from typing import Iterator
 import analysis.p_types as p_types
 from analysis.ip_base import IPv6_or_IPv4_obj
 from analysis.iwvae_base import IWVAE
-from analysis.itxye_base import ITXYE, ITXYEPoint
+from analysis.itxyek_base import ITXYEK, ITXYEKPoint
 
 
 class IDGenerator:
@@ -24,10 +24,10 @@ class IDGenerator:
 class User:
     id: int
     ip: IPv6_or_IPv4_obj
-    all_itxye: ITXYE
+    all_itxye: ITXYEK
 
-    exit_itxye: ITXYE = field(default_factory=ITXYE)
-    entry_itxye: ITXYE = field(default_factory=ITXYE)
+    exit_itxye: ITXYEK = field(default_factory=ITXYEK)
+    entry_itxye: ITXYEK = field(default_factory=ITXYEK)
     exit_metrics: IWVAE = field(default_factory=IWVAE)
     entry_metrics: IWVAE = field(default_factory=IWVAE)
 
@@ -45,23 +45,23 @@ class User:
         self.entry_x = self.entry_itxye.x
         self.entry_y = self.entry_itxye.y
 
-    def all_itxye_as_points(self) -> Iterator[ITXYEPoint]:
+    def all_itxye_as_points(self) -> Iterator[ITXYEKPoint]:
         return [p for p in self.all_itxye.as_points()]
 
-    def exit_points(self) -> Iterator[ITXYEPoint]:
+    def exit_points(self) -> Iterator[ITXYEKPoint]:
         return (p for p in self.all_itxye_as_points() if p.e == p_types.EXIT)
 
-    def entry_points(self) -> Iterator[ITXYEPoint]:
+    def entry_points(self) -> Iterator[ITXYEKPoint]:
         return (p for p in self.all_itxye_as_points() if p.e == p_types.ENTRY)
 
-    def _exit_itxye(self) -> ITXYE:
-        itxye = ITXYE()
+    def _exit_itxye(self) -> ITXYEK:
+        itxye = ITXYEK()
         for p in self.exit_points():
             itxye.append_point(p=p)
         return itxye
 
-    def _entry_itxye(self) -> ITXYE:
-        itxye = ITXYE()
+    def _entry_itxye(self) -> ITXYEK:
+        itxye = ITXYEK()
         for p in self.entry_points():
             itxye.append_point(p=p)
         return itxye

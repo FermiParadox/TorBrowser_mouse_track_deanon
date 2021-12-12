@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 import analysis.p_types as p_types
-from analysis.itxye_base import ITXYEPoint
+from analysis.itxyek_base import ITXYEKPoint
 
 
 class TestMatchesCreator(TestCase):
@@ -9,8 +9,8 @@ class TestMatchesCreator(TestCase):
         from analysis.user_handling import UserMatchCreator
         self.MatchesCreator = UserMatchCreator
 
-        self.p1 = ITXYEPoint(index=0, time=0, x=1, y=512, e=p_types.EntryOrExit(''), k=p_types.KeyOrMouse())
-        self.p2 = ITXYEPoint(index=1, time=623, x=512535, y=623, e=p_types.EntryOrExit(''), k=p_types.KeyOrMouse())
+        self.p1 = ITXYEKPoint(index=0, time=0, x=1, y=512, e=p_types.EntryOrExit(''), k=p_types.KeyOrMouse())
+        self.p2 = ITXYEKPoint(index=1, time=623, x=512535, y=623, e=p_types.EntryOrExit(''), k=p_types.KeyOrMouse())
 
     def test_dt_0(self):
         self.p1.time = self.p2.time
