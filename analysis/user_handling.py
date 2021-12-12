@@ -12,7 +12,6 @@ from analysis.iwvaek_base import IWVAEK
 from analysis.itxyek_base import ITXYEKPoint, XYFloatPoint
 from analysis.plotting import Plotter
 
-
 from analysis.user_base import User
 
 
@@ -270,9 +269,43 @@ class UsersPair:
     exit_to_entry_matches: List[PointMatch]
     entry_to_exit_matches: List[PointMatch]
 
-    center1: XYFloatPoint
-    center2: XYFloatPoint
+    center1: XYFloatPoint = field(init=False, default=None)
+    center2: XYFloatPoint = field(init=False, default=None)
     match_id: str = field(init=False, default=None)
+
+    @staticmethod
+    def is_invalid_point_match(p_match: PointMatch):
+        return not p_match.valid_match
+
+    @staticmethod
+    def _center(point_matches: List[PointMatch], user_num: int) -> XYFloatPoint:
+        x_array = []
+        y_array = []
+        p_match: PointMatch
+        for p_match in point_matches:
+            if UsersPair.is_invalid_point_match(p_match=p_match):
+                continue
+
+            if user_num == 1:
+                p = p_match.p1
+            elif user_num == 2:
+                p = p_match.p2
+            else:
+                raise ValueError(f"user_num must be 1 or 2. Not {user_num}.")
+
+            x_array.append(p.x)
+            y_array.append(p.y)
+        return center_point(x_array=x_array, y_array=y_array)
+
+    def _center1(self) -> XYFloatPoint:
+        return self._center(point_matches=self.exit_to_entry_matches, user_num=1)
+
+    def _center2(self) -> XYFloatPoint:
+        return self._center(point_matches=self.entry_to_exit_matches, user_num=2)
+
+    def set_centers(self):
+        self.center1 = self._center1()
+        self.center2 = self._center2()
 
     def __post_init__(self):
         self.match_id = f"{self.user1.id},{self.user2.id}"
@@ -382,33 +415,10 @@ class UserMatchCreator:
                     matches.append(point_match)
         return matches
 
-    @staticmethod
-    def _center(point_matches: List[PointMatch], user_num: int) -> XYFloatPoint:
-        x_array = []
-        y_array = []
-        for p_match in point_matches:
-            if user_num == 1:
-                p = p_match.p1
-            elif user_num == 2:
-                p = p_match.p2
-            else:
-                raise ValueError(f"user_num must be 1 or 2. Not {user_num}.")
-            x_array.append(p.x)
-            y_array.append(p.y)
-        return center_point(x_array=x_array, y_array=y_array)
-
-    def center1(self) -> XYFloatPoint:
-        return self._center(point_matches=self.exit_and_entry_matches, user_num=1)
-
-    def center2(self) -> XYFloatPoint:
-        return self._center(point_matches=self.exit_and_entry_matches, user_num=2)
-
     def user_match(self) -> UsersPair:
         return UsersPair(user1=self.user1, user2=self.user2,
                          exit_to_entry_matches=self.exit_to_entry_matches,
-                         entry_to_exit_matches=self.entry_to_exit_matches,
-                         center1=self.center1(),
-                         center2=self.center2())
+                         entry_to_exit_matches=self.entry_to_exit_matches)
 
 
 class UserPairHandler:
@@ -466,5 +476,8 @@ class UserPairHandler:
         return valid_pairs
 
     def insert_valid_user_pairs(self) -> None:
+        pair: UsersPair
         for pair in self._valid_user_pairs():
+            pair.set_centers()
             all_matches.add(pair)
+
