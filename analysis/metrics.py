@@ -30,12 +30,12 @@ class _EntryOrExitHandler(ABC):
     # Currently, up to two extra points are needed from a critical point
     MAX_EXTRA_INDEX = 2
 
-    def __init__(self, crit_index: int, all_itxye: ITXYEK):
-        self.x_list = all_itxye.x
-        self.y_list = all_itxye.y
-        self.t_list = all_itxye.time
+    def __init__(self, crit_index: int, all_itxyek: ITXYEK):
+        self.x_list = all_itxyek.x
+        self.y_list = all_itxyek.y
+        self.t_list = all_itxyek.time
         self.crit_index = crit_index
-        self.max_index = all_itxye.indices[-1]
+        self.max_index = all_itxyek.indices[-1]
 
     def index_too_small(self) -> bool:
         return self.index_total_less_than_0()
@@ -102,10 +102,10 @@ ENTRY_OR_EXIT_HANDLER = Type[Union[ExitHandler, EntryHandler]]
 
 
 class _MetricsCalculator:
-    def __init__(self, all_itxye: ITXYEK, crit_type: p_types.EntryOrExit, crit_indices: Iterator[int]):
+    def __init__(self, all_itxyek: ITXYEK, crit_type: p_types.EntryOrExit, crit_indices: Iterator[int]):
         self.crit_indices = crit_indices
         self.crit_type = crit_type
-        self.all_itxye = all_itxye
+        self.all_itxyek = all_itxyek
         self.point_handler: ENTRY_OR_EXIT_HANDLER = self._point_handler()
 
     def _point_handler(self):
@@ -117,7 +117,7 @@ class _MetricsCalculator:
     def critical_angles(self) -> Iterator[float]:
         angles = []
         for i in self.crit_indices:
-            handler = self.point_handler(crit_index=i, all_itxye=self.all_itxye)
+            handler = self.point_handler(crit_index=i, all_itxyek=self.all_itxyek)
             angle = handler.angle()
             if angle != MetricValueUndefined:
                 angles.append(angle)
@@ -126,7 +126,7 @@ class _MetricsCalculator:
     def critical_speeds(self) -> Iterator[float]:
         speeds = []
         for i in self.crit_indices:
-            handler = self.point_handler(crit_index=i, all_itxye=self.all_itxye)
+            handler = self.point_handler(crit_index=i, all_itxyek=self.all_itxyek)
             speed = handler.speed()
             if speed != MetricValueUndefined:
                 speeds.append(speed)
@@ -135,7 +135,7 @@ class _MetricsCalculator:
     def critical_accelerations(self) -> Iterator[float]:
         accelerations = []
         for i in self.crit_indices:
-            handler = self.point_handler(crit_index=i, all_itxye=self.all_itxye)
+            handler = self.point_handler(crit_index=i, all_itxyek=self.all_itxyek)
             acceleration = handler.acceleration()
             if acceleration != MetricValueUndefined:
                 accelerations.append(acceleration)
@@ -143,10 +143,10 @@ class _MetricsCalculator:
 
 
 class ExitMetricsCalc(_MetricsCalculator):
-    def __init__(self, all_itxye: ITXYEK, crit_indices: Iterator[int]):
-        super().__init__(all_itxye=all_itxye, crit_type=p_types.Exit(), crit_indices=crit_indices)
+    def __init__(self, all_itxyek: ITXYEK, crit_indices: Iterator[int]):
+        super().__init__(all_itxyek=all_itxyek, crit_type=p_types.Exit(), crit_indices=crit_indices)
 
 
 class EntryMetricsCalc(_MetricsCalculator):
-    def __init__(self, all_itxye: ITXYEK, crit_indices: Iterator[int]):
-        super().__init__(all_itxye=all_itxye, crit_type=p_types.Entry(), crit_indices=crit_indices)
+    def __init__(self, all_itxyek: ITXYEK, crit_indices: Iterator[int]):
+        super().__init__(all_itxyek=all_itxyek, crit_type=p_types.Entry(), crit_indices=crit_indices)

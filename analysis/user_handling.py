@@ -64,32 +64,32 @@ class UserHandler:
         all_users.add(self.user)
 
     def _exit_angles(self) -> Iterator[float]:
-        metrics = ExitMetricsCalc(all_itxye=self.user.all_itxye,
+        metrics = ExitMetricsCalc(all_itxyek=self.user.all_itxye,
                                   crit_indices=self.user.exit_indices)
         return metrics.critical_angles()
 
     def _entry_angles(self) -> Iterator[float]:
-        metrics = EntryMetricsCalc(all_itxye=self.user.all_itxye,
+        metrics = EntryMetricsCalc(all_itxyek=self.user.all_itxye,
                                    crit_indices=self.user.entry_indices)
         return metrics.critical_angles()
 
     def _exit_speeds(self) -> Iterator[float]:
-        metrics = ExitMetricsCalc(all_itxye=self.user.all_itxye,
+        metrics = ExitMetricsCalc(all_itxyek=self.user.all_itxye,
                                   crit_indices=self.user.exit_indices)
         return metrics.critical_speeds()
 
     def _entry_speeds(self) -> Iterator[float]:
-        metrics = EntryMetricsCalc(all_itxye=self.user.all_itxye,
+        metrics = EntryMetricsCalc(all_itxyek=self.user.all_itxye,
                                    crit_indices=self.user.entry_indices)
         return metrics.critical_speeds()
 
     def _exit_accelerations(self) -> Iterator[float]:
-        metrics = ExitMetricsCalc(all_itxye=self.user.all_itxye,
+        metrics = ExitMetricsCalc(all_itxyek=self.user.all_itxye,
                                   crit_indices=self.user.exit_indices)
         return metrics.critical_accelerations()
 
     def _entry_accelerations(self) -> Iterator[float]:
-        metrics = EntryMetricsCalc(all_itxye=self.user.all_itxye,
+        metrics = EntryMetricsCalc(all_itxyek=self.user.all_itxye,
                                    crit_indices=self.user.entry_indices)
         return metrics.critical_accelerations()
 
@@ -186,6 +186,7 @@ class PointMatch:
     p1: ITXYEKPoint
     p2: ITXYEKPoint
     type_p1: p_types.EntryOrExit
+    trigger: p_types.KEY_OR_MOUSE
     dt: float
     exit_w: float
     entry_w: float
@@ -238,6 +239,8 @@ class PointMatch:
 
     def _valid_match_tor_plus_normal(self) -> bool:
         if self._dw_in_range() and self._dv_in_range() and self._da_in_range():
+            return True
+        if self.trigger == p_types.KEY:
             return True
         return False
 
@@ -357,6 +360,8 @@ class UserMatchCreator:
     MAX_DELTA_T = TOR_RESOLUTION + POSSIBLE_BROWSER_ERROR_ON_SAME_MACHINE + DEAD_ZONE_TIME
     MIN_DELTA_T = - POSSIBLE_BROWSER_ERROR_ON_SAME_MACHINE
 
+    ALT_TAB_MOVE_DELAY = 2000
+
     def __init__(self, user1: User, user2: User):
         self.user1 = user1
         self.user2 = user2
@@ -376,12 +381,26 @@ class UserMatchCreator:
         return p_in.time - p_out.time
 
     @staticmethod
-    def dt_in_bounds(dt: int) -> bool:
+    def dt_of_mouse_in_bounds(dt: int) -> bool:
         return UserMatchCreator.MIN_DELTA_T <= dt <= UserMatchCreator.MAX_DELTA_T
+
+    @staticmethod
+    def is_key_triggered(p1: ITXYEKPoint) -> bool:
+        return p1.k == p_types.KEY
+
+    @staticmethod
+    def is_mouse_triggered(p1: ITXYEKPoint) -> bool:
+        return p1.k == p_types.MOUSE
+
+    def dt_in_bounds(self, dt: int, p1: ITXYEKPoint) -> bool:
+        if self.is_mouse_triggered(p1=p1):
+            return self.dt_of_mouse_in_bounds(dt=dt)
+        elif self.is_key_triggered(p1=p1):
+            return -100 < dt < self.ALT_TAB_MOVE_DELAY
 
     def _single_point_match(self, p1: ITXYEKPoint, p2: ITXYEKPoint, type_p1: p_types.EntryOrExit) -> PointMatch:
         dt = self.dt(p1=p1, p2=p2, type_p1=type_p1)
-        if self.dt_in_bounds(dt=dt):
+        if self.dt_in_bounds(dt=dt, p1=p1):
             p1_i = p1.index
             p2_i = p2.index
             if type_p1 == p_types.EXIT:
@@ -391,7 +410,8 @@ class UserMatchCreator:
                 entry_p = self.user1.entry_metrics.get_point_by_index(index=p1_i)
                 exit_p = self.user2.exit_metrics.get_point_by_index(index=p2_i)
 
-            return PointMatch(p1=p1, p2=p2, type_p1=type_p1, dt=dt,
+            return PointMatch(p1=p1, p2=p2, dt=dt,
+                              type_p1=type_p1, trigger=p1.k,
                               entry_w=entry_p.w, exit_w=exit_p.w,
                               entry_v=entry_p.v, exit_v=exit_p.v,
                               entry_a=entry_p.a, exit_a=exit_p.a,
@@ -485,4 +505,3 @@ class UserPairHandler:
         pair: UsersPair
         for pair in self._valid_user_pairs():
             all_matches.add(pair)
-

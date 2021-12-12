@@ -32,13 +32,13 @@ class TestMatchesCreator(TestCase):
         self.assertEqual(-5, self.MatchesCreator.dt(p1=self.p2, p2=self.p1, type_p1=p_types.Entry()))
 
     def test_dt_in_bounds_less_than_max(self):
-        self.assertTrue(self.MatchesCreator.dt_in_bounds(dt=110))
+        self.assertTrue(self.MatchesCreator.dt_of_mouse_in_bounds(dt=110))
 
     def test_dt_in_bounds_more_than_min(self):
-        self.assertTrue(self.MatchesCreator.dt_in_bounds(dt=-5))
+        self.assertTrue(self.MatchesCreator.dt_of_mouse_in_bounds(dt=-5))
 
     def test_dt_in_bounds_more_than_max(self):
-        self.assertFalse(self.MatchesCreator.dt_in_bounds(dt=150))
+        self.assertFalse(self.MatchesCreator.dt_of_mouse_in_bounds(dt=150))
 
     def test_dt_in_bounds_less_than_min(self):
-        self.assertFalse(self.MatchesCreator.dt_in_bounds(-50))
+        self.assertFalse(self.MatchesCreator.dt_of_mouse_in_bounds(-50))
