@@ -6,7 +6,7 @@ import analysis.p_types as p_types
 
 
 @dataclass
-class IWVAEPoint:
+class IWVAEKPoint:
     """
     `index`:    Index of the full trajectory object.
     `w`:        Angle in relation to previous point(s) (if this point is an exit point)
@@ -14,6 +14,7 @@ class IWVAEPoint:
     `v`:        Velocity (the above for entry-exit applies).
     `a`:        Acceleration (the above for entry-exit applies)
     `e`:        Exit or entry type of critical point.
+    `k`:        Mouse or key triggered exit/entry.
     """
     index: int
     w: float  # angle
@@ -24,7 +25,7 @@ class IWVAEPoint:
 
 
 @dataclass
-class IWVAE:
+class IWVAEK:
     indices: List[int] = field(default_factory=list)
     w: List[float] = field(default_factory=list)
     v: List[float] = field(default_factory=list)
@@ -37,21 +38,21 @@ class IWVAE:
 
     def get_point_by_index(self, index):
         n = self.indices.index(index)
-        return IWVAEPoint(index=n,
-                          w=self.w[n],
-                          v=self.v[n],
-                          a=self.a[n],
-                          e=self.e[n],
-                          k=self.k[n],
-                          )
+        return IWVAEKPoint(index=n,
+                           w=self.w[n],
+                           v=self.v[n],
+                           a=self.a[n],
+                           e=self.e[n],
+                           k=self.k[n],
+                           )
 
-    def append_point(self, iwvae_point: IWVAEPoint):
-        self.indices.append(iwvae_point.index)
-        self.w.append(iwvae_point.w)
-        self.v.append(iwvae_point.v)
-        self.a.append(iwvae_point.a)
-        self.e.append(iwvae_point.e)
-        self.k.append(iwvae_point.k)
+    def append_point(self, p: IWVAEKPoint):
+        self.indices.append(p.index)
+        self.w.append(p.w)
+        self.v.append(p.v)
+        self.a.append(p.a)
+        self.e.append(p.e)
+        self.k.append(p.k)
 
     def as_points(self):
         return zip(self.indices, self.w, self.v, self.a, self.e, self.k)

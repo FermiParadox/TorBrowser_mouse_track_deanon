@@ -4,7 +4,7 @@ from typing import Iterator
 
 import analysis.p_types as p_types
 from analysis.ip_base import IPv6_or_IPv4_obj
-from analysis.iwvae_base import IWVAE
+from analysis.iwvaek_base import IWVAEK
 from analysis.itxyek_base import ITXYEK, ITXYEKPoint
 
 
@@ -28,8 +28,8 @@ class User:
 
     exit_itxye: ITXYEK = field(default_factory=ITXYEK)
     entry_itxye: ITXYEK = field(default_factory=ITXYEK)
-    exit_metrics: IWVAE = field(default_factory=IWVAE)
-    entry_metrics: IWVAE = field(default_factory=IWVAE)
+    exit_metrics: IWVAEK = field(default_factory=IWVAEK)
+    entry_metrics: IWVAEK = field(default_factory=IWVAEK)
 
     def __post_init__(self):
         self.exit_itxye = self._exit_itxye()

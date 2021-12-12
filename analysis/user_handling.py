@@ -8,7 +8,7 @@ import analysis.p_types as p_types
 from analysis.metrics import ExitMetricsCalc, EntryMetricsCalc
 from analysis.physics import center_point
 from analysis.str_parser import DataExtractor
-from analysis.iwvae_base import IWVAE
+from analysis.iwvaek_base import IWVAEK
 from analysis.itxyek_base import ITXYEKPoint, XYFloatPoint
 from analysis.plotting import Plotter
 
@@ -53,8 +53,8 @@ class UserCreator:
         return User(id=extractor.user_id(),
                     ip=extractor.user_ip(),
                     all_itxye=extractor.itxye_lists(),
-                    exit_metrics=IWVAE(),
-                    entry_metrics=IWVAE())
+                    exit_metrics=IWVAEK(),
+                    entry_metrics=IWVAEK())
 
 
 class UserHandler:
