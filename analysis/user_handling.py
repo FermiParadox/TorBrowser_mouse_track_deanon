@@ -174,7 +174,7 @@ class PointMatchLimits:
     MAX_DA = 50
     # Assuming the user usually stops moving during CTR TAB
     #   this can be set to 1 (it would reduce false positives).
-    MAX_DS_2TOR_USERS = 10
+    MAX_DS_2TOR = 10
 
 
 @dataclass
@@ -198,10 +198,6 @@ class PointMatch:
     dw: float = field(init=False, default=None)
     dv: float = field(init=False, default=None)
     da: float = field(init=False, default=None)
-    # dx, dy meaningful only when using CTR TAB in Tor.
-    #   That is, both userIDs belong to the same Tor browser.
-    dx_2tor: float = field(init=False, default=None)
-    dy_2tor: float = field(init=False, default=None)
 
     valid_match: bool = field(init=False, default=False)
 
@@ -209,8 +205,6 @@ class PointMatch:
         self._store_dw(self.entry_w, self.exit_w)
         self._store_dv(self.entry_v, self.exit_v)
         self._store_da(self.entry_a, self.exit_a)
-        self.dx_2tor = self._dx_2tor()
-        self.dy_2tor = self._dy_2tor()
         self.valid_match = self._valid_match()
 
     def _store_dw(self, entry_w, exit_w) -> None:
@@ -218,12 +212,6 @@ class PointMatch:
 
     def _store_dv(self, entry_v, exit_v) -> None:
         self.dv = exit_v - entry_v
-
-    def _dx_2tor(self):
-        return self.p2.x - self.p1.x
-
-    def _dy_2tor(self):
-        return self.p2.y - self.p1.y
 
     def _store_da(self, entry_a, exit_a) -> None:
         self.da = exit_a - entry_a
@@ -252,7 +240,9 @@ class PointMatch:
         There might be a small difference if the mouse was moving
         during the key press.
         """
-        return distance.euclidean(self.dx_2tor, self.dy_2tor) <= PointMatchLimits.MAX_DS_2TOR_USERS
+        xy1 = [self.p1.x, self.p1.y]
+        xy2 = [self.p2.x, self.p2.y]
+        return distance.euclidean(xy1, xy2) <= PointMatchLimits.MAX_DS_2TOR
 
     def _valid_match_both_tor(self) -> bool:
         if self._ds_tor_to_tor_in_range():
@@ -274,6 +264,7 @@ class UsersPair:
 
     center1: XYFloatPoint = field(init=False, default=None)
     center2: XYFloatPoint = field(init=False, default=None)
+    deviation: float = field(init=False, default=None)
     match_id: str = field(init=False, default=None)
 
     @staticmethod
@@ -281,7 +272,7 @@ class UsersPair:
         return not p_match.valid_match
 
     @staticmethod
-    def _center(point_matches: List[PointMatch], user_num: int) -> XYFloatPoint:
+    def _center(point_matches: List[PointMatch], user_1or2: int) -> XYFloatPoint:
         x_array = []
         y_array = []
         p_match: PointMatch
@@ -289,29 +280,52 @@ class UsersPair:
             if UsersPair.is_invalid_point_match(p_match=p_match):
                 continue
 
-            if user_num == 1:
+            if user_1or2 == 1:
                 p = p_match.p1
-            elif user_num == 2:
+            elif user_1or2 == 2:
                 p = p_match.p2
             else:
-                raise ValueError(f"user_num must be 1 or 2. Not {user_num}.")
+                raise ValueError(f"User num must be 1 or 2. Not {user_1or2}.")
 
             x_array.append(p.x)
             y_array.append(p.y)
         return center_point(x_array=x_array, y_array=y_array)
 
-    def _center1(self) -> XYFloatPoint:
-        return self._center(point_matches=self.exit_to_entry_matches, user_num=1)
+    def _center1(self, point_matches) -> XYFloatPoint:
+        return self._center(point_matches=point_matches, user_1or2=1)
 
-    def _center2(self) -> XYFloatPoint:
-        return self._center(point_matches=self.entry_to_exit_matches, user_num=2)
+    def _center2(self, point_matches) -> XYFloatPoint:
+        return self._center(point_matches=point_matches, user_1or2=2)
 
     def set_centers(self) -> None:
-        self.center1 = self._center1()
-        self.center2 = self._center2()
+        self.center1 = self._center1(point_matches=self.all_point_matches)
+        self.center2 = self._center2(point_matches=self.all_point_matches)
+
+    @staticmethod
+    def _ds_relative_to_center(p_pair: PointMatch, center1: XYFloatPoint, center2: XYFloatPoint) -> float:
+        xy1_rel = [p_pair.p1.x - center1.x, p_pair.p1.y - center1.y]
+        xy2_rel = [p_pair.p2.x - center2.x, p_pair.p2.y - center2.y]
+        return distance.euclidean(xy1_rel, xy2_rel)
+
+    def _total_deviation(self):
+        """
+        This is a metric of the deviation of all point-pairs from one another.
+        In an (unrealistic) perfect match the ds of p1 and p2 would be 0.
+        """
+        tot_dev = 0
+        p_pair: PointMatch
+        for p_pair in self.all_point_matches:
+            ds = self._ds_relative_to_center(p_pair=p_pair, center1=self.center1, center2=self.center2)
+            tot_dev += ds
+        tot_dev /= len(self.all_point_matches)
+        return tot_dev
+
+    def set_deviation(self):
+        self.deviation = self._total_deviation()
 
     def __post_init__(self):
         self.match_id = f"{self.user1.id},{self.user2.id}"
+        self.all_point_matches = self.exit_to_entry_matches + self.entry_to_exit_matches
 
     def __eq__(self, other):
         return self.match_id == other.match_id
@@ -330,8 +344,11 @@ class UserPairsSet(ReAddingSet):
         m: UsersPair
         for m in self:
             print("=" * 30)
-            print(f"Center {m.center1}")
-            print(f"Center {m.center2}")
+            print(f"User1: {m.user1.id}")
+            print(f"User2: {m.user2.id}")
+            print(f"Center: {m.center1}")
+            print(f"Center: {m.center2}")
+            print(f"Deviation: {m.deviation}")
             print("Exit points matched")
             for p in m.exit_to_entry_matches:
                 print("-" * 15)
@@ -485,6 +502,14 @@ class UserPairHandler:
 
         return True
 
+    @staticmethod
+    def _set_user_pair_centers(user_pair: UsersPair) -> None:
+        user_pair.set_centers()
+
+    @staticmethod
+    def _set_deviation(user_pair: UsersPair) -> None:
+        user_pair.set_deviation()
+
     def _valid_user_pairs(self) -> UserPairsSet:
         valid_pairs = UserPairsSet()
 
@@ -494,12 +519,10 @@ class UserPairHandler:
                 continue
 
             self._set_user_pair_centers(user_pair=user_pair)
+            self._set_deviation(user_pair=user_pair)
             valid_pairs.add(user_pair)
-        return valid_pairs
 
-    @staticmethod
-    def _set_user_pair_centers(user_pair):
-        user_pair.set_centers()
+        return valid_pairs
 
     def insert_valid_user_pairs(self) -> None:
         pair: UsersPair

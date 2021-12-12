@@ -2,7 +2,7 @@
 Check de-anonymization risk of Tor Browser users, through:
 
 - mouse-over from Tor browser to another non-Tor browser (and vice versa)
-- switching browsers with hotkeys (implementation pending)
+- switching browsers with hotkeys 
 
 
 There are probably many similar ways the user 
@@ -41,12 +41,14 @@ Mouse movement close to entry and exit locations:
 - mouse **speed**
 - mouse **acceleration**
 
-Due to time granulation at 100ms speed and acceleration might be
+Due to time granulation at 100ms speed and acceleration are 
 useless unless they are calculated in a different way.
 A way around this might be deducing the elapsed time based on 
 registered points. The storage of x-y values seems to be following 
-the speed pattern of my mouse movements. Delays due to other simultaneous 
-browser events perhaps can affect it.
+the speed pattern of my mouse movements. 
+
+However, delays due to other simultaneous 
+browser events perhaps will probably affect it.
 
 ## Exit and entry point distances on both browsers
 
@@ -77,8 +79,13 @@ the expected latency differences of non-Tor/Tor.
 (note: latency might not be an issue; 
 must check whether collected time-data is based on PC clock)
 
+## Increasing accuracy
 To reduce false positives smaller thresholds 
-can be used for all metrics.
+can be used for all metrics. 
+
+Also, the distance comparison of critical points 
+(that is, suspected exit or entry points) can be calculated 
+while taking into account speed and acceleration.
 
 # Software limitations 
 
@@ -92,5 +99,5 @@ I haven't taken into account all scenarios, e.g.:
 
 
 # Investigate later
-- Can single browser metrics be used to extract user patterns 
+- Can single browser-tab metrics be used to extract user patterns 
 related to user's UI layout (file shortcuts on desktop, etc.)?
