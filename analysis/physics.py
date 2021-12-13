@@ -41,7 +41,7 @@ class AngleCalc:
         return self.angle_from_2_points()
 
 
-class Speed2Points:
+class Velocity:
     """Velocity is defined as "pixels between 2 points",
     assuming the points are recorded on equal intervals.
 
@@ -50,31 +50,44 @@ class Speed2Points:
 
     # The distance between 2 diagonal pixels is sqrt(2)
     # Below that the angles are inaccurate.
-    SLOW_SPEED = 2
+    SLOW_SPEED = 3
+    SMALL_DISTANCE_THRESHOLD = SLOW_SPEED
 
-    def __init__(self, xy1, xy2):
+    def __init__(self, xy1, xy2, xy_extra):
+        self.xy_extra = xy_extra
         self.xy1 = xy1
         self.xy2 = xy2
 
-    def distance(self) -> float:
+    def _distance_2_consecutive(self) -> float:
         return distance.euclidean([self.xy1.x, self.xy1.y], [self.xy2.x, self.xy2.y])
 
-    def velocity(self) -> float:
+    def _distance_5_points(self) -> float:
+        return 1/4 * distance.euclidean([self.xy1.x, self.xy1.y], [self.xy_extra.x, self.xy_extra.y])
+
+    def distance(self) -> float:
+        s_2_points = self._distance_2_consecutive()
+        if s_2_points > self.SMALL_DISTANCE_THRESHOLD:
+            return s_2_points
+
+        return self._distance_5_points()
+
+    def v(self) -> float:
         return self.distance()
 
 
 class Acceleration:
-    def __init__(self, xy1: XYPoint, xy2: XYPoint, xy3: XYPoint):
+    def __init__(self, xy1: XYPoint, xy2: XYPoint, xy3: XYPoint, xy_extra: XYPoint):
+        self.xy_extra = xy_extra
         self.xy3 = xy3
         self.xy2 = xy2
         self.xy1 = xy1
 
     def dv(self) -> float:
-        speed_1 = Speed2Points(xy1=self.xy1, xy2=self.xy2).velocity()
-        speed_2 = Speed2Points(xy1=self.xy2, xy2=self.xy3).velocity()
+        speed_1 = Velocity(xy1=self.xy1, xy2=self.xy2, xy_extra=self.xy_extra).v()
+        speed_2 = Velocity(xy1=self.xy2, xy2=self.xy3, xy_extra=self.xy_extra).v()
         return speed_2 - speed_1
 
-    def acceleration(self) -> float:
+    def a(self) -> float:
         return self.dv()
 
 

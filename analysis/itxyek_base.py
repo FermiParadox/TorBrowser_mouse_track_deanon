@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, Iterator
 
 from analysis.p_types import EntryOrExit, KeyOrMouse
 
@@ -54,7 +54,7 @@ class ITXYEK:
     e: List[EntryOrExit] = field(default_factory=list)
     k: List[KeyOrMouse] = field(default_factory=list)
 
-    def point_by_index(self, index):
+    def point_by_index(self, index) -> ITXYEKPoint:
         return ITXYEKPoint(index=index,
                            time=self.time[index],
                            x=self.x[index],
@@ -63,7 +63,7 @@ class ITXYEK:
                            k=self.k[index]
                            )
 
-    def append_point(self, p: ITXYEKPoint):
+    def append_point(self, p: ITXYEKPoint) -> None:
         self.indices.append(p.index)
         self.time.append(p.time)
         self.x.append(p.x)
@@ -71,10 +71,10 @@ class ITXYEK:
         self.e.append(p.e)
         self.k.append(p.k)
 
-    def as_iterator(self):
+    def as_iterator(self) -> Iterator:
         return zip(self.indices, self.time, self.x, self.y, self.e, self.k)
 
-    def as_points(self):
+    def as_points(self) -> Iterator:
         iterator = self.as_iterator()
         for point in iterator:
             yield ITXYEKPoint(index=point[0],

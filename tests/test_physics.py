@@ -57,8 +57,8 @@ class TestAngleCalc(TestCase):
 
 class TestSpeed2Points(TestCase):
     def setUp(self) -> None:
-        from analysis.physics import Speed2Points
-        self.Speed2Points = Speed2Points
+        from analysis.physics import Velocity
+        self.Speed2Points = Velocity
 
     def test_distance_is_sqrt2(self):
         from math import sqrt
@@ -70,13 +70,13 @@ class TestSpeed2Points(TestCase):
     def test_speed_0(self):
         xy1 = XYPoint(x=4, y=1)
         xy2 = XYPoint(x=4, y=1)
-        speed = self.Speed2Points(xy1=xy1, xy2=xy2).velocity()
+        speed = self.Speed2Points(xy1=xy1, xy2=xy2).v()
         self.assertEqual(0, speed)
 
     def test_speed_20(self):
         xy1 = XYPoint(x=1, y=1)
         xy2 = XYPoint(x=1, y=21)
-        speed = self.Speed2Points(xy1=xy1, xy2=xy2).velocity()
+        speed = self.Speed2Points(xy1=xy1, xy2=xy2).v()
         self.assertEqual(20, speed)
 
 
@@ -100,7 +100,7 @@ class TestAcceleration3Points(TestCase):
         xy1 = XYPoint(x=1, y=2)
         xy2 = XYPoint(x=2, y=3)
         xy3 = XYPoint(x=3, y=4)
-        acceleration = self.Acceleration(xy1=xy1, xy2=xy2, xy3=xy3).acceleration()
+        acceleration = self.Acceleration(xy1=xy1, xy2=xy2, xy3=xy3).a()
         self.assertAlmostEqual(0, acceleration)
 
     def test_acceleration(self):
@@ -111,7 +111,7 @@ class TestAcceleration3Points(TestCase):
         v1 = distance.euclidean(xy2.as_tuple(), xy1.as_tuple())
         v2 = distance.euclidean(xy3.as_tuple(), xy2.as_tuple())
         acceleration_expected = (v2 - v1)
-        acceleration = self.Acceleration(xy1=xy1, xy2=xy2, xy3=xy3).acceleration()
+        acceleration = self.Acceleration(xy1=xy1, xy2=xy2, xy3=xy3).a()
         self.assertAlmostEqual(acceleration_expected, acceleration)
 
 

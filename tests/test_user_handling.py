@@ -31,13 +31,13 @@ class TestIsTorUser(TestCase):
     def test_false(self):
         from analysis.user_handling import is_tor_user
 
-        self.user.all_itxye.time = NORMAL_USER_TIMES
+        self.user.all_itxyek.time = NORMAL_USER_TIMES
         self.assertFalse(is_tor_user(user=self.user))
 
     def test_true(self):
         from analysis.user_handling import is_tor_user
 
-        self.user.all_itxye.time = TOR_USER_TIMES
+        self.user.all_itxyek.time = TOR_USER_TIMES
         self.assertTrue(is_tor_user(user=self.user))
 
 
@@ -67,14 +67,14 @@ class TestCombinations(TestCase):
         self.assertEqual(3, len(list(combs)))
 
     def test_3_users_1tor_2_combinations(self):
-        self.u1.all_itxye.time = TOR_USER_TIMES
+        self.u1.all_itxyek.time = TOR_USER_TIMES
         combs = {(self.u1, self.u2), (self.u1, self.u3), (self.u2, self.u3)}
         tor_combs = self.Combinations._tor_user_combs(combs)
         self.assertEqual(2, len(tor_combs))
 
     def test_3_users_2tor_3_combinations(self):
-        self.u1.all_itxye.time = TOR_USER_TIMES
-        self.u2.all_itxye.time = TOR_USER_TIMES
+        self.u1.all_itxyek.time = TOR_USER_TIMES
+        self.u2.all_itxyek.time = TOR_USER_TIMES
         combs = {(self.u1, self.u2), (self.u1, self.u3), (self.u2, self.u3)}
         tor_combs = self.Combinations._tor_user_combs(combs)
         self.assertEqual(3, len(tor_combs))
@@ -139,4 +139,4 @@ class TestAllUsers(TestCase):
         users_list.add(self.u3_updated)
 
         user = users_list.pop()
-        self.assertEqual(user.all_itxye, self.txy_updated)
+        self.assertEqual(user.all_itxyek, self.txy_updated)

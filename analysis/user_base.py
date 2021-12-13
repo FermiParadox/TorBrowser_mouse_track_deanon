@@ -24,47 +24,47 @@ class IDGenerator:
 class User:
     id: int
     ip: IPv6_or_IPv4_obj
-    all_itxye: ITXYEK
+    all_itxyek: ITXYEK
 
-    exit_itxye: ITXYEK = field(default_factory=ITXYEK)
-    entry_itxye: ITXYEK = field(default_factory=ITXYEK)
+    exit_itxyek: ITXYEK = field(default_factory=ITXYEK)
+    entry_itxyek: ITXYEK = field(default_factory=ITXYEK)
     exit_metrics: IWVAEK = field(default_factory=IWVAEK)
     entry_metrics: IWVAEK = field(default_factory=IWVAEK)
 
     def __post_init__(self):
-        self.exit_itxye = self._exit_itxye()
-        self.entry_itxye = self._entry_itxye()
+        self.exit_itxyek = self._exit_itxyek()
+        self.entry_itxyek = self._entry_itxyek()
 
-        self.exit_times = self.exit_itxye.time
-        self.exit_indices = self.exit_itxye.indices
-        self.exit_x = self.exit_itxye.x
-        self.exit_y = self.exit_itxye.y
+        self.exit_times = self.exit_itxyek.time
+        self.exit_indices = self.exit_itxyek.indices
+        self.exit_x = self.exit_itxyek.x
+        self.exit_y = self.exit_itxyek.y
 
-        self.entry_times = self.entry_itxye.time
-        self.entry_indices = self.entry_itxye.indices
-        self.entry_x = self.entry_itxye.x
-        self.entry_y = self.entry_itxye.y
+        self.entry_times = self.entry_itxyek.time
+        self.entry_indices = self.entry_itxyek.indices
+        self.entry_x = self.entry_itxyek.x
+        self.entry_y = self.entry_itxyek.y
 
-    def all_itxye_as_points(self) -> Iterator[ITXYEKPoint]:
-        return [p for p in self.all_itxye.as_points()]
+    def all_itxyek_as_points(self) -> Iterator[ITXYEKPoint]:
+        return [p for p in self.all_itxyek.as_points()]
 
     def exit_points(self) -> Iterator[ITXYEKPoint]:
-        return (p for p in self.all_itxye_as_points() if p.e == p_types.EXIT)
+        return (p for p in self.all_itxyek_as_points() if p.e == p_types.EXIT)
 
     def entry_points(self) -> Iterator[ITXYEKPoint]:
-        return (p for p in self.all_itxye_as_points() if p.e == p_types.ENTRY)
+        return (p for p in self.all_itxyek_as_points() if p.e == p_types.ENTRY)
 
-    def _exit_itxye(self) -> ITXYEK:
-        itxye = ITXYEK()
+    def _exit_itxyek(self) -> ITXYEK:
+        itxyek = ITXYEK()
         for p in self.exit_points():
-            itxye.append_point(p=p)
-        return itxye
+            itxyek.append_point(p=p)
+        return itxyek
 
-    def _entry_itxye(self) -> ITXYEK:
-        itxye = ITXYEK()
+    def _entry_itxyek(self) -> ITXYEK:
+        itxyek = ITXYEK()
         for p in self.entry_points():
-            itxye.append_point(p=p)
-        return itxye
+            itxyek.append_point(p=p)
+        return itxyek
 
     def __eq__(self, other):
         return self.id == other.id

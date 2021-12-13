@@ -51,7 +51,7 @@ class UserCreator:
         extractor = DataExtractor(req=self.req)
         return User(id=extractor.user_id(),
                     ip=extractor.user_ip(),
-                    all_itxye=extractor.itxye_lists(),
+                    all_itxyek=extractor.itxyek_lists(),
                     exit_metrics=IWVAEK(),
                     entry_metrics=IWVAEK())
 
@@ -64,55 +64,55 @@ class UserHandler:
         all_users.add(self.user)
 
     def _exit_angles(self) -> Iterator[float]:
-        metrics = ExitMetricsCalc(all_itxyek=self.user.all_itxye,
+        metrics = ExitMetricsCalc(all_itxyek=self.user.all_itxyek,
                                   crit_indices=self.user.exit_indices)
         return metrics.critical_angles()
 
     def _entry_angles(self) -> Iterator[float]:
-        metrics = EntryMetricsCalc(all_itxyek=self.user.all_itxye,
+        metrics = EntryMetricsCalc(all_itxyek=self.user.all_itxyek,
                                    crit_indices=self.user.entry_indices)
         return metrics.critical_angles()
 
     def _exit_speeds(self) -> Iterator[float]:
-        metrics = ExitMetricsCalc(all_itxyek=self.user.all_itxye,
+        metrics = ExitMetricsCalc(all_itxyek=self.user.all_itxyek,
                                   crit_indices=self.user.exit_indices)
         return metrics.critical_speeds()
 
     def _entry_speeds(self) -> Iterator[float]:
-        metrics = EntryMetricsCalc(all_itxyek=self.user.all_itxye,
+        metrics = EntryMetricsCalc(all_itxyek=self.user.all_itxyek,
                                    crit_indices=self.user.entry_indices)
         return metrics.critical_speeds()
 
     def _exit_accelerations(self) -> Iterator[float]:
-        metrics = ExitMetricsCalc(all_itxyek=self.user.all_itxye,
+        metrics = ExitMetricsCalc(all_itxyek=self.user.all_itxyek,
                                   crit_indices=self.user.exit_indices)
         return metrics.critical_accelerations()
 
     def _entry_accelerations(self) -> Iterator[float]:
-        metrics = EntryMetricsCalc(all_itxyek=self.user.all_itxye,
+        metrics = EntryMetricsCalc(all_itxyek=self.user.all_itxyek,
                                    crit_indices=self.user.entry_indices)
         return metrics.critical_accelerations()
 
     def calc_and_store_metrics(self) -> None:
         exit_metrics = self.user.exit_metrics
-        exit_metrics.indices = [p.index for p in self.user.all_itxye.as_points() if p.e == p_types.EXIT]
+        exit_metrics.indices = [p.index for p in self.user.all_itxyek.as_points() if p.e == p_types.EXIT]
         exit_metrics.v = self._exit_speeds()
         exit_metrics.w = self._exit_angles()
         exit_metrics.a = self._exit_accelerations()
         exit_metrics.e = [p_types.EXIT for _ in exit_metrics.indices]
-        exit_metrics.k = [self.user.all_itxye.point_by_index(index=i) for i in exit_metrics.indices]
+        exit_metrics.k = [self.user.all_itxyek.point_by_index(index=i).k for i in exit_metrics.indices]
 
         entry_metrics = self.user.entry_metrics
-        entry_metrics.indices = [p.index for p in self.user.all_itxye.as_points() if p.e == p_types.ENTRY]
+        entry_metrics.indices = [p.index for p in self.user.all_itxyek.as_points() if p.e == p_types.ENTRY]
         entry_metrics.v = self._entry_speeds()
         entry_metrics.w = self._entry_angles()
         entry_metrics.a = self._entry_accelerations()
         entry_metrics.e = [p_types.ENTRY for _ in entry_metrics.indices]
-        entry_metrics.k = [self.user.all_itxye.point_by_index(index=i) for i in entry_metrics.indices]
+        entry_metrics.k = [self.user.all_itxyek.point_by_index(index=i).k for i in entry_metrics.indices]
 
     def plot_and_show_mouse_movement(self) -> None:
-        x_all = self.user.all_itxye.x
-        y_all = self.user.all_itxye.y
+        x_all = self.user.all_itxyek.x
+        y_all = self.user.all_itxyek.y
 
         plotter = Plotter(user_id=self.user.id)
         plotter.plot_all_x_y(x=x_all, y=y_all)
@@ -131,7 +131,7 @@ class UserHandler:
 def is_tor_user(user: User) -> bool:
     """Tor-user times always end in '00'
     because of the 100ms time-resolution imposed in JS."""
-    all_modulo = (i % 100 for i in user.all_itxye.time)
+    all_modulo = (i % 100 for i in user.all_itxyek.time)
     if any(all_modulo):
         return False
     return True
@@ -436,8 +436,8 @@ class UserMatchCreator:
 
     def _exit_to_entry_matches(self) -> List[PointMatch]:
         matches = []
-        for p1 in self.user1.exit_itxye.as_points():
-            for p2 in self.user2.entry_itxye.as_points():
+        for p1 in self.user1.exit_itxyek.as_points():
+            for p2 in self.user2.entry_itxyek.as_points():
                 point_match = self._single_point_match(p1=p1, p2=p2, type_p1=p_types.EXIT)
                 if point_match:
                     matches.append(point_match)
@@ -445,8 +445,8 @@ class UserMatchCreator:
 
     def _entry_to_exit_matches(self) -> List[PointMatch]:
         matches = []
-        for p1 in self.user1.entry_itxye.as_points():
-            for p2 in self.user2.exit_itxye.as_points():
+        for p1 in self.user1.entry_itxyek.as_points():
+            for p2 in self.user2.exit_itxyek.as_points():
                 point_match = self._single_point_match(p1=p1, p2=p2, type_p1=p_types.ENTRY)
                 if point_match:
                     matches.append(point_match)

@@ -3,32 +3,18 @@ from typing import Iterator, Union, Type
 
 import analysis.p_types as p_types
 from analysis.itxyek_base import ITXYEK, XYPoint
-from analysis.physics import AngleCalc, Speed2Points, Acceleration
+from analysis.metrics_base import MetricValueUndefined, METRIC_TYPE
+from analysis.physics import AngleCalc, Velocity, Acceleration
 
 """
 When calculating angle, speed, etc. using only the last 2 points 
 causes huge errors at low mouse speeds, 
 due to pixels being chessboard-like boxes.
-
-A better solution would be (linear) fitting of more than 2 points,
-when the speed is low.
 """
 
 
-class MetricValueUndefined:
-    """
-    Some metrics can't be determined always.
-
-    E.g. the angle of an exit point when there is only 1 point.
-    """
-
-
-METRIC_TYPE = Union[float, Type[MetricValueUndefined]]
-
-
 class _EntryOrExitHandler(ABC):
-    # Currently, up to two extra points are needed from a critical point
-    MAX_EXTRA_INDEX = 2
+    MAX_EXTRA_INDEX = 5
 
     def __init__(self, crit_index: int, all_itxyek: ITXYEK):
         self.x_list = all_itxyek.x
@@ -69,15 +55,19 @@ class ExitHandler(_EntryOrExitHandler):
             return MetricValueUndefined
         return AngleCalc(xy1=self.point_n(-1), xy2=self.point_n(0)).angle()
 
-    def speed(self) -> METRIC_TYPE:
+    def velocity(self) -> METRIC_TYPE:
         if self.index_too_small():
             return MetricValueUndefined
-        return Speed2Points(xy1=self.point_n(-1), xy2=self.point_n(0)).velocity()
+        return Velocity(xy1=self.point_n(-1), xy2=self.point_n(0), xy_extra=self.point_n(-5)).v()
 
     def acceleration(self) -> METRIC_TYPE:
         if self.index_too_small():
             return MetricValueUndefined
-        return Acceleration(xy1=self.point_n(-2), xy2=self.point_n(-1), xy3=self.point_n(0)).acceleration()
+        xy1 = self.point_n(-2)
+        xy2 = self.point_n(-1)
+        xy3 = self.point_n(0)
+        xy_extra = self.point_n(-5)
+        return Acceleration(xy1=xy1, xy2=xy2, xy3=xy3, xy_extra=xy_extra).a()
 
 
 class EntryHandler(_EntryOrExitHandler):
@@ -87,15 +77,22 @@ class EntryHandler(_EntryOrExitHandler):
             return MetricValueUndefined
         return AngleCalc(xy1=self.point_n(0), xy2=self.point_n(1)).angle()
 
-    def speed(self) -> METRIC_TYPE:
+    def velocity(self) -> METRIC_TYPE:
         if self.index_too_large():
             return MetricValueUndefined
-        return Speed2Points(xy1=self.point_n(0), xy2=self.point_n(1)).velocity()
+        xy1 = self.point_n(0)
+        xy2 = self.point_n(1)
+        xy_extra = self.point_n(5)
+        return Velocity(xy1=xy1, xy2=xy2, xy_extra=xy_extra).v()
 
     def acceleration(self) -> METRIC_TYPE:
         if self.index_too_large():
             return MetricValueUndefined
-        return Acceleration(xy1=self.point_n(0), xy2=self.point_n(1), xy3=self.point_n(2)).acceleration()
+        xy1 = self.point_n(0)
+        xy2 = self.point_n(1)
+        xy3 = self.point_n(2)
+        xy_extra = self.point_n(5)
+        return Acceleration(xy1=xy1, xy2=xy2, xy3=xy3, xy_extra=xy_extra).a()
 
 
 ENTRY_OR_EXIT_HANDLER = Type[Union[ExitHandler, EntryHandler]]
@@ -127,7 +124,7 @@ class _MetricsCalculator:
         speeds = []
         for i in self.crit_indices:
             handler = self.point_handler(crit_index=i, all_itxyek=self.all_itxyek)
-            speed = handler.speed()
+            speed = handler.velocity()
             if speed != MetricValueUndefined:
                 speeds.append(speed)
         return speeds
