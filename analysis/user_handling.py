@@ -205,6 +205,7 @@ class PointMatch:
     dw: float = field(init=False, default=None)
     dv: float = field(init=False, default=None)
     da: float = field(init=False, default=None)
+    ds: float = field(init=False, default=None)  # distance p1-p2 relative to the centers
 
     valid_match: bool = field(init=False, default=False)
 
@@ -314,6 +315,13 @@ class UsersPair:
         xy2_rel = [p_pair.p2.x - center2.x, p_pair.p2.y - center2.y]
         return distance.euclidean(xy1_rel, xy2_rel)
 
+    @staticmethod
+    def _set_point_pair_deviation(ds: float, p_pair: PointMatch):
+        p_pair.ds = ds
+
+    def all_valid_point_matches(self) -> List[PointMatch]:
+        return [p_match for p_match in self.all_point_matches if p_match.valid_match]
+
     def _total_deviation(self):
         """
         This is a metric of the deviation of all point-pairs from one another.
@@ -321,11 +329,18 @@ class UsersPair:
         """
         tot_dev = 0
         p_pair: PointMatch
+        for p_pair in self.all_valid_point_matches():
+            ds = self._ds_relative_to_center(p_pair=p_pair, center1=self.center1, center2=self.center2)
+            self._set_point_pair_deviation(ds=ds, p_pair=p_pair)
+            tot_dev += ds
+        tot_dev /= len(self.all_valid_point_matches())
+        return tot_dev
+
+    def set_point_pair_ds(self):
+        p_pair: PointMatch
         for p_pair in self.all_point_matches:
             ds = self._ds_relative_to_center(p_pair=p_pair, center1=self.center1, center2=self.center2)
-            tot_dev += ds
-        tot_dev /= len(self.all_point_matches)
-        return tot_dev
+            p_pair.ds = ds
 
     def set_deviation(self):
         self.deviation = self._total_deviation()
@@ -335,7 +350,12 @@ class UsersPair:
         self.all_point_matches = self.exit_to_entry_matches + self.entry_to_exit_matches
 
     def invalidate_point_pairs_by_deviation(self):
-        pass
+        p_pair: PointMatch
+        for p_pair in self.all_point_matches:
+            if self.is_invalid_point_match(p_pair):
+                continue
+            if p_pair.ds > 70:
+                p_pair.valid_match = False
 
     def __eq__(self, other):
         return self.match_id == other.match_id
@@ -348,7 +368,7 @@ class UserPairsSet(ReAddingSet):
     def add(self, other: UsersPair) -> None:
         super().add(other)
 
-    def print_pairs(self) -> None:
+    def print_user_pairs(self) -> None:
         print("=" * 60)
         print("All pairs matched:")
         m: UsersPair
@@ -359,21 +379,25 @@ class UserPairsSet(ReAddingSet):
             print(f"Center: {m.center1}")
             print(f"Center: {m.center2}")
             print(f"Deviation: {m.deviation}")
-            print("Exit points matched")
+            print("Exit points matched:")
             for p in m.exit_to_entry_matches:
                 print("-" * 15)
                 print(f"dt = {p.dt}")
                 print(f"dw = {p.dw}")
                 print(f"dv = {p.dv}")
                 print(f"da = {p.da}")
+                print(f"ds = {p.ds}")
+                print(f"valid = {p.valid_match}")
             print("=" * 30)
-            print("Entry points matched")
+            print("Entry points matched:")
             for p in m.entry_to_exit_matches:
                 print("-" * 15)
                 print(f"dt = {p.dt}")
                 print(f"dw = {p.dw}")
                 print(f"dv = {p.dv}")
                 print(f"da = {p.da}")
+                print(f"ds = {p.ds}")
+                print(f"valid = {p.valid_match}")
 
 
 all_matches = UserPairsSet()
@@ -470,7 +494,7 @@ class UserMatchCreator:
 
 class UserPairHandler:
     MIN_VALID_POINTS = 3
-    MIN_VALID_POINTS_PERCENTAGE = 0.2
+    MIN_VALID_POINTS_PERCENTAGE = 0.05
 
     @staticmethod
     def _all_user_pairs() -> UserPairsSet:
@@ -512,16 +536,7 @@ class UserPairHandler:
             return False
         if self._not_enough_valid(total_valid_points):
             return False
-
         return True
-
-    @staticmethod
-    def _set_user_pair_centers(user_pair: UsersPair) -> None:
-        user_pair.set_centers()
-
-    @staticmethod
-    def _set_deviation(user_pair: UsersPair) -> None:
-        user_pair.set_deviation()
 
     def _valid_user_pairs(self) -> UserPairsSet:
         valid_pairs = UserPairsSet()
@@ -531,9 +546,11 @@ class UserPairHandler:
             if not self._is_valid_user_pair(user_pair=user_pair):
                 continue
 
-            self._set_user_pair_centers(user_pair=user_pair)
-            self._set_deviation(user_pair=user_pair)
-            user_pair.invalidate_point_pairs_by_deviation()
+            for _ in range(10):
+                user_pair.set_centers()
+                user_pair.set_deviation()
+                user_pair.invalidate_point_pairs_by_deviation()
+
             valid_pairs.add(user_pair)
 
         return valid_pairs

@@ -124,16 +124,23 @@ class AltTabPoints:
     to become a false positive.
     """
 
-    MIN_INACTIVITY = 100
+    MIN_INACTIVITY = 300  # min delta-t of entry/exit (in same browser)
     MAX_INACTIVITY = 30000
-    MIN_S = 2
+    MIN_S = 50
 
     @staticmethod
     def _inactivity_in_bounds(t2: int, t1: int) -> bool:
-        return AltTabPoints.MAX_INACTIVITY > t2 - t1 > AltTabPoints.MIN_INACTIVITY
+        return AltTabPoints.MIN_INACTIVITY < t2 - t1 < AltTabPoints.MAX_INACTIVITY
 
     @staticmethod
     def _distance_adequate(s: float) -> bool:
+        """
+        When switching tab with ALT TAB, usually the user will move his mouse,
+        until he gets back to the original browser.
+
+        Meaning there should be a distance between the point he stopped moving the mouse
+        and the point he started moving it again.
+        """
         return s > AltTabPoints.MIN_S
 
     def exit_indices(self, itxyek: ITXYEK) -> List[int]:
