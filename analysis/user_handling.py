@@ -257,9 +257,14 @@ class PointMatch:
             return True
         return False
 
+    def _valid_match_alt(self) -> bool:
+        return self.ds < 30
+
     def _valid_match(self) -> bool:
         if self.both_tor_users:
             return self._valid_match_both_tor()
+        elif self.trigger == p_types.Key:
+            return self._valid_match_alt()
         return self._valid_match_tor_plus_normal()
 
 
