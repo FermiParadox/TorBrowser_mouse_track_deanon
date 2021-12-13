@@ -14,13 +14,13 @@ class TestAngleCalc(TestCase):
         x = randint(-100, 100)
         xy1 = XYPoint(x=x, y=5)
         xy2 = XYPoint(x=x, y=12)
-        self.assertEqual(0, self.AngleCalc(xy1=xy1, xy2=xy2).dx())
+        self.assertEqual(0, self.AngleCalc().dx(xy1=xy1, xy2=xy2))
 
     def test_2points_dy_0(self):
         y = randint(-100, 100)
         xy1 = XYPoint(x=7, y=y)
         xy2 = XYPoint(x=6, y=y)
-        self.assertEqual(0, self.AngleCalc(xy1=xy1, xy2=xy2).dy())
+        self.assertEqual(0, self.AngleCalc().dy(xy1=xy1, xy2=xy2))
 
     def test_2points_dx_any(self):
         random_dx = randint(-100, 100)
@@ -28,7 +28,7 @@ class TestAngleCalc(TestCase):
         x2 = random_dx + x1
         xy1 = XYPoint(x=x1, y=5)
         xy2 = XYPoint(x=x2, y=12)
-        self.assertAlmostEqual(random_dx, self.AngleCalc(xy1=xy1, xy2=xy2).dx())
+        self.assertAlmostEqual(random_dx, self.AngleCalc().dx(xy1=xy1, xy2=xy2))
 
     def test_2points_dy_any(self):
         random_dy = randint(-100, 100)
@@ -36,23 +36,23 @@ class TestAngleCalc(TestCase):
         y2 = random_dy + y1
         xy1 = XYPoint(x=5, y=y1)
         xy2 = XYPoint(x=12, y=y2)
-        self.assertAlmostEqual(random_dy, self.AngleCalc(xy1=xy1, xy2=xy2).dy())
+        self.assertAlmostEqual(random_dy, self.AngleCalc().dy(xy1=xy1, xy2=xy2))
 
     def test_2points_same_y_angle_0(self):
         y = randint(-100, 100)
         xy1 = XYPoint(x=4, y=y)
         xy2 = XYPoint(x=518, y=y)
-        self.assertEqual(0, self.AngleCalc(xy1=xy1, xy2=xy2).angle())
+        self.assertEqual(0, self.AngleCalc().angle(xy1=xy1, xy2=xy2))
 
     def test_2points_angle_45deg(self):
         xy1 = XYPoint(x=1, y=1)
         xy2 = XYPoint(x=22, y=22)
-        self.assertAlmostEqual(45, self.AngleCalc(xy1=xy1, xy2=xy2).angle())
+        self.assertAlmostEqual(45, self.AngleCalc().angle(xy1=xy1, xy2=xy2))
 
     def test_2points_angle_90deg(self):
         xy1 = XYPoint(x=1, y=1)
         xy2 = XYPoint(x=1, y=2)
-        self.assertAlmostEqual(90, self.AngleCalc(xy1=xy1, xy2=xy2).angle())
+        self.assertAlmostEqual(90, self.AngleCalc().angle(xy1=xy1, xy2=xy2))
 
 
 class TestSpeed2Points(TestCase):
@@ -64,19 +64,19 @@ class TestSpeed2Points(TestCase):
         from math import sqrt
         xy1 = XYPoint(x=1, y=1)
         xy2 = XYPoint(x=2, y=2)
-        distance = self.Speed2Points(xy1=xy1, xy2=xy2).distance()
+        distance = self.Speed2Points().distance(xy1=xy1, xy2=xy2)
         self.assertAlmostEqual(sqrt(2), distance)
 
     def test_speed_0(self):
         xy1 = XYPoint(x=4, y=1)
         xy2 = XYPoint(x=4, y=1)
-        speed = self.Speed2Points(xy1=xy1, xy2=xy2).v()
+        speed = self.Speed2Points().v(xy1=xy1, xy2=xy2)
         self.assertEqual(0, speed)
 
     def test_speed_20(self):
         xy1 = XYPoint(x=1, y=1)
         xy2 = XYPoint(x=1, y=21)
-        speed = self.Speed2Points(xy1=xy1, xy2=xy2).v()
+        speed = self.Speed2Points().v(xy1=xy1, xy2=xy2)
         self.assertEqual(20, speed)
 
 
@@ -93,14 +93,14 @@ class TestAcceleration3Points(TestCase):
         v1 = distance.euclidean(xy2.as_tuple(), xy1.as_tuple())
         v2 = distance.euclidean(xy3.as_tuple(), xy2.as_tuple())
         dv_expected = v2 - v1
-        dv = self.Acceleration(xy1=xy1, xy2=xy2, xy3=xy3).dv()
+        dv = self.Acceleration().dv(xy1=xy1, xy2=xy2, xy3=xy3)
         self.assertAlmostEqual(dv_expected, dv)
 
     def test_acceleration_0(self):
         xy1 = XYPoint(x=1, y=2)
         xy2 = XYPoint(x=2, y=3)
         xy3 = XYPoint(x=3, y=4)
-        acceleration = self.Acceleration(xy1=xy1, xy2=xy2, xy3=xy3).a()
+        acceleration = self.Acceleration().a(xy1=xy1, xy2=xy2, xy3=xy3)
         self.assertAlmostEqual(0, acceleration)
 
     def test_acceleration(self):
@@ -111,7 +111,7 @@ class TestAcceleration3Points(TestCase):
         v1 = distance.euclidean(xy2.as_tuple(), xy1.as_tuple())
         v2 = distance.euclidean(xy3.as_tuple(), xy2.as_tuple())
         acceleration_expected = (v2 - v1)
-        acceleration = self.Acceleration(xy1=xy1, xy2=xy2, xy3=xy3).a()
+        acceleration = self.Acceleration().a(xy1=xy1, xy2=xy2, xy3=xy3)
         self.assertAlmostEqual(acceleration_expected, acceleration)
 
 
@@ -132,4 +132,3 @@ class TestCenterPoint(TestCase):
         x = [-3, 0]
         y = [-10, 2, 4, 4]
         self.assertRaises(ValueError, center_point, x_array=x, y_array=y)
-

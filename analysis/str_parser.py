@@ -124,16 +124,17 @@ class AltTabPoints:
     to become a false positive.
     """
 
-    TIME_INACTIVE_THRESHOLD = 2000
-    DISTANCE_THRESHOLD = 200
+    MIN_INACTIVITY = 100
+    MAX_INACTIVITY = 30000
+    MIN_S = 2
 
     @staticmethod
-    def _inactivity_adequate(t2: int, t1: int) -> bool:
-        return t2 - t1 > AltTabPoints.TIME_INACTIVE_THRESHOLD
+    def _inactivity_in_bounds(t2: int, t1: int) -> bool:
+        return AltTabPoints.MAX_INACTIVITY > t2 - t1 > AltTabPoints.MIN_INACTIVITY
 
     @staticmethod
     def _distance_adequate(s: float) -> bool:
-        return s > AltTabPoints.DISTANCE_THRESHOLD
+        return s > AltTabPoints.MIN_S
 
     def exit_indices(self, itxyek: ITXYEK) -> List[int]:
         extra_indices = []
@@ -147,6 +148,6 @@ class AltTabPoints:
             y2 = itxyek.y[i + 1]
 
             space = distance.euclidean([x1, y1], [x2, y2])
-            if self._inactivity_adequate(t2=t2, t1=t1) and self._distance_adequate(s=space):
+            if self._inactivity_in_bounds(t2=t2, t1=t1) and self._distance_adequate(s=space):
                 extra_indices.append(i)
         return extra_indices

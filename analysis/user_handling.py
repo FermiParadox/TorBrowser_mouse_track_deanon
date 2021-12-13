@@ -150,7 +150,7 @@ class Combinations:
     USER_COMBS_TYPE = Iterator[Tuple[User, User]]
 
     @staticmethod
-    def user_combs(users_iter: Collection[User]) -> USER_COMBS_TYPE:
+    def all_user_combs(users_iter: Collection[User]) -> USER_COMBS_TYPE:
         return combinations(users_iter, 2)
 
     @staticmethod
@@ -166,9 +166,11 @@ class Combinations:
 
     @staticmethod
     def tor_users_combs(users_iter: Collection[User]) -> USER_COMBS_TYPE:
-        # all_combs = Combinations.user_combs(users_iter=users_iter)
-        # TODO temp disable, revert.   v
-        return Combinations.user_combs(users_iter=users_iter)
+        # TODO re-activate tor
+        if 1:
+            all_combs = Combinations.all_user_combs(users_iter=users_iter)
+            return all_combs
+        return Combinations._tor_user_combs(all_combs=all_combs)
 
 
 class PointMatchLimits:
@@ -331,6 +333,9 @@ class UsersPair:
     def __post_init__(self):
         self.match_id = f"{self.user1.id},{self.user2.id}"
         self.all_point_matches = self.exit_to_entry_matches + self.entry_to_exit_matches
+
+    def invalidate_point_pairs_by_deviation(self):
+        pass
 
     def __eq__(self, other):
         return self.match_id == other.match_id
@@ -498,6 +503,9 @@ class UserPairHandler:
 
         total_valid_points = len(valid_points)
         total_points = len(valid_points)
+        if not total_points:
+            return False
+
         percent_valid = total_valid_points / total_points
 
         if self._matches_due_to_luck(percent_valid):
@@ -525,6 +533,7 @@ class UserPairHandler:
 
             self._set_user_pair_centers(user_pair=user_pair)
             self._set_deviation(user_pair=user_pair)
+            user_pair.invalidate_point_pairs_by_deviation()
             valid_pairs.add(user_pair)
 
         return valid_pairs
