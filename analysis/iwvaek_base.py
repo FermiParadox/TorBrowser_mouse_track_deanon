@@ -3,6 +3,7 @@ from typing import List
 
 from analysis.itxyek_base import ITXYEKPoint
 import analysis.p_types as p_types
+from analysis.metrics_base import MetricValueUndefined
 
 
 @dataclass
@@ -56,3 +57,22 @@ class IWVAEK:
 
     def as_points(self):
         return zip(self.indices, self.w, self.v, self.a, self.e, self.k)
+
+    def del_point_by_index(self, index):
+        self.indices.pop(index)
+        self.w.pop(index)
+        self.v.pop(index)
+        self.a.pop(index)
+        self.e.pop(index)
+        self.k.pop(index)
+
+    def del_point_by_value(self, instance_var: str, val) -> None:
+        try:
+            index = getattr(self, instance_var).index(val)
+            self.del_point_by_index(index=index)
+        except ValueError:
+            return
+
+    def clean_undefined_metrics(self):
+        for instance_var in "wva":
+            self.del_point_by_value(instance_var=instance_var, val=MetricValueUndefined)

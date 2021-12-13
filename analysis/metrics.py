@@ -39,26 +39,26 @@ class _EntryOrExitHandler(ABC):
         index = self.crit_index + extra_index
         return XYPoint(self.x_list[index], self.y_list[index])
 
-    def space_n(self, extra_index) -> METRIC_TYPE:
-        pass
-
-    def velocity_n(self, extra_index) -> METRIC_TYPE:
-        pass
-
-    def acceleration_n(self, extra_index) -> METRIC_TYPE:
-        pass
-
 
 class ExitHandler(_EntryOrExitHandler):
+
     def angle(self) -> METRIC_TYPE:
         if self.index_too_small():
             return MetricValueUndefined
-        return AngleCalc(xy1=self.point_n(-1), xy2=self.point_n(0)).angle()
+        xy1 = self.point_n(-1)
+        xy2 = self.point_n(0)
+        if Velocity().distance_too_small(xy1=xy1, xy2=xy2):
+            xy1 = self.point_n(-4)
+        return AngleCalc().angle(xy1=xy1, xy2=xy2)
 
     def velocity(self) -> METRIC_TYPE:
         if self.index_too_small():
             return MetricValueUndefined
-        return Velocity(xy1=self.point_n(-1), xy2=self.point_n(0), xy_extra=self.point_n(-5)).v()
+        xy1 = self.point_n(-1)
+        xy2 = self.point_n(0)
+        if Velocity().distance_too_small(xy1=xy1, xy2=xy2):
+            xy1 = self.point_n(-4)
+        return Velocity().v(xy1=xy1, xy2=xy2)
 
     def acceleration(self) -> METRIC_TYPE:
         if self.index_too_small():
@@ -66,24 +66,27 @@ class ExitHandler(_EntryOrExitHandler):
         xy1 = self.point_n(-2)
         xy2 = self.point_n(-1)
         xy3 = self.point_n(0)
-        xy_extra = self.point_n(-5)
-        return Acceleration(xy1=xy1, xy2=xy2, xy3=xy3, xy_extra=xy_extra).a()
+        return Acceleration().a(xy1=xy1, xy2=xy2, xy3=xy3)
 
 
 class EntryHandler(_EntryOrExitHandler):
     def angle(self) -> METRIC_TYPE:
-        """Return approximate angle when exiting browser."""
         if self.index_too_large():
             return MetricValueUndefined
-        return AngleCalc(xy1=self.point_n(0), xy2=self.point_n(1)).angle()
+        xy1 = self.point_n(0)
+        xy2 = self.point_n(1)
+        if Velocity().distance_too_small(xy1=xy1, xy2=xy2):
+            xy2 = self.point_n(4)
+        return AngleCalc().angle(xy1=xy1, xy2=xy2)
 
     def velocity(self) -> METRIC_TYPE:
         if self.index_too_large():
             return MetricValueUndefined
         xy1 = self.point_n(0)
         xy2 = self.point_n(1)
-        xy_extra = self.point_n(5)
-        return Velocity(xy1=xy1, xy2=xy2, xy_extra=xy_extra).v()
+        if Velocity().distance_too_small(xy1=xy1, xy2=xy2):
+            xy2 = self.point_n(4)
+        return Velocity().v(xy1=xy1, xy2=xy2)
 
     def acceleration(self) -> METRIC_TYPE:
         if self.index_too_large():
@@ -91,8 +94,7 @@ class EntryHandler(_EntryOrExitHandler):
         xy1 = self.point_n(0)
         xy2 = self.point_n(1)
         xy3 = self.point_n(2)
-        xy_extra = self.point_n(5)
-        return Acceleration(xy1=xy1, xy2=xy2, xy3=xy3, xy_extra=xy_extra).a()
+        return Acceleration().a(xy1=xy1, xy2=xy2, xy3=xy3)
 
 
 ENTRY_OR_EXIT_HANDLER = Type[Union[ExitHandler, EntryHandler]]
@@ -116,8 +118,7 @@ class _MetricsCalculator:
         for i in self.crit_indices:
             handler = self.point_handler(crit_index=i, all_itxyek=self.all_itxyek)
             angle = handler.angle()
-            if angle != MetricValueUndefined:
-                angles.append(angle)
+            angles.append(angle)
         return angles
 
     def critical_speeds(self) -> Iterator[float]:
@@ -125,8 +126,7 @@ class _MetricsCalculator:
         for i in self.crit_indices:
             handler = self.point_handler(crit_index=i, all_itxyek=self.all_itxyek)
             speed = handler.velocity()
-            if speed != MetricValueUndefined:
-                speeds.append(speed)
+            speeds.append(speed)
         return speeds
 
     def critical_accelerations(self) -> Iterator[float]:
@@ -134,8 +134,7 @@ class _MetricsCalculator:
         for i in self.crit_indices:
             handler = self.point_handler(crit_index=i, all_itxyek=self.all_itxyek)
             acceleration = handler.acceleration()
-            if acceleration != MetricValueUndefined:
-                accelerations.append(acceleration)
+            accelerations.append(acceleration)
         return accelerations
 
 

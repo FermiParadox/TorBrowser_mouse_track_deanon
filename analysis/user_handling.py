@@ -94,6 +94,7 @@ class UserHandler:
         return metrics.critical_accelerations()
 
     def calc_and_store_metrics(self) -> None:
+        exit_metrics: IWVAEK
         exit_metrics = self.user.exit_metrics
         exit_metrics.indices = [p.index for p in self.user.all_itxyek.as_points() if p.e == p_types.EXIT]
         exit_metrics.v = self._exit_speeds()
@@ -102,6 +103,7 @@ class UserHandler:
         exit_metrics.e = [p_types.EXIT for _ in exit_metrics.indices]
         exit_metrics.k = [self.user.all_itxyek.point_by_index(index=i).k for i in exit_metrics.indices]
 
+        entry_metrics: IWVAEK
         entry_metrics = self.user.entry_metrics
         entry_metrics.indices = [p.index for p in self.user.all_itxyek.as_points() if p.e == p_types.ENTRY]
         entry_metrics.v = self._entry_speeds()
@@ -109,6 +111,9 @@ class UserHandler:
         entry_metrics.a = self._entry_accelerations()
         entry_metrics.e = [p_types.ENTRY for _ in entry_metrics.indices]
         entry_metrics.k = [self.user.all_itxyek.point_by_index(index=i).k for i in entry_metrics.indices]
+
+        exit_metrics.clean_undefined_metrics()
+        entry_metrics.clean_undefined_metrics()
 
     def plot_and_show_mouse_movement(self) -> None:
         x_all = self.user.all_itxyek.x
