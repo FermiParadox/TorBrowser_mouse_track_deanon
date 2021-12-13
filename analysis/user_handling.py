@@ -258,7 +258,13 @@ class PointMatch:
         return False
 
     def _valid_match_alt(self) -> bool:
-        return self.ds < 30
+        """
+        I assume when switching browsers with ALT TAB
+        the user usually stops moving the mouse.
+
+        So, angle and velocity differences probably don't matter.
+        """
+        return self.ds < 10
 
     def _valid_match(self) -> bool:
         if self.both_tor_users:
@@ -564,3 +570,29 @@ class UserPairHandler:
         pair: UsersPair
         for pair in self._valid_user_pairs():
             all_matches.add(pair)
+
+    def plot_user_pair(self, user_pair: UsersPair):
+        point_pairs = user_pair.all_valid_point_matches()
+
+        p_pair: PointMatch
+        new_p1_list = [p_pair.p1 for p_pair in point_pairs]
+        new_p1_x_list = [p.x - user_pair.center1.x for p in new_p1_list]
+        new_p1_y_list = [p.y - user_pair.center1.y for p in new_p1_list]
+
+        new_p2_list = [p_pair.p2 for p_pair in point_pairs]
+        new_p2_x_list = [p.x - user_pair.center2.x for p in new_p2_list]
+        new_p2_y_list = [p.y - user_pair.center2.y for p in new_p2_list]
+
+        from matplotlib.pyplot import scatter, plot, show, legend
+        for x, y in zip(new_p1_x_list, new_p1_y_list):
+            plot([x, 0], [y, 0], c='red', linewidth=0.3)
+        scatter(new_p1_x_list, new_p1_y_list, s=10, c='blue', marker='<', label="User A")
+
+        for x, y in zip(new_p2_x_list, new_p2_y_list):
+            plot([x, 0], [y, 0], c='red', linewidth=0.3)
+        scatter(new_p2_x_list, new_p2_y_list, s=10, c='green', marker='x', label="User B")
+
+        scatter(0, 0, s=20, c='red')
+
+        legend()
+        show()
