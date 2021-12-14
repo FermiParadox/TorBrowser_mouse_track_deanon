@@ -10,7 +10,7 @@ from analysis.physics import center_point
 from analysis.str_parser import DataExtractor
 from analysis.iwvaek_base import IWVAEK
 from analysis.itxyek_base import ITXYEKPoint, XYFloatPoint
-from analysis.plotting import Plotter
+from analysis.plotting import TrackPlotter
 
 from analysis.user_base import User
 
@@ -116,21 +116,10 @@ class UserHandler:
         entry_metrics.clean_undefined_metrics()
 
     def plot_and_show_mouse_movement(self) -> None:
-        x_all = self.user.all_itxyek.x
-        y_all = self.user.all_itxyek.y
-
-        plotter = Plotter(user_id=self.user.id)
-        plotter.plot_all_x_y(x=x_all, y=y_all)
-
-        exit_x_list = self.user.exit_x
-        exit_y_list = self.user.exit_y
-        plotter.plot_exit_xy(x=exit_x_list, y=exit_y_list)
-
-        entry_x_list = self.user.entry_x
-        entry_y_list = self.user.entry_y
-        plotter.plot_entry_xy(x=entry_x_list, y=entry_y_list)
-
-        plotter.decorate_graphs_and_show()
+        import matplotlib.pyplot as plt
+        ax = plt.subplot(1, 1, 1)
+        TrackPlotter(user=self.user, ax=ax).plot()
+        ax.show()
 
 
 def is_tor_user(user: User) -> bool:
@@ -166,10 +155,7 @@ class Combinations:
 
     @staticmethod
     def tor_users_combs(users_iter: Collection[User]) -> USER_COMBS_TYPE:
-        # TODO re-activate tor
-        if 1:
-            all_combs = Combinations.all_user_combs(users_iter=users_iter)
-            return all_combs
+        all_combs = Combinations.all_user_combs(users_iter=users_iter)
         return Combinations._tor_user_combs(all_combs=all_combs)
 
 
@@ -574,25 +560,60 @@ class UserPairHandler:
     def plot_user_pair(self, user_pair: UsersPair):
         point_pairs = user_pair.all_valid_point_matches()
 
+        center1 = user_pair.center1
+
         p_pair: PointMatch
-        new_p1_list = [p_pair.p1 for p_pair in point_pairs]
-        new_p1_x_list = [p.x - user_pair.center1.x for p in new_p1_list]
-        new_p1_y_list = [p.y - user_pair.center1.y for p in new_p1_list]
+        p1_list = [p_pair.p1 for p_pair in point_pairs]
+        new_p1_x_list = [p.x - center1.x for p in p1_list]
+        new_p1_y_list = [p.y - center1.y for p in p1_list]
 
-        new_p2_list = [p_pair.p2 for p_pair in point_pairs]
-        new_p2_x_list = [p.x - user_pair.center2.x for p in new_p2_list]
-        new_p2_y_list = [p.y - user_pair.center2.y for p in new_p2_list]
+        center2 = user_pair.center2
 
-        from matplotlib.pyplot import scatter, plot, show, legend
+        p2_list = [p_pair.p2 for p_pair in point_pairs]
+        new_p2_x_list = [p.x - center2.x for p in p2_list]
+        new_p2_y_list = [p.y - center2.y for p in p2_list]
+
+        import matplotlib.pyplot as plt
+
+        ax1 = plt.subplot(2, 2, 1)
+        plt.title(f"Mouse track (UserID: {user_pair.user1.id})")
+        ax2 = plt.subplot(2, 2, 2)
+        plt.title(f"Mouse track (UserID: {user_pair.user2.id})")
+
+        ax_fingerprint = plt.subplot(2, 3, 5)
+
+        TrackPlotter(user=user_pair.user1, ax=ax1).plot()
+        TrackPlotter(user=user_pair.user2, ax=ax2).plot()
+
+        color_finger1 = 'magenta'
+        color_finger2 = 'blue'
+
+        for p1 in p1_list:
+            ax1.plot([p1.x, center1.x], [p1.y, center1.y], c=color_finger1, linewidth=0.8)
+
+        for p2 in p2_list:
+            ax2.plot([p2.x, center2.x], [p2.y, center2.y], c=color_finger2, linewidth=0.8)
+
+        # fingerprint
         for x, y in zip(new_p1_x_list, new_p1_y_list):
-            plot([x, 0], [y, 0], c='red', linewidth=0.3)
-        scatter(new_p1_x_list, new_p1_y_list, s=10, c='blue', marker='<', label="User A")
+            ax_fingerprint.plot([x, 0], [y, 0], c=color_finger1, linewidth=0.8)
+        ax_fingerprint.scatter(new_p1_x_list, new_p1_y_list, s=40, c=color_finger1, marker='o', label="Fingerprint A")
 
         for x, y in zip(new_p2_x_list, new_p2_y_list):
-            plot([x, 0], [y, 0], c='red', linewidth=0.3)
-        scatter(new_p2_x_list, new_p2_y_list, s=10, c='green', marker='x', label="User B")
+            ax_fingerprint.plot([x, 0], [y, 0], c=color_finger2, linewidth=0.8)
+        ax_fingerprint.scatter(new_p2_x_list, new_p2_y_list, s=40, c=color_finger2, marker='o', label="Fingerprint B")
 
-        scatter(0, 0, s=20, c='red')
+        ax_fingerprint.scatter(0, 0, s=40, c='red')
+        ax_fingerprint.legend()
 
-        legend()
-        show()
+        ax1.legend()
+        ax2.legend()
+
+        ax1.axis([0, 1280, -1024, 0])
+        ax2.axis([0, 1280, -1024, 0])
+        ax_fingerprint.axis([-500, 500, -500, 500])
+
+        fig = plt.gcf()
+        fig.set_size_inches(20, 15)
+        plt.savefig('tracks_and_fingerprint.png', dpi=100)
+        # plt.show()
