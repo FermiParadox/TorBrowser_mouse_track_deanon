@@ -8,6 +8,18 @@ Check de-anonymization risk of Tor Browser users, through:
 There are probably many similar ways the user 
 can be deanonymized. Not all are examined here.
 
+# Results
+I tested it on my PC with Tor and another browser:
+ - The match is **extremely accurate** when using **CTR TAB in Tor**.
+
+ - It is **very accurate in Tor-to-normal**, but less so 
+due to speed. It can be further improved by projecting 
+the mouse track on the border of the browser.
+
+This has to be tested with real data (double-blind).   
+Also, just to make sure, it has to be 
+independently verified by other researchers.
+
 ### Tor might be unaware of this attack...
  
 [Official page:](https://support.torproject.org/tbb/tbb-17/)
@@ -50,17 +62,26 @@ the speed pattern of my mouse movements.
 However, delays due to other simultaneous 
 browser events perhaps will probably affect it.
 
+### Tor CTR TAB metrics
+Only the location and the time-frame is used, 
+since probably most users stop moving their mouse 
+before switching tab.
+
 ## Exit and entry point distances on both browsers
 
 Measuring the entry-exit distance between points in a browser 
-and comparing it with other browsers would probably de-anonymize 
-the user.
+and comparing it with other browsers results in the creation of
+unique fingerprints. 
+
+Firstly, a center of all matching points is created 
+(for each browser). Then the matching users' centers 
+are taken as a common point 
+and the distance of each matching point is compared.
 
 
 ### Pixels are like chessboard boxes
 
-I am assuming, slow mouse movement 
-results erroneously in exit/entry angles 
+Slow mouse movement results erroneously in exit/entry angles 
 of 45.00000, 90.00000 or 0.00000 degrees. 
 Or other "standard" values for slightly higher speeds.
 
@@ -71,13 +92,7 @@ before browser exit to calculate the angle at
 slow speeds.
 
 Much more accurate (yet computationally 
-expensive) methods are possible. 
-
-# Thresholds
-Metrics will be compared for time differences approaching 
-the expected latency differences of non-Tor/Tor. 
-(note: latency might not be an issue; 
-must check whether collected time-data is based on PC clock)
+more demanding) methods are possible. 
 
 ## Increasing accuracy
 To reduce false positives smaller thresholds 
@@ -96,8 +111,9 @@ I haven't taken into account all scenarios, e.g.:
 - interrupted data transfer
 - changing IP during session
 - assignment of existing IP to new user
+- accuracy (false positives and false negatives)
 
 
 # Investigate later
-- Can single browser-tab metrics be used to extract user patterns 
+- Can single-browser single-tab metrics be used to extract user patterns 
 related to user's UI layout (file shortcuts on desktop, etc.)?

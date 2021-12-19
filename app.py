@@ -29,7 +29,7 @@ def print_metrics():
     all_matches.print_user_pairs()
 
     for user_pair in all_matches:
-        UserPairHandler().plot_user_pair(user_pair=user_pair)
+        UserPairHandler().plot_and_save_user_pair(user_pair=user_pair)
 
 
 def safe_print_metrics():

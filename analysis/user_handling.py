@@ -557,7 +557,8 @@ class UserPairHandler:
         for pair in self._valid_user_pairs():
             all_matches.add(pair)
 
-    def plot_user_pair(self, user_pair: UsersPair):
+    @staticmethod
+    def plot_and_save_user_pair(user_pair: UsersPair):
         point_pairs = user_pair.all_valid_point_matches()
 
         center1 = user_pair.center1
