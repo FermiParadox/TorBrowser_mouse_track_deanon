@@ -14,10 +14,11 @@ class IDGenerator:
 
     @staticmethod
     def unique_id() -> int:
-        while 1:
+        for _ in range(10 ** 4):
             generated_id = secrets.randbelow(IDGenerator.MAX_ID_NUM)
             if generated_id not in IDGenerator.IDs_Used:
                 return generated_id
+        raise ValueError("Couldn't find a random value in time. Too many users already logged.")
 
 
 @dataclass

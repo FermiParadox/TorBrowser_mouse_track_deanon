@@ -19,7 +19,7 @@ class ReAddingSet(set):
     def add(self, other) -> None:
         """When added element is already present, it replaces the existing one,
         instead of "editing" it.
-        Not very efficient, but should be ok for testing.
+        Not very efficient, but should be ok for a proof-of-concept project.
 
         By default, `add` has no effect if the element is already present,
         meaning new data points wouldn't be stored."""
@@ -616,4 +616,4 @@ class UserPairHandler:
         fig = plt.gcf()
         fig.set_size_inches(20, 15)
         plt.savefig('tracks_and_fingerprint.png', dpi=100)
-        # plt.show()
+        plt.show()

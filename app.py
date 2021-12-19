@@ -18,11 +18,12 @@ def print_metrics():
     user_handler = UserHandler(user=user)
     user_handler.calc_and_store_metrics()
     user_handler.insert_user()
+    print("=" * 100)
     print(f"t entry {user.entry_times}")
     print(f"t exit {user.exit_times}")
     print(f"entry metrics {user.entry_metrics}")
     print(f"exit metrics {user.exit_metrics}")
-    print("=" * 50)
+    print("=" * 40)
 
     UserPairHandler().insert_valid_user_pairs()
     all_matches.print_user_pairs()

@@ -25,11 +25,19 @@ class TestUser(TestCase):
 
 
 class TestIDGenerator(TestCase):
+    """The odds of a test failing are near 0, but not 0."""
     def test_unique_id(self):
         generator = IDGenerator
-        generator.IDs_Used = {0, 1, 2}
-        generator.MAX_ID_NUM = 4  # Only value available will be 3
+        generator.MAX_ID_NUM = 4
+        generator.IDs_Used = {0, 1, 2}  # Only value available will be 3
 
         self.assertEqual(generator.unique_id(), 3)
 
+    def test_not_infinite(self):
+        generator = IDGenerator
+        generator.MAX_ID_NUM = 4
+        generator.IDs_Used = {0, 1, 2, 3}   # No available values
+
+        with self.assertRaises(ValueError):
+            generator.unique_id()
 
