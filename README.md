@@ -11,10 +11,14 @@ can be deanonymized. Not all are examined here.
 # Results
 I tested it on my PC with Tor and another browser:
  - The match is **extremely accurate** when using **CTR TAB in Tor**.
+ - 
+![tor_to_tor](https://github.com/FermiParadox/torWindowSwitchDeanon/blob/master/tor_to_tor_CTR_TAB.png)
 
  - It is **very accurate in Tor-to-normal**, but less so 
 due to speed. It can be further improved by projecting 
 the mouse track on the border of the browser.
+
+![tor_to_normal](https://github.com/FermiParadox/torWindowSwitchDeanon/blob/master/tor_to_normal2.png)
 
 This has to be tested with real data (double-blind).   
 Also, just to make sure, it has to be 
