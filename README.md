@@ -11,7 +11,7 @@ can be deanonymized. Not all are examined here.
 # Results
 I tested it on my PC with Tor and another browser:
  - The match is **extremely accurate** when using **CTR TAB in Tor**.
- - 
+
 ![tor_to_tor](https://github.com/FermiParadox/torWindowSwitchDeanon/blob/master/tor_to_tor_CTR_TAB.png)
 
  - It is **very accurate in Tor-to-normal**, but less so 
