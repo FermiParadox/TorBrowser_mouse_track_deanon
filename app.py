@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, Response, make_response
 
 from analysis.user_base import IDGenerator
-from analysis.user_handling import UserCreator, UserHandler, UserPairHandler, all_matches, UsersPair
+from analysis.user_handling import UserCreator, UserHandler, UserPairHandler, all_matches
 
 app = Flask(__name__)
 
