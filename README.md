@@ -24,27 +24,8 @@ This has to be tested with real data (double-blind).
 Also, just to make sure, it has to be 
 independently verified by other researchers.
 
-### Tor might be unaware of this attack...
- 
-[Official page:](https://support.torproject.org/tbb/tbb-17/)
-
-> **Is it safe to run Tor Browser and another browser 
-> at the same time?**
-
-> If you run Tor Browser and another browser at the same time, 
-> it won't affect Tor's performance or privacy properties. 
-> However, be aware that your other browser is not keeping 
-> your activity private, and you may forget 
-> and accidentally use that non-private browser to do something 
-> that you intended to do in Tor Browser.
-
-### ...but they have taken measures to reduce time accuracy
-
-[Bug 1517: Reduce precision of time for Javascript](https://gitweb.torproject.org/user/mikeperry/tor-browser.git/commit/?h=bug1517)
-> This clamps Javascript's time precision to 100ms for most things, without
-altering event delivery or responsiveness. It also clamps keyboard events
-(such as keypress, keyup, keydown, etc.) to 250ms resolution, to mitigate
-keystroke fingerprinting.
+### Tor has been notified and they will change the documentation
+["Discourage more running a browser in parallel to Tor Browser"](https://gitlab.torproject.org/tpo/web/support/-/issues/280)
 
 
 # Metrics analysed
