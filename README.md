@@ -40,12 +40,12 @@ Mouse movement close to entry and exit locations:
 
 Due to time granulation at 100ms speed and acceleration are 
 useless unless they are calculated in a different way.
-A way around this might be deducing the elapsed time based on 
+A way around this is deducing the elapsed time based on 
 registered points. The storage of x-y values seems to be following 
 the speed pattern of my mouse movements. 
 
 However, delays due to other simultaneous 
-browser events perhaps will probably affect it.
+browser events perhaps will affect it.
 
 ### Tor CTR TAB metrics
 Only the location and the time-frame is used, 
