@@ -110,5 +110,5 @@ I haven't taken into account all scenarios, e.g.:
 
 
 # Investigate later
-- Can single-browser single-tab metrics be used to extract user patterns 
-related to user's UI layout (file shortcuts on desktop, etc.)?
+- Can single-browser single-tab metrics be used to extract patterns 
+related to a user's UI layout (file shortcuts on desktop, etc.)?
