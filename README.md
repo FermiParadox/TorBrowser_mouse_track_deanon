@@ -12,24 +12,27 @@ can be deanonymized. Not all are examined here.
 I tested it on my PC with Tor and another browser:
  - The match is **extremely accurate** when using **CTR TAB in Tor**.
 
-![tor_to_tor](https://github.com/FermiParadox/torWindowSwitchDeanon/blob/master/tor_to_tor_CTR_TAB.png)
+![image](https://user-images.githubusercontent.com/10809024/147253839-c1d2413f-2e31-4b3b-bd1b-fe2a75824812.png)
+
 
  - It is **very accurate in Tor-to-normal**, but less so 
 due to speed. It can be further improved by projecting 
 the mouse track on the border of the browser.
 
-![tor_to_normal](https://github.com/FermiParadox/torWindowSwitchDeanon/blob/master/tor_to_normal2.png)
+![image](https://user-images.githubusercontent.com/10809024/147254027-6cbc6f85-d82b-4ed8-9834-6c5912920dfd.png)
 
-This has to be tested with real data (double-blind).   
-Also, just to make sure, it has to be 
-independently verified by other researchers.
+
+This has to be tested with data from users 
+that don't know of the attack (double-blind).   
+Also, it has to be independently verified by other researchers,
+although I doubt there's anything that makes the attack infeasible. 
 
 ### Tor has been notified and they will change the documentation
 ["Discourage more running a browser in parallel to Tor Browser"](https://gitlab.torproject.org/tpo/web/support/-/issues/280)
 
 
 # Metrics analysed
-The following are compared between users 
+The following metrics are compared between users 
 when they are within a specified time difference. 
 
 Mouse movement close to entry and exit locations: 
@@ -40,12 +43,12 @@ Mouse movement close to entry and exit locations:
 
 Due to time granulation at 100ms speed and acceleration are 
 useless unless they are calculated in a different way.
-A way around this might be deducing the elapsed time based on 
+A way around this is deducing the elapsed time based on 
 registered points. The storage of x-y values seems to be following 
 the speed pattern of my mouse movements. 
 
 However, delays due to other simultaneous 
-browser events perhaps will probably affect it.
+browser events perhaps will affect it.
 
 ### Tor CTR TAB metrics
 Only the location and the time-frame is used, 
@@ -87,6 +90,13 @@ Also, the distance comparison of critical points
 (that is, suspected exit or entry points) can be calculated 
 while taking into account speed and acceleration.
 
+# Bug
+It sometimes crashes 
+(when specific mouse-tracks are stored in a browser tab session)
+Simply restart the program and open new tabs.
+
+I'll fix it in the future.
+
 # Software limitations 
 
 This is simply a proof of concept.   
@@ -100,5 +110,5 @@ I haven't taken into account all scenarios, e.g.:
 
 
 # Investigate later
-- Can single-browser single-tab metrics be used to extract user patterns 
-related to user's UI layout (file shortcuts on desktop, etc.)?
+- Can single-browser single-tab metrics be used to extract patterns 
+related to a user's UI layout (file shortcuts on desktop, etc.)?
