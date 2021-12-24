@@ -7,8 +7,8 @@ Users can have their real IP "revealed" to websites opened in Tor Browser by:
 # Attack summary: CTR-TAB in Tor Browser
 Tor Browser has separate exit nodes (and IPs) for each tab. 
 However, switching tabs with hotkeys creates a unique pattern,
-meaning all websites (despite being opened on separate tabs) 
-can be attributed to the same user.
+meaning all opened websites (despite being opened on separate tabs) 
+can be linked to the same user.
 
 # Preconditions
 1. JavaScript must be enabled on both browsers.
