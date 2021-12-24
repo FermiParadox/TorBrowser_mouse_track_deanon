@@ -1,16 +1,27 @@
-# Goals
-Check de-anonymization risk of Tor Browser users, through:
+# Attack summary
+Tor Browser users can be deanonymized by:
 
-- mouse-over from Tor browser to another non-Tor browser (and vice versa)
+- moving the mouse from Tor Browser to another non-Tor browser (and vice versa)
 - switching browsers with hotkeys 
 
+The necessary precondition for this attack to work
+is that websites share mouse-movement data.
 
-There are probably many similar ways the user 
-can be deanonymized. Not all are examined here.
+Google Tag Manager could be gathering such data 
+and is being used by [~18 million websites](https://trends.builtwith.com/websitelist/Google-Tag-Manager).
+If such data are indeed gathered in one place,
+then whoever has access to the data can use this attack.
 
-# Results
-I tested it on my PC with Tor and another browser:
- - The match is **extremely accurate** when using **CTR TAB in Tor**.
+## CTR TAB on Tor Browser (no other browser needed)
+Tor Browser has separate exit nodes (and IPs) for each tab. 
+However, switching tabs with hotkeys creates a unique pattern,
+meaning all websites (despite being opened on separate tabs) 
+can be attributed to the same user.
+
+# Test results
+I tested it on my PC:
+ - The match is **extremely accurate** when using **CTR TAB in Tor** 
+(that is, only one browser).
 
 ![image](https://user-images.githubusercontent.com/10809024/147253839-c1d2413f-2e31-4b3b-bd1b-fe2a75824812.png)
 
