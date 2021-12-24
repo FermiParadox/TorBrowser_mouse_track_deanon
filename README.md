@@ -1,22 +1,27 @@
-# Attack summary
-Tor Browser users can be deanonymized by:
+# Attack summary: Tor Browser plus another browser
+Users can have their real IP "revealed" to websites opened in Tor Browser by:
 
 - moving the mouse from Tor Browser to another non-Tor browser (and vice versa)
-- switching browsers with hotkeys 
+- switching said browsers with hotkeys 
 
-The necessary precondition for this attack to work
-is that websites share mouse-movement data.
-
-Google Tag Manager could be gathering such data 
-and is being used by [~18 million websites](https://trends.builtwith.com/websitelist/Google-Tag-Manager).
-If such data are indeed gathered in one place,
-then whoever has access to the data can use this attack.
-
-## CTR TAB on Tor Browser (no other browser needed)
+# Attack summary: CTR-TAB in Tor Browser
 Tor Browser has separate exit nodes (and IPs) for each tab. 
 However, switching tabs with hotkeys creates a unique pattern,
 meaning all websites (despite being opened on separate tabs) 
 can be attributed to the same user.
+
+# Preconditions
+1. JavaScript must be enabled on both browsers.
+2. Websites must share mouse-movement data.
+
+Many websites *already share data* for anti-fraud purposes.
+
+Also, Google Tag Manager could be gathering such data 
+and is being used by [~18 million websites](https://trends.builtwith.com/websitelist/Google-Tag-Manager).
+If such data is indeed gathered in one place,
+then whoever has access to it can use this attack.
+
+
 
 # Test results
 I tested it on my PC:
@@ -52,8 +57,8 @@ Mouse movement close to entry and exit locations:
 - mouse **speed**
 - mouse **acceleration**
 
-Due to time granulation at 100ms speed and acceleration are 
-useless unless they are calculated in a different way.
+Due to [time granulation in Tor at 100ms](https://gitlab.torproject.org/legacy/trac/-/issues/1517) 
+speed and acceleration can't be calculated in a traditional way.
 A way around this is deducing the elapsed time based on 
 registered points. The storage of x-y values seems to be following 
 the speed pattern of my mouse movements. 
@@ -72,7 +77,7 @@ Measuring the entry-exit distance between points in a browser
 and comparing it with other browsers results in the creation of
 unique fingerprints. 
 
-Firstly, a center of all matching points is created 
+Firstly, **a center of all matching points** is created 
 (for each browser). Then the matching users' centers 
 are taken as a common point 
 and the distance of each matching point is compared.
@@ -90,12 +95,11 @@ Meaning we can't take just the last 2 points
 before browser exit to calculate the angle at 
 slow speeds.
 
-Much more accurate (yet computationally 
-more demanding) methods are possible. 
+So, more accurate methods are used. 
 
 ## Increasing accuracy
-To reduce false positives smaller thresholds 
-can be used for all metrics. 
+To reduce false positives smaller, 
+thresholds can be used for all metrics. 
 
 Also, the distance comparison of critical points 
 (that is, suspected exit or entry points) can be calculated 
