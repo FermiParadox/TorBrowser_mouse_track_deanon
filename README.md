@@ -107,7 +107,7 @@ while taking into account speed and acceleration.
 
 # Bug
 It sometimes crashes 
-(when specific mouse-tracks are stored in a browser tab session)
+(when specific mouse-tracks are stored in a browser tab session).   
 Simply restart the program and open new tabs.
 
 I'll fix it in the future.
