@@ -1,10 +1,12 @@
-# Attack summary: Tor Browser plus another browser
+# Attack summary 
+
+### Tor Browser plus another browser
 Users can have their real IP "revealed" to websites opened in Tor Browser by:
 
 - moving the mouse from Tor Browser to another non-Tor browser (and vice versa)
 - switching said browsers with hotkeys 
 
-# Attack summary: CTR-TAB in Tor Browser
+### CTR-TAB in Tor Browser
 Tor Browser has separate exit nodes (and IPs) for each tab. 
 However, switching tabs with hotkeys creates a unique pattern,
 meaning all opened websites (despite being opened on separate tabs) 
