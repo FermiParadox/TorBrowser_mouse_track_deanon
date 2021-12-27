@@ -16,7 +16,7 @@ can be linked to the same user.
 
 Many websites *already share data* for anti-fraud purposes.
 
-Also, Google Tag Manager could be gathering such data 
+Also, Google Tag Manager or similar services could be gathering such data (haven't confirmed it yet)
 and is being used by [~18 million websites](https://trends.builtwith.com/websitelist/Google-Tag-Manager).
 If such data is indeed gathered in one place,
 then whoever has access to it can use this attack.
