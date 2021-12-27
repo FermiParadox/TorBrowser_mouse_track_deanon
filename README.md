@@ -28,7 +28,7 @@ then whoever has access to it can use this attack.
 # Test results
 I tested it on my PC:
  - The match is **extremely accurate** when using **CTR TAB in Tor** 
-(that is, only one browser). Note that both fingerprints are drawn on top of each other (3rd graph), since they completely identical. 
+(that is, only one browser). Note that both fingerprints are drawn on top of each other (3rd graph), since they are completely identical. 
 
 ![image](https://user-images.githubusercontent.com/10809024/147253839-c1d2413f-2e31-4b3b-bd1b-fe2a75824812.png)
 
