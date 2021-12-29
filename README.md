@@ -12,19 +12,6 @@ However, switching tabs with hotkeys creates a unique pattern,
 meaning all opened websites (despite being opened on separate tabs) 
 can be linked to the same user.
 
-# Preconditions
-1. JavaScript must be enabled on both browsers.
-2. Websites must share mouse-movement data.
-
-Many websites *already share data* for anti-fraud purposes.
-
-Also, Google Tag Manager or similar services could be gathering such data (haven't confirmed it yet)
-and is being used by [~18 million websites](https://trends.builtwith.com/websitelist/Google-Tag-Manager).
-If such data is indeed gathered in one place,
-then whoever has access to it can use this attack.
-
-
-
 # Test results
 I tested it on my PC:
  - The match is **extremely accurate** when using **CTR TAB in Tor** 
@@ -47,6 +34,18 @@ although I doubt there's anything that makes the attack infeasible.
 
 ### Tor has been notified and they will change the documentation
 ["Discourage more running a browser in parallel to Tor Browser"](https://gitlab.torproject.org/tpo/web/support/-/issues/280)
+
+
+# Preconditions
+1. JavaScript must be enabled on both browsers.
+2. Websites must share mouse-movement data.
+
+Many websites *already share data* for anti-fraud purposes.
+
+Also, Google Tag Manager or similar services could be gathering such data (haven't confirmed it yet)
+and is being used by [~18 million websites](https://trends.builtwith.com/websitelist/Google-Tag-Manager).
+If such data is indeed gathered in one place,
+then whoever has access to it can use this attack.
 
 
 # Metrics analysed
