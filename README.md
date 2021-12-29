@@ -14,17 +14,18 @@ can be linked to the same user.
 
 # Test results
 I tested it on my PC:
- - The match is **extremely accurate** when using **CTR TAB in Tor** 
-(that is, only one browser). Note that both fingerprints are drawn on top of each other (3rd graph), since they are completely identical. 
-
-![image](https://user-images.githubusercontent.com/10809024/147253839-c1d2413f-2e31-4b3b-bd1b-fe2a75824812.png)
-
 
  - It is **very accurate in Tor-to-normal**, but less so 
 due to speed. It can be further improved by projecting 
 the mouse track on the border of the browser.
 
 ![image](https://user-images.githubusercontent.com/10809024/147254027-6cbc6f85-d82b-4ed8-9834-6c5912920dfd.png)
+
+ - The match is **extremely accurate** when using **CTR TAB in Tor** 
+(that is, only one browser). Note that both fingerprints are drawn on top of each other (3rd graph), since they are completely identical. 
+
+![image](https://user-images.githubusercontent.com/10809024/147253839-c1d2413f-2e31-4b3b-bd1b-fe2a75824812.png)
+
 
 
 This has to be tested with data from users 
