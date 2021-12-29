@@ -1,16 +1,34 @@
-# Goals
-Check de-anonymization risk of Tor Browser users, through:
+# Attack summary 
 
-- mouse-over from Tor browser to another non-Tor browser (and vice versa)
-- switching browsers with hotkeys 
+### Tor Browser plus another browser
+Users can have their real IP "revealed" to websites opened in Tor Browser by:
+
+- moving the mouse from Tor Browser to another non-Tor browser (and vice versa)
+- switching said browsers with hotkeys 
+
+### CTR-TAB in Tor Browser
+Tor Browser has separate exit nodes (and IPs) for each tab. 
+However, switching tabs with hotkeys creates a unique pattern,
+meaning all opened websites (despite being opened on separate tabs) 
+can be linked to the same user.
+
+# Preconditions
+1. JavaScript must be enabled on both browsers.
+2. Websites must share mouse-movement data.
+
+Many websites *already share data* for anti-fraud purposes.
+
+Also, Google Tag Manager or similar services could be gathering such data (haven't confirmed it yet)
+and is being used by [~18 million websites](https://trends.builtwith.com/websitelist/Google-Tag-Manager).
+If such data is indeed gathered in one place,
+then whoever has access to it can use this attack.
 
 
-There are probably many similar ways the user 
-can be deanonymized. Not all are examined here.
 
-# Results
-I tested it on my PC with Tor and another browser:
- - The match is **extremely accurate** when using **CTR TAB in Tor**.
+# Test results
+I tested it on my PC:
+ - The match is **extremely accurate** when using **CTR TAB in Tor** 
+(that is, only one browser). Note that both fingerprints are drawn on top of each other (3rd graph), since they are completely identical. 
 
 ![image](https://user-images.githubusercontent.com/10809024/147253839-c1d2413f-2e31-4b3b-bd1b-fe2a75824812.png)
 
@@ -41,8 +59,8 @@ Mouse movement close to entry and exit locations:
 - mouse **speed**
 - mouse **acceleration**
 
-Due to time granulation at 100ms speed and acceleration are 
-useless unless they are calculated in a different way.
+Due to [time granulation in Tor at 100ms](https://gitlab.torproject.org/legacy/trac/-/issues/1517) 
+speed and acceleration can't be calculated in a traditional way.
 A way around this is deducing the elapsed time based on 
 registered points. The storage of x-y values seems to be following 
 the speed pattern of my mouse movements. 
@@ -61,7 +79,7 @@ Measuring the entry-exit distance between points in a browser
 and comparing it with other browsers results in the creation of
 unique fingerprints. 
 
-Firstly, a center of all matching points is created 
+Firstly, **a center of all matching points** is created 
 (for each browser). Then the matching users' centers 
 are taken as a common point 
 and the distance of each matching point is compared.
@@ -79,20 +97,19 @@ Meaning we can't take just the last 2 points
 before browser exit to calculate the angle at 
 slow speeds.
 
-Much more accurate (yet computationally 
-more demanding) methods are possible. 
+So, more accurate methods are used. 
 
 ## Increasing accuracy
-To reduce false positives smaller thresholds 
-can be used for all metrics. 
+To reduce false positives smaller, 
+thresholds can be used for all metrics. 
 
 Also, the distance comparison of critical points 
 (that is, suspected exit or entry points) can be calculated 
 while taking into account speed and acceleration.
 
-# Bug
+# Bug - Crashes
 It sometimes crashes 
-(when specific mouse-tracks are stored in a browser tab session)
+(when specific mouse-tracks are stored in a browser tab session).   
 Simply restart the program and open new tabs.
 
 I'll fix it in the future.
