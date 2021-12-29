@@ -119,6 +119,7 @@ I'll fix it in the future.
 This is simply a proof of concept.   
 
 I haven't taken into account all scenarios, e.g.: 
+- user moving one of the browsers
 - user trying to deceive the server by manipulating data
 - interrupted data transfer
 - changing IP during session
