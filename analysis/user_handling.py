@@ -13,6 +13,7 @@ from analysis.itxyek_base import ITXYEKPoint, XYFloatPoint
 from analysis.plotting import TrackPlotter
 
 from analysis.user_base import User
+from config import PAIR_MUST_INCLUDE_TOR
 
 
 class ReAddingSet(set):
@@ -496,7 +497,13 @@ class UserPairHandler:
     @staticmethod
     def _all_user_pairs() -> UserPairsSet:
         matches = UserPairsSet()
-        for comb in Combinations.tor_users_combs(users_iter=all_users):
+
+        if PAIR_MUST_INCLUDE_TOR:
+            combs = Combinations.tor_users_combs(users_iter=all_users)
+        else:
+            combs = Combinations.all_user_combs(users_iter=all_users)
+
+        for comb in combs:
             tor_u1, u2 = comb
             match_creator = UserMatchCreator(user1=tor_u1, user2=u2)
             matches.add(match_creator.user_match())

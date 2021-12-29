@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, Response, make_response
 
 from analysis.user_base import IDGenerator
 from analysis.user_handling import UserCreator, UserHandler, UserPairHandler, all_matches
+from config import PREVENT_SERVER_CRASH
 
 app = Flask(__name__)
 
@@ -39,9 +40,6 @@ def safe_print_metrics():
         print(e)
         return Response(status=400)
     return Response(status=204)
-
-
-PREVENT_SERVER_CRASH = 0
 
 
 @app.route("/store-txy", methods=["POST"])
