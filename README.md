@@ -7,6 +7,8 @@ Users can have their real IP "revealed" to websites opened in Tor Browser by:
 - switching said browsers with hotkeys 
 
 ### CTR-TAB in Tor Browser
+There's another vulnerability involving the use of only Tor Browser.
+
 Tor Browser has separate exit nodes (and IPs) for each tab. 
 However, switching tabs with hotkeys creates a unique pattern,
 meaning all opened websites (despite being opened on separate tabs) 
@@ -33,7 +35,10 @@ that don't know of the attack (double-blind).
 Also, it has to be independently verified by other researchers,
 although I doubt there's anything that makes the attack infeasible. 
 
-### Tor has been notified and they will change the documentation
+### Tor has been notified
+Tor Browser generally doesn't defend against problems caused
+by simultaneous use of other browsers. However, 
+an update to their documentation is planned:    
 ["Discourage more running a browser in parallel to Tor Browser"](https://gitlab.torproject.org/tpo/web/support/-/issues/280)
 
 
@@ -47,7 +52,6 @@ Also, Google Tag Manager or similar services could be gathering such data (haven
 and is being used by [~18 million websites](https://trends.builtwith.com/websitelist/Google-Tag-Manager).
 If such data is indeed gathered in one place,
 then whoever has access to it can use this attack.
-
 
 # Metrics analysed
 The following metrics are compared between users 
