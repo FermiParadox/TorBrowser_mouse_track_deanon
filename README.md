@@ -35,7 +35,7 @@ that don't know of the attack (double-blind).
 Also, it has to be independently verified by other researchers,
 although I doubt there's anything that makes the attack infeasible. 
 
-### Tor has been notified
+### TorProject has been notified
 Tor Browser generally doesn't defend against problems caused
 by simultaneous use of other browsers. However, 
 an update to their documentation is planned:    
@@ -104,7 +104,7 @@ slow speeds.
 So, more accurate methods are used. 
 
 ## Increasing accuracy
-To reduce false positives smaller, 
+To reduce false positives smaller 
 thresholds can be used for all metrics. 
 
 Also, the distance comparison of critical points 
