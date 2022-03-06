@@ -517,12 +517,12 @@ class UserPairHandler:
         return total_valid_points < self.MIN_VALID_POINTS
 
     @staticmethod
-    def _zero_matches(matched_points) -> bool:
+    def _no_matches_found(matched_points) -> bool:
         return not matched_points
 
     def _is_valid_user_pair(self, user_pair: UsersPair) -> bool:
         matched_points = user_pair.entry_to_exit_matches + user_pair.exit_to_entry_matches
-        if self._zero_matches(matched_points):
+        if self._no_matches_found(matched_points):
             return False
 
         valid_points = []
