@@ -119,8 +119,9 @@ class UserHandler:
     def plot_and_show_mouse_movement(self) -> None:
         import matplotlib.pyplot as plt
         ax = plt.subplot(1, 1, 1)
-        TrackPlotter(user=self.user, ax=ax).plot()
-        ax.show()
+        plotter = TrackPlotter(user=self.user, ax=ax)
+        plotter.plot()
+        plt.show()
 
 
 def is_tor_user(user: User) -> bool:
