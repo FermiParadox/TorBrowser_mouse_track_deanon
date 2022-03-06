@@ -1,12 +1,12 @@
 # Attack summary 
 
-### Tor Browser plus another browser
-Users can have their real IP "revealed" to websites opened in Tor Browser by:
+### Attack 1: Tor Browser plus normal browser
+Users can have their Tor Browser activity linked to their non-Tor IP by:
 
 - moving the mouse from Tor Browser to another non-Tor browser (and vice versa)
 - switching said browsers with hotkeys 
 
-### CTR-TAB in Tor Browser
+### Attack 2: only Tor Browser, with multiple tabs opened
 There's another vulnerability involving the use of only Tor Browser.
 
 Tor Browser has separate exit nodes (and IPs) for each tab. 
