@@ -624,5 +624,5 @@ class UserPairHandler:
 
         fig = plt.gcf()
         fig.set_size_inches(20, 15)
-        plt.savefig('tracks_and_fingerprint.png', dpi=100)
+        plt.savefig('results/tracks_and_fingerprint.png', dpi=100)
         plt.show()
