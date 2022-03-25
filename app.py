@@ -61,3 +61,5 @@ if __name__ == "__main__":
 
 # Run in terminal:
 #   gunicorn -w 4 -b 0.0.0.0:65000 app:app
+# Before rerunning it, use:
+#   killall gunicorn
