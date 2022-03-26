@@ -1,13 +1,21 @@
 # Attack summary 
 
 ### Attack 1: Tor Browser plus normal browser
+
 Users can have their Tor Browser activity linked to their non-Tor IP by:
 
 - moving the mouse from Tor Browser to another non-Tor browser (and vice versa)
 - switching said browsers with hotkeys 
 
+
+![tor_deanon1](https://user-images.githubusercontent.com/10809024/160257003-083a432b-9e61-470c-a54e-e562d000985a.gif)
+
+
 ### Attack 2: only Tor Browser, with multiple tabs opened
 There's another vulnerability involving the use of only Tor Browser.
+
+![tor_deanon2](https://user-images.githubusercontent.com/10809024/160257165-07ee4ffe-9d57-4e4e-8558-2131c8573148.gif)
+
 
 Tor Browser has separate exit nodes (and IPs) for each tab. 
 However, switching tabs with hotkeys creates a unique pattern,
@@ -44,7 +52,8 @@ an update to their documentation is planned:
 
 # Preconditions
 1. JavaScript must be enabled on both browsers.
-2. Websites must share mouse-movement data.
+2. Websites must collect mouse-movement data.
+3. Websites must share the data (big tech does)
 
 Many websites *already share data* for anti-fraud purposes.
 
