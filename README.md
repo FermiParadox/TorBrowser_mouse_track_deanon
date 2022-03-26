@@ -2,7 +2,7 @@
 
 ### Attack 1: Tor Browser plus normal browser
 
-![tor_deanon1](https://user-images.githubusercontent.com/10809024/160257003-083a432b-9e61-470c-a54e-e562d000985a.gif)
+![tor-deanon1](https://user-images.githubusercontent.com/10809024/160258389-48e2d156-a7e6-46c8-8bc2-89920f118751.gif)
 
 Users can have their Tor Browser activity linked to their non-Tor IP by:
 
