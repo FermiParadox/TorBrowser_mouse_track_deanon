@@ -2,7 +2,7 @@
 
 ### Attack 1: Tor Browser plus normal browser
 
-![tor-deanon1](https://user-images.githubusercontent.com/10809024/160258389-48e2d156-a7e6-46c8-8bc2-89920f118751.gif)
+![deanon_attack_1](https://user-images.githubusercontent.com/10809024/160258389-48e2d156-a7e6-46c8-8bc2-89920f118751.gif)
 
 Users can have their Tor Browser activity linked to their non-Tor IP by:
 
@@ -20,7 +20,7 @@ However, switching tabs with hotkeys creates a unique pattern,
 meaning all opened websites (despite being opened on separate tabs) 
 can be linked to the same user.
 
-![tor_deanon2](https://user-images.githubusercontent.com/10809024/160257165-07ee4ffe-9d57-4e4e-8558-2131c8573148.gif)
+![deanon_attack_2](https://user-images.githubusercontent.com/10809024/160257165-07ee4ffe-9d57-4e4e-8558-2131c8573148.gif)
 
 
 # Test results
