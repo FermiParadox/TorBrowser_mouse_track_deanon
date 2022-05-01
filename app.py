@@ -14,17 +14,21 @@ async def index():
     return resp
 
 
-def print_metrics():
-    user = UserCreator(req=request).user()
-    user_handler = UserHandler(user=user)
-    user_handler.calc_and_store_metrics()
-    user_handler.insert_user()
+def print_user(user):
     print("=" * 100)
     print(f"t entry {user.entry_times}")
     print(f"t exit {user.exit_times}")
     print(f"entry metrics {user.entry_metrics}")
     print(f"exit metrics {user.exit_metrics}")
     print("=" * 40)
+
+
+def print_and_plot():
+    user = UserCreator(req=request).user()
+    user_handler = UserHandler(user=user)
+    user_handler.calc_and_store_metrics()
+    user_handler.insert_user()
+    print_user(user)
 
     UserPairHandler().insert_valid_user_pairs()
     all_matches.print_user_pairs()
@@ -33,9 +37,9 @@ def print_metrics():
         UserPairHandler().plot_and_save_user_pair(user_pair=user_pair)
 
 
-def safe_print_metrics():
+def safe_print_and_plot():
     try:
-        print_metrics()
+        print_and_plot()
     except Exception as e:
         print(e)
         return Response(status=400)
@@ -45,9 +49,9 @@ def safe_print_metrics():
 @app.route("/store-txy", methods=["POST"])
 async def store_mouse_position():
     if PREVENT_SERVER_CRASH:
-        return safe_print_metrics()
+        return safe_print_and_plot()
 
-    print_metrics()
+    print_and_plot()
     return Response(status=204)
 
 
