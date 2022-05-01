@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, Response, make_response
 
-from analysis.user_base import IDGenerator
+from analysis.user_base import IDGenerator, User
 from analysis.user_handling import UserCreator, UserHandler, UserPairHandler, all_matches
 from config import PREVENT_SERVER_CRASH
 
@@ -14,7 +14,7 @@ async def index():
     return resp
 
 
-def print_user(user):
+def print_user(user: User):
     print("=" * 100)
     print(f"t entry {user.entry_times}")
     print(f"t exit {user.exit_times}")
@@ -28,7 +28,8 @@ def print_and_plot():
     user_handler = UserHandler(user=user)
     user_handler.calc_and_store_metrics()
     user_handler.insert_user()
-    print_user(user)
+
+    print_user(user=user)
 
     UserPairHandler().insert_valid_user_pairs()
     all_matches.print_user_pairs()
