@@ -123,6 +123,14 @@ class UserHandler:
         plotter.plot()
         plt.show()
 
+    def print_user(self) -> None:
+        print("=" * 100)
+        print(f"t entry {self.user.entry_times}")
+        print(f"t exit {self.user.exit_times}")
+        print(f"entry metrics {self.user.entry_metrics}")
+        print(f"exit metrics {self.user.exit_metrics}")
+        print("=" * 40)
+
 
 def is_tor_user(user: User) -> bool:
     """Tor-user times always end in '00'
