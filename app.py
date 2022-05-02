@@ -62,17 +62,17 @@ if __name__ == "__main__":
 Run in terminal:
     gunicorn -w 4 -b 0.0.0.0:65000 app:app
 
-To run it normally with Tor and a normal browser you must
-    a. port-forward port 65000 in your router settings
+To run it normally with Tor and a normal browser you must:
+    a. port-forward port 65000 in your router (or any other port you aren't using)
     b. find your IP
     c. visit <your-IP>:65000
 
-To test it locally using only a normal browser
+To test it locally using only a normal browser:
     a. edit the config file to allow pair matching between non-Tor browsers
     b. Open http://0.0.0.0:65000/ on two windows (not maximized)
     c1. move mouse from one window into the other
     c2. or alt-tab and move it
-    d. matches will be plotted
+    d. .. until matches are plotted.
 
 
 Before re-running it, use:
