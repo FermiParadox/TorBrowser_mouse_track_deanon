@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, Response, make_response
 
-from analysis.user_base import IDGenerator, User
+from analysis.user_base import IDGenerator
 from analysis.user_handling import UserCreator, UserHandler, UserPairHandler, all_matches
 from config import PREVENT_SERVER_CRASH
 
@@ -14,22 +14,12 @@ async def index():
     return resp
 
 
-def print_user(user: User):
-    print("=" * 100)
-    print(f"t entry {user.entry_times}")
-    print(f"t exit {user.exit_times}")
-    print(f"entry metrics {user.entry_metrics}")
-    print(f"exit metrics {user.exit_metrics}")
-    print("=" * 40)
-
-
 def print_and_plot():
     user = UserCreator(req=request).user()
     user_handler = UserHandler(user=user)
     user_handler.calc_and_store_metrics()
     user_handler.insert_user()
-
-    print_user(user=user)
+    user_handler.print_user()
 
     UserPairHandler().insert_valid_user_pairs()
     all_matches.print_user_pairs()
@@ -64,7 +54,29 @@ async def correlated_users():
 if __name__ == "__main__":
     app.run(debug=True)
 
-# Run in terminal:
-#   gunicorn -w 4 -b 0.0.0.0:65000 app:app
-# Before rerunning it, use:
-#   killall gunicorn
+
+""" 
+            HOW TO RUN IT 
+
+
+Run in terminal:
+    gunicorn -w 4 -b 0.0.0.0:65000 app:app
+
+To run it normally with Tor and a normal browser you must
+    a. port-forward port 65000 in your router settings
+    b. find your IP
+    c. visit <your-IP>:65000
+
+To test it locally using only a normal browser
+    a. edit the config file to allow pair matching between non-Tor browsers
+    b. Open http://0.0.0.0:65000/ on two windows (not maximized)
+    c1. move mouse from one window into the other
+    c2. or alt-tab and move it
+    d. matches will be plotted
+
+
+Before re-running it, use:
+    killall gunicorn
+
+
+"""
