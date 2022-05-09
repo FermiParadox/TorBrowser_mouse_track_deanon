@@ -1,5 +1,11 @@
 # Attack summary 
 
+When a Tor user switches tabs 
+(to another Tor tab or to his clearnet browser)
+his sessions can be linked from the mouse entry-exit points. 
+
+This attack has two variants:
+
 ### Attack 1: Tor Browser plus normal browser
 
 ![deanon_attack_1](https://user-images.githubusercontent.com/10809024/160258389-48e2d156-a7e6-46c8-8bc2-89920f118751.gif)
@@ -18,7 +24,7 @@ There's another vulnerability involving the use of only Tor Browser.
 Tor Browser has separate exit nodes (and IPs) for each tab. 
 However, switching tabs with hotkeys creates a unique pattern,
 meaning all opened websites (despite being opened on separate tabs) 
-can be linked to the same user.
+can be attributed to the same user.
 
 ![deanon_attack_2](https://user-images.githubusercontent.com/10809024/160257165-07ee4ffe-9d57-4e4e-8558-2131c8573148.gif)
 
@@ -45,9 +51,7 @@ Also, it has to be independently verified by other researchers,
 although I doubt there's anything that makes the attack infeasible. 
 
 ### TorProject has been notified
-Tor Browser generally doesn't defend against problems caused
-by simultaneous use of other browsers. However, 
-an update to their documentation is planned:    
+An update to their documentation is planned:    
 ["Discourage more running a browser in parallel to Tor Browser"](https://gitlab.torproject.org/tpo/web/support/-/issues/280)
 
 
@@ -56,7 +60,8 @@ an update to their documentation is planned:
 2. Websites must collect mouse-movement data.
 3. Websites must share the data (big tech does)
 
-Many websites *already share data* for anti-fraud purposes.
+Big tech is *already sharing data* for anti-fraud purposes, etc. 
+[GIFTCT](https://gifct.org/about/story/#june-26--2017---formation-of-gifct)
 
 Also, Google Tag Manager or similar services could be gathering such data (haven't confirmed it yet)
 and is being used by [~18 million websites](https://trends.builtwith.com/websitelist/Google-Tag-Manager).
