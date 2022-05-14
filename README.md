@@ -63,8 +63,8 @@ An update to their documentation is planned:
 Big tech is *already sharing data* for anti-fraud purposes, etc. 
 [GIFTCT](https://gifct.org/about/story/#june-26--2017---formation-of-gifct)
 
-Also, Google Tag Manager or similar services could be gathering such data (haven't confirmed it yet)
-and is being used by [~18 million websites](https://trends.builtwith.com/websitelist/Google-Tag-Manager).
+Also, Google Tag Manager (used by [~18 million websites](https://trends.builtwith.com/websitelist/Google-Tag-Manager))
+or similar 3rd parties could be gathering such data (haven't confirmed it yet).
 If such data is indeed gathered in one place,
 then whoever has access to it can use this attack.
 
@@ -74,14 +74,15 @@ when they are within a specified time difference.
 
 Mouse movement close to entry and exit locations: 
 
+- **x, y**, **time**
 - **angle**
-- mouse **speed**
-- mouse **acceleration**
+- **speed**
+- **acceleration**
 
 Due to [time granulation in Tor at 100ms](https://gitlab.torproject.org/legacy/trac/-/issues/1517) 
 speed and acceleration can't be calculated in a traditional way.
 A way around this is deducing the elapsed time based on 
-registered points. The storage of x-y values seems to be following 
+density of registered points. The storage of x-y values seems to be following 
 the speed pattern of my mouse movements. 
 
 However, delays due to other simultaneous 
