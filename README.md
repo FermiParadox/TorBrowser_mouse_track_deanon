@@ -57,11 +57,12 @@ An update to their documentation is planned:
 
 # Preconditions
 1. JavaScript must be enabled on both browsers.
-2. Websites must collect mouse-movement data.
-3. Websites must share the data (big tech does)
+2. Websites must collect mouse x,y,time data.
+3. Websites must share that data with each other.
 
 Big tech is *already sharing data* for anti-fraud purposes, etc. 
 [GIFTCT](https://gifct.org/about/story/#june-26--2017---formation-of-gifct)
+Whether it's x,y,time I don't know.
 
 Also, Google Tag Manager (used by [~18 million websites](https://trends.builtwith.com/websitelist/Google-Tag-Manager))
 or similar 3rd parties could be gathering such data (haven't confirmed it yet).
