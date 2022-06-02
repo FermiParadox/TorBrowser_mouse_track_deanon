@@ -14,29 +14,6 @@ async def index():
     return resp
 
 
-def print_and_plot():
-    user = UserCreator(req=request).user()
-    user_handler = UserHandler(user=user)
-    user_handler.calc_and_store_metrics()
-    user_handler.insert_user()
-    user_handler.print_user()
-
-    UserPairHandler().insert_valid_user_pairs()
-    all_matches.print_user_pairs()
-
-    for user_pair in all_matches:
-        UserPairHandler().plot_and_save_user_pair(user_pair=user_pair)
-
-
-def safe_print_and_plot():
-    try:
-        print_and_plot()
-    except Exception as e:
-        print(e)
-        return Response(status=400)
-    return Response(status=204)
-
-
 @app.route("/store-txy", methods=["POST"])
 async def store_mouse_position():
     if PREVENT_SERVER_CRASH:
@@ -51,9 +28,31 @@ async def correlated_users():
     return Response(status=404)
 
 
+def print_and_plot() -> None:
+    user = UserCreator(req=request).user()
+    user_handler = UserHandler(user=user)
+    user_handler.calc_and_store_metrics()
+    user_handler.insert_user()
+    user_handler.print_user()
+
+    UserPairHandler().insert_valid_user_pairs()
+    all_matches.print_user_pairs()
+
+    for user_pair in all_matches:
+        UserPairHandler().plot_and_save_user_pair(user_pair=user_pair)
+
+
+def safe_print_and_plot() -> Response:
+    try:
+        print_and_plot()
+    except Exception as e:
+        print(e)
+        return Response(status=400)
+    return Response(status=204)
+
+
 if __name__ == "__main__":
     app.run(debug=True)
-
 
 """ 
             HOW TO RUN IT 
