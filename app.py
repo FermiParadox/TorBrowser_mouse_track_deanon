@@ -8,14 +8,14 @@ app = Flask(__name__)
 
 
 @app.route("/", methods=["GET"])
-async def index():
+async def index() -> Response:
     new_user_id = IDGenerator.unique_id()
     resp = make_response(render_template("website.html", userID=new_user_id))
     return resp
 
 
 @app.route("/store-txy", methods=["POST"])
-async def store_mouse_position():
+async def store_mouse_position() -> Response:
     if PREVENT_SERVER_CRASH:
         return safe_print_and_plot()
 
@@ -24,7 +24,7 @@ async def store_mouse_position():
 
 
 @app.route("/users-correlated-to-me", methods=["GET"])
-async def correlated_users():
+async def correlated_users() -> Response:
     return Response(status=404)
 
 
