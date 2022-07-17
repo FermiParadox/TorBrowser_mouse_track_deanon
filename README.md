@@ -46,7 +46,7 @@ the mouse track on the border of the browser.
 
 
 This has to be tested with data from users 
-that don't know of the attack (double-blind).   
+that don't know of the attack (to prevent mouse movement biases).   
 Also, it has to be independently verified by other researchers,
 although I doubt there's anything that makes the attack infeasible. 
 
