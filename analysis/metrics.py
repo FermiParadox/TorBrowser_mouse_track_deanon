@@ -113,7 +113,7 @@ class _MetricsCalculator:
         else:
             return EntryHandler
 
-    def critical_angles(self) -> Iterator[float]:
+    def critical_angles(self) -> list[float]:
         angles = []
         for i in self.crit_indices:
             handler = self.point_handler(crit_index=i, all_itxyek=self.all_itxyek)
@@ -121,7 +121,7 @@ class _MetricsCalculator:
             angles.append(angle)
         return angles
 
-    def critical_speeds(self) -> Iterator[float]:
+    def critical_speeds(self) -> list[float]:
         speeds = []
         for i in self.crit_indices:
             handler = self.point_handler(crit_index=i, all_itxyek=self.all_itxyek)
@@ -129,7 +129,7 @@ class _MetricsCalculator:
             speeds.append(speed)
         return speeds
 
-    def critical_accelerations(self) -> Iterator[float]:
+    def critical_accelerations(self) -> list[float]:
         accelerations = []
         for i in self.crit_indices:
             handler = self.point_handler(crit_index=i, all_itxyek=self.all_itxyek)
