@@ -50,8 +50,8 @@ that don't know of the attack (to prevent mouse movement biases).
 Also, it has to be independently verified by other researchers,
 although I doubt there's anything that makes the attack infeasible. 
 
-### TorProject has been notified
-An update to their documentation is planned:    
+### TorProject had been notified prior to release
+Update to their documentation:    
 ["Discourage more running a browser in parallel to Tor Browser"](https://gitlab.torproject.org/tpo/web/support/-/issues/280)
 
 
@@ -147,7 +147,9 @@ I haven't taken into account all scenarios, e.g.:
 - assignment of existing IP to new user
 - accuracy (false positives and false negatives)
 
+The above could make the attacks a bit harder.   
+But a more sophisticated software would overcome them.
 
 # Investigate later
 - Can single-browser single-tab metrics be used to extract patterns 
-related to a user's UI layout (file shortcuts on desktop, etc.)?
+related to a user's UI layout (location of shortcuts on desktop, etc.)?
