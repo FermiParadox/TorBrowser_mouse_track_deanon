@@ -89,7 +89,7 @@ the speed pattern of my mouse movements.
 However, delays due to other simultaneous 
 browser events perhaps will affect it.
 
-### Tor CTR TAB metrics
+### TorBrowser CTR TAB metrics
 Only the location and the time-frame is used, 
 since probably most users stop moving their mouse 
 before switching tab.
@@ -128,12 +128,71 @@ Also, the distance comparison of critical points
 (that is, suspected exit or entry points) can be calculated 
 while taking into account speed and acceleration.
 
+# How to run it
+- Install dependencies:   
+```pip install -r requirements.txt```
+
+## Try it locally:
+(using only a normal browser):
+
+1. edit the config file to allow pair matching between non-Tor browsers:
+   ```python 
+   PAIR_MUST_INCLUDE_TOR = False
+   ```
+2. run in terminal: 
+   ```bash
+   gunicorn -w 4 -b 0.0.0.0:65000 app:app
+   ```
+3. Open http://0.0.0.0:65000/ on two windows (not maximized)
+4. move mouse from one window into the other
+5. or alt-tab and move it
+6. ... until matches are plotted (automatically)
+
+### TorBrowser plus clearnet browser:
+
+> ⚠️ WARNING ⚠️     
+This exposes your server to the outside-world.  
+**No** guarantees it's suitable for production. 
+
+
+1. port-forward port 65000 in your router (or any other unused port)
+2. find your IP
+3. visit `<your-IP>:65000` through TorBrowser
+4. visit `<your-IP>:65000` through clearnet browser
+5. move mouse from one browser into the other until fingerprints appear
+
+When finished you should undo the forwarding. 
+
+### TorBrowser
+
+> ⚠️ WARNING ⚠️   
+This exposes your server to the outside-world.  
+**No** guarantees it's suitable for production. 
+
+1. port-forward port 65000 in your router (or any other unused port)
+2. find your IP
+3. visit `<your-IP>:65000` through TorBrowser _only_
+4. open `<your-IP>:65000` on a 2nd tab in TorBrowser
+5. press <kbd>CTR TAB</kbd> to switch tabs, and move mouse
+6. repeat until fingerprints appear
+
+When finished you should undo the forwarding. 
+
+
+
 # Bug - Crashes
 It sometimes crashes 
-(when specific mouse-tracks are stored in a browser tab session).   
-Simply restart the program and open new tabs.
+(when specific mouse-tracks are stored in a browser tab session). 
 
-I'll fix it in the future.
+Avoid ultra-fast mouse-speed; I think registering only 2 points in a browser 
+due to fast mouse-speed causes it to permanently crash.
+
+Workaround: 
+1. close the tabs
+2. restart the program 
+3. open _new_ tabs.
+
+
 
 # Software limitations 
 
